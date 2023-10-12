@@ -3,16 +3,21 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "dtable-sdk": "0.2.2",
     "react": "16.14.0",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "16.14.0",
+    "react-icons": "^4.11.0",
     "react-intl-universal": "^2.2.2",
-    "reactstrap": "8.9.0"
+    "reactstrap": "8.9.0",
+    "sass": "^1.69.0",
+    "uninstall": "^0.0.0"
   },
   "scripts": {
     "clean": "rm -rf plugin-zip && mkdir plugin-zip",
-    "start": "node scripts/start.js",
+    "start": "node scripts/start.js ",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "translate": "node scripts/translate.js",
