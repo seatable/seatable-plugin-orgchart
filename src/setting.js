@@ -3,10 +3,10 @@ import intl from 'react-intl-universal';
 
 /** (1/5) initialize config object */
 let config = {
-  APIToken: 'd3f019a6b71490ff8ac497378982942210b8b86f',
+  APIToken: process.env.REACT_APP_API_TOKEN,
   server: 'https://stage.seatable.io',
-  workspaceID: '314',
-  dtableName: 'Org Chart',
+  workspaceID: process.env.REACT_APP_WORKSPACE_ID,
+  dtableName: process.env.REACT_APP_DTABLE_NAME,
   lang: 'zh-cn'
 };
 
