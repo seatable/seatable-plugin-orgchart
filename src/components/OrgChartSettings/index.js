@@ -27,7 +27,7 @@ class OrgChartSettings extends Component {
     } = this.props;
 
     return (
-      <div className={`w-25 p-5 shadow-lg bg-white ${styles.settings}`}>
+      <div className={`p-5 shadow-lg bg-white ${styles.settings}`}>
         <div className="d-flex justify-content-between align-items-center pb-3 border-bottom border-light">
           <h5 className="font-weight-bold">Settings</h5>
           <button
@@ -41,6 +41,7 @@ class OrgChartSettings extends Component {
         <div className="pt-3">
           <div>
             <h6 className="d-inline-block mb-3">Table</h6>
+            {/* toggle table view  */}
             <select
               value={currentTable._id}
               onChange={(e) => onTablechange(e.target.value)}
@@ -56,6 +57,7 @@ class OrgChartSettings extends Component {
 
           <div className="mt-6">
             <h6 className="mb-3">Other fields</h6>
+            {/* hide or show columns (managed with state and not persisted)  */}
             {columns.map((c) => (
               <div
                 key={c.key}

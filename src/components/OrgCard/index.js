@@ -20,6 +20,7 @@ class OrgCard extends Component {
     };
   }
 
+  // logic to toggle collapsed charts 
   toggleChartCollapse = (row_id) => {
     const { collapsedCharts } = this.state;
 
@@ -49,6 +50,7 @@ class OrgCard extends Component {
     const img = shownColumns.find((c) => c.type === 'image');
     const isImage = img && row[img.key];
 
+    // check if sub cards should be collapsed
     const isCollapsed = collapsedCharts.includes(row._id);
 
     return (
@@ -93,10 +95,10 @@ class OrgCard extends Component {
             
           </div>
 
-          {/* check if row has sub employees and render them using recursion */}
+          {/* check if row has sub rows and render them using recursion */}
           {!isCollapsed && sub[0] && (
             <div
-              className={`${styles.sub}`}
+              className={styles.sub}
               style={{
                 display: 'grid',
                 gridTemplateColumns: `repeat(${sub.length}, 1fr)`,
