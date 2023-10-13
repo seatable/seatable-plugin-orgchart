@@ -36,10 +36,12 @@ class Modal extends Component {
     };
   }
 
+  // handle view name change 
   onViewNameChange = (e) => {
     this.setState({ viewName: e.target.value });
   };
 
+  // handle add view functionality 
   onNewViewSubmit = () => {
     const { addNewView, currentTable } = this.props;
     const { viewName } = this.state;
@@ -48,10 +50,12 @@ class Modal extends Component {
     addNewView(currentTable, viewName);
   };
 
+  // toggle new view popup display 
   toggleNewViewPopUp = () => {
     this.setState((prev) => ({ showNewViewPopUp: !prev.showNewViewPopUp }));
   };
 
+  // toggle settings display 
   toggleSettings = () => {
     this.setState((prev) => ({ showSettings: !prev.showSettings }));
   };
@@ -89,24 +93,27 @@ class Modal extends Component {
         <div className={styles.modal_header}>
           {/* logo and plugin name  */}
           <div className='d-flex align-items-center'>
-            <div className='bg-info py-1 px-2 rounded mr-2'><RiOrganizationChart size={16} color='#fff' /></div>
+            <div className={`bg-info py-1 px-2 rounded mr-2 ${styles.modal_header_logo}`}><RiOrganizationChart size={16} color='#fff' /></div>
             <p className={styles.modal_header_name}>Org Chart</p>
           </div>
 
           {/* views  */}
           <div className="d-flex w-50 align-items-center">
-            {allViews?.map((v) => (
-              <button
-                key={v._id}
-                className={
-                  currentView._id === v._id
-                    ? styles.modal_header_viewBtn_active
-                    : styles.modal_header_viewBtn
-                }
-              >
-                {v.name}
-              </button>
-            ))}
+            <div className={styles.modal_header_views}>
+              {allViews?.map((v) => (
+                <button
+                  key={v._id}
+                  className={
+                    currentView._id === v._id
+                      ? styles.modal_header_viewBtn_active
+                      : styles.modal_header_viewBtn
+                  }
+                >
+                  {v.name}
+                </button>
+              ))}
+            </div>
+            {/* add new view button  */}
             <button
               onClick={this.toggleNewViewPopUp}
               className={styles.modal_header_icon_btn}
@@ -116,7 +123,7 @@ class Modal extends Component {
           </div>
 
           {/* settings and close icons  */}
-          <div className="w-25 d-flex align-items-center justify-content-end">
+          <div className={`d-flex align-items-center justify-content-end ${styles.modal_header_settings}`}>
             <button
               className={styles.modal_header_icon_btn}
               onClick={this.toggleSettings}

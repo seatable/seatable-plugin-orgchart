@@ -1,4 +1,4 @@
-// This function is used to fetch all the rows with no parent employee
+// This function is used to fetch all the rows with no parent employee/row
 export const getParentRows = (linkedRows, currentTable) => {
   if (Object.keys(linkedRows)[0]) {
     let sub = currentTable.rows.filter(
