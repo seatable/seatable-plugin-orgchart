@@ -1,5 +1,5 @@
 @import "./abstracts/_media.scss";
-// STYLE FOR MODAL COMPONENT 
+// STYLE FOR MODAL COMPONENT
 
 .modal {
   width: 100%;
@@ -25,13 +25,13 @@
     z-index: 999;
 
     @include mobile {
-        padding: 10px 10px 7px;
+      padding: 10px 10px 7px;
     }
 
     &_logo {
-        @include mobile {
-            transform: scale(.7);
-        }
+      @include mobile {
+        transform: scale(0.7);
+      }
     }
 
     &_name {
@@ -58,7 +58,7 @@
 
       @include mobile {
         width: 40%;
-    }
+      }
     }
 
     &_icon_btn {
@@ -111,7 +111,7 @@
 
       @include mobile {
         font-size: 10px;
-    }
+      }
     }
 
     &_viewBtn_active {
@@ -123,10 +123,10 @@
     }
 
     &_settings {
-        width: 25%;
-        @include mobile {
-            width: 10%;
-        }
+      width: 25%;
+      @include mobile {
+        width: 10%;
+      }
     }
   }
 }
@@ -215,14 +215,14 @@
   border-radius: 5px;
   position: relative;
   padding: 130px 10px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   margin-bottom: 50px;
 
   &_columns {
     max-height: 100px;
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 
     &::-webkit-scrollbar {
       width: 0; /* Remove scrollbar space */
@@ -277,9 +277,7 @@
 
   &_data {
     font-size: 11px;
-    padding: 2px 0px;
     display: inline-block;
     border-radius: 3px;
-    margin-top: 5px;
   }
 }
