@@ -1,0 +1,285 @@
+@import "./abstracts/_media.scss";
+// STYLE FOR MODAL COMPONENT 
+
+.modal {
+  width: 100%;
+  position: fixed;
+  height: 95%;
+  bottom: 0;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.134);
+  background: rgb(250, 250, 250);
+  overflow: scroll;
+
+  &_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px 15px 10px;
+    border-bottom: 1px solid rgba(113, 113, 113, 0.079);
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+
+    @include mobile {
+        padding: 10px 10px 7px;
+    }
+
+    &_logo {
+        @include mobile {
+            transform: scale(.7);
+        }
+    }
+
+    &_name {
+      color: #132043;
+      font-weight: 600;
+      font-size: 15px;
+      white-space: nowrap;
+
+      @include mobile {
+        font-size: 11px;
+        margin-left: -5px;
+      }
+    }
+
+    &_views {
+      display: flex;
+      max-width: 50%;
+      overflow-x: scroll;
+      align-items: center;
+      flex-wrap: nowrap;
+      padding-bottom: 15px;
+      margin-right: 10px;
+      margin-bottom: -15px;
+
+      @include mobile {
+        width: 40%;
+    }
+    }
+
+    &_icon_btn {
+      all: unset;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      border-radius: 3px;
+      outline: none;
+      margin-right: 5px;
+
+      &:hover {
+        background: #13204325;
+      }
+
+      &:focus {
+        display: none;
+      }
+    }
+
+    &_viewBtn,
+    &_viewBtn_active {
+      all: unset;
+      margin-right: 20px;
+      position: relative;
+      font-weight: 600;
+      font-size: 14px;
+      color: #61677a;
+      outline: none;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 0%;
+        height: 2px;
+        background-color: #ff8001;
+        bottom: -15px;
+        left: 0;
+        transition: width 0.3s ease-in-out;
+        border-radius: 3px;
+      }
+
+      &:hover::after {
+        width: 100%;
+      }
+
+      @include mobile {
+        font-size: 10px;
+    }
+    }
+
+    &_viewBtn_active {
+      color: #132043;
+
+      &::after {
+        width: 100%;
+      }
+    }
+
+    &_settings {
+        width: 25%;
+        @include mobile {
+            width: 10%;
+        }
+    }
+  }
+}
+
+.main {
+  padding-top: 50px;
+  align-items: flex-start;
+}
+
+.sub {
+  position: relative;
+  padding-top: 10px;
+  max-width: fit-content;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -50px;
+    height: 50px;
+    width: 2px;
+    background: #9ba4b5;
+  }
+
+  &_cards,
+  &_cards_f,
+  &_cards_l {
+    position: relative;
+    flex: 1;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -10px;
+      height: 10px;
+      width: 2px;
+      background: #9ba4b5;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -10px;
+      transform: translateX(-50%);
+      height: 2px;
+      width: 100%;
+      background: #9ba4b5;
+    }
+  }
+
+  &_cards_f {
+    &::after {
+      left: 50%;
+      transform: translateX(0);
+      width: 50%;
+    }
+  }
+
+  &_cards_l {
+    &::after {
+      left: 0%;
+      width: 50%;
+      transform: translateX(0);
+    }
+  }
+
+  &_cards_one {
+    &::after {
+      display: none;
+    }
+  }
+
+  &_ends {
+    position: relative;
+  }
+}
+
+.Person {
+  width: 150px;
+  border-radius: 5px;
+  position: relative;
+  padding: 130px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 50px;
+
+  &_columns {
+    max-height: 100px;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+      width: 0; /* Remove scrollbar space */
+      background: transparent; /* just make scrollbar invisible */
+    }
+  }
+
+  &_toggle_btn {
+    all: unset;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: grid;
+    place-items: center;
+    opacity: 0.5;
+    transition: opacity 0.3s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:focus {
+      display: none;
+    }
+  }
+
+  figure {
+    width: 100%;
+    height: 120px;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    img {
+      object-fit: cover;
+      object-position: top;
+      width: 100%;
+      height: 100%;
+      border-bottom: 2px solid #eee;
+    }
+  }
+
+  h6 {
+    text-transform: uppercase;
+    color: #9ba4b5;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  &_data {
+    font-size: 11px;
+    padding: 2px 0px;
+    display: inline-block;
+    border-radius: 3px;
+    margin-top: 5px;
+  }
+}

@@ -3,16 +3,16 @@ import intl from 'react-intl-universal';
 
 /** (1/5) initialize config object */
 let config = {
-  APIToken: '65be605361e3fed0bd364a2596b134ed9a337e7f',
-  server: 'http://127.0.0.1:80',
-  workspaceID: '1',
-  dtableName: 'test-1',
+  APIToken: process.env.REACT_APP_API_TOKEN,
+  server: 'https://stage.seatable.io',
+  workspaceID: process.env.REACT_APP_WORKSPACE_ID,
+  dtableName: process.env.REACT_APP_DTABLE_NAME,
   lang: 'zh-cn'
 };
 
 /** (2/5) load local development settings ./setting.local.js (if exist) */
 try {
-  config.local = require('./setting.local.js').default || {};
+  config.local = require('./setting.local.dist.js').default || {};
   config = {...config, ...{loadVerbose: true}, ...config.local};
   config.loadVerbose && console.log('[SeaTable Plugin Development] Configuration merged with "./src/setting.local.js" (this message can be disabled by adding `loadVerbose: false` to the local development settings)');
   delete config.local;
