@@ -1,13 +1,14 @@
-import PropTypes from "prop-types";
-import React, { Component } from "react";
-import styles from "../../styles/Modal.module.scss";
-import DTable from "dtable-sdk";
-import OrgCard from "../OrgCard";
-import "../../assets/css/plugin-layout.css";
-import NewViewPopUp from "../NewViewPopUp";
-import { AiOutlinePlus } from "react-icons/ai";
-import { BiSolidCog } from "react-icons/bi";
-import { CgClose } from "react-icons/cg";
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import styles from '../../styles/Modal.module.scss';
+import OrgCard from '../OrgCard';
+import '../../assets/css/plugin-layout.css';
+import NewViewPopUp from '../NewViewPopUp';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { BiSolidCog } from 'react-icons/bi';
+import { CgClose } from 'react-icons/cg';
+import { RiOrganizationChart  } from 'react-icons/ri';
+import OrgChartSettings from '../OrgChartSettings';
 
 const propTypes = {
   subtables: PropTypes.array,
@@ -18,22 +19,21 @@ const propTypes = {
   currentView: PropTypes.object,
   addNewView: PropTypes.func,
   toggle: PropTypes.func,
+  shownColumns: PropTypes.array,
+  rows: PropTypes.array,
+  columns: PropTypes.array,
+  onTablechange: PropTypes.func,
+  handleShownColumn: PropTypes.func
 };
 
 class Modal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      columns: props.currentTable.columns,
       showNewViewPopUp: false,
-      viewName: "",
-      _rows: props.currentTable.rows.filter(
-        (r) =>
-          props.linkedRows[r._id][Object.keys(props.linkedRows[r._id])[0]]
-            .length === 0
-      ),
+      viewName: '',
+      showSettings: false,
     };
-    this.dtable = new DTable();
   }
 
   onViewNameChange = (e) => {
@@ -52,17 +52,44 @@ class Modal extends Component {
     this.setState((prev) => ({ showNewViewPopUp: !prev.showNewViewPopUp }));
   };
 
+  toggleSettings = () => {
+    this.setState((prev) => ({ showSettings: !prev.showSettings }));
+  };
+
   render() {
-    const { currentTable, allViews, linkedRows, currentView, toggle } =
-      this.props;
-    const { columns, _rows, showNewViewPopUp, viewName } = this.state;
+    const {
+      currentTable,
+      allViews,
+      linkedRows,
+      currentView,
+      toggle,
+      subtables,
+      shownColumns,
+      onTablechange,
+      rows,
+      columns,
+      handleShownColumn
+    } = this.props;
+    const { showNewViewPopUp, viewName, showSettings } = this.state;
 
     return (
       <div className={styles.modal}>
+        {showSettings && (
+          <OrgChartSettings
+            columns={columns}
+            toggleSettings={this.toggleSettings}
+            onTablechange={onTablechange}
+            subtables={subtables}
+            currentTable={currentTable}
+            shownColumns={shownColumns}
+            handleShownColumn={handleShownColumn}
+          />
+        )}
         {/* header  */}
         <div className={styles.modal_header}>
           {/* logo and plugin name  */}
-          <div>
+          <div className='d-flex align-items-center'>
+            <div className='bg-info py-1 px-2 rounded mr-2'><RiOrganizationChart size={16} color='#fff' /></div>
             <p className={styles.modal_header_name}>Org Chart</p>
           </div>
 
@@ -70,9 +97,9 @@ class Modal extends Component {
           <div className="d-flex w-50 align-items-center">
             {allViews?.map((v) => (
               <button
-                key={v.id}
+                key={v._id}
                 className={
-                  currentView.id === v.id
+                  currentView._id === v._id
                     ? styles.modal_header_viewBtn_active
                     : styles.modal_header_viewBtn
                 }
@@ -90,7 +117,10 @@ class Modal extends Component {
 
           {/* settings and close icons  */}
           <div className="w-25 d-flex align-items-center justify-content-end">
-            <button className={styles.modal_header_icon_btn}>
+            <button
+              className={styles.modal_header_icon_btn}
+              onClick={this.toggleSettings}
+            >
               <BiSolidCog size={17} />
             </button>
             <button className={styles.modal_header_icon_btn} onClick={toggle}>
@@ -100,12 +130,16 @@ class Modal extends Component {
         </div>
 
         {/* main body  */}
-        <div className={styles.main}>
-          {_rows.map((row) => (
+        <div className={styles.main}   style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
+        }}>
+          {rows.map((row) => (
             <OrgCard
               row={row}
               key={row._id}
               columns={columns}
+              shownColumns={shownColumns}
               currentTable={currentTable}
               linkedRows={linkedRows}
             />
