@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import React, { Component } from "react";
-import styles from "../../styles/NewViewPopUp.module.scss";
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import styles from '../../styles/NewViewPopUp.module.scss';
 
 const propTypes = {
   viewName: PropTypes.string,
@@ -32,7 +32,7 @@ class NewViewPopUp extends Component {
             <input
               className="w-100 p-2"
               autoFocus
-              type={"text"}
+              type={'text'}
               value={viewName}
               onChange={onViewNameChange}
             />
