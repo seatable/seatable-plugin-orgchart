@@ -1,33 +1,17 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from '../../styles/Modal.module.scss';
-import OrgCard from '../OrgCard';
+import OrgCard from '../OrgCard/index.tsx';
 import '../../assets/css/plugin-layout.css';
-import NewViewPopUp from '../NewViewPopUp';
+import NewViewPopUp from '../NewViewPopUp/index.tsx';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { BiSolidCog } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
 import { RiOrganizationChart  } from 'react-icons/ri';
-import OrgChartSettings from '../OrgChartSettings';
+import OrgChartSettings from '../OrgChartSettings/index.tsx';
+import { IModalProps, IModalState } from '../../utils/Interfaces/Modal.interface';
 
-const propTypes = {
-  subtables: PropTypes.array,
-  togglePlugin: PropTypes.func,
-  linkedRows: PropTypes.object,
-  allViews: PropTypes.array,
-  currentTable: PropTypes.object,
-  currentView: PropTypes.object,
-  addNewView: PropTypes.func,
-  toggle: PropTypes.func,
-  shownColumns: PropTypes.array,
-  rows: PropTypes.array,
-  columns: PropTypes.array,
-  onTablechange: PropTypes.func,
-  handleShownColumn: PropTypes.func
-};
-
-class Modal extends Component {
-  constructor(props) {
+class Modal extends Component<IModalProps, IModalState> {
+  constructor(props: IModalProps) {
     super(props);
     this.state = {
       showNewViewPopUp: false,
@@ -37,8 +21,8 @@ class Modal extends Component {
   }
 
   // handle view name change 
-  onViewNameChange = (e) => {
-    this.setState({ viewName: e.target.value });
+  onViewNameChange = (e:React.FormEvent<HTMLInputElement>) => {
+    this.setState({ viewName: e.currentTarget.value });
   };
 
   // handle add view functionality 
@@ -164,7 +148,5 @@ class Modal extends Component {
     );
   }
 }
-
-Modal.propTypes = propTypes;
 
 export default Modal;

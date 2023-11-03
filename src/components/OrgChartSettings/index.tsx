@@ -1,20 +1,11 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import modal_styles from '../../styles/Modal.module.scss';
 import styles from '../../styles/OrgChartSettings.module.scss';
 import { CgClose } from 'react-icons/cg';
+import { IOrgChartSettingsProps } from '../../utils/Interfaces/OrgChartSettings.interface';
 
-const propTypes = {
-  subtables: PropTypes.array,
-  currentTable: PropTypes.object,
-  toggleSettings: PropTypes.func,
-  columns: PropTypes.array,
-  shownColumns: PropTypes.array,
-  onTablechange: PropTypes.func,
-  handleShownColumn: PropTypes.func
-};
 
-class OrgChartSettings extends Component {
+class OrgChartSettings extends Component<IOrgChartSettingsProps> {
   render() {
     const {
       columns,
@@ -78,7 +69,5 @@ class OrgChartSettings extends Component {
     );
   }
 }
-
-OrgChartSettings.propTypes = propTypes;
 
 export default OrgChartSettings;

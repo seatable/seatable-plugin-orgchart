@@ -1,5 +1,5 @@
 # setting
-/src/setting.js
+/src/setting.ts
 
 # locale
 /src/locale/**/*.js

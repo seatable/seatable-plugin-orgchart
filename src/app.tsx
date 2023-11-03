@@ -1,19 +1,15 @@
+// @ts-nocheck
 import React from 'react';
-import PropTypes from 'prop-types';
 import DTable from 'dtable-sdk';
 // import intl from 'react-intl-universal';
 import './locale/index.js';
-import Modal from './components/Modal/index.js';
-import { getParentRows } from './utils/helpers/tableRows.js';
+import Modal from './components/Modal/index.tsx';
+import { getParentRows } from './utils/helpers/tableRows.ts';
+import { IAppProps, IAppState } from './utils/Interfaces/App.interface.ts';
 
-const propTypes = {
-  isDevelopment: PropTypes.bool,
-  showDialog: PropTypes.bool,
-  row: PropTypes.object, // If the plugin is opened with a button, it will have a row parameter
-};
 
-class App extends React.Component {
-  constructor(props) {
+class App extends React.Component<IAppProps, IAppState> {
+  constructor(props: IAppProps) {
     super(props);
     this.state = {
       isLoading: true,
@@ -110,7 +106,7 @@ class App extends React.Component {
   };
 
   // switch tables 
-  onTablechange = (id) => {
+  onTablechange = (id: string) => {
     const { subtables } = this.state;
     let currentTable = subtables.find((s) => s._id === id);
     let linkedRows = this.dtable.getTableLinkRows(
@@ -135,7 +131,7 @@ class App extends React.Component {
   };
 
   // add new view 
-  addNewView = (table, v_name) => {
+  addNewView = (table: any, v_name: string) => {
     this.dtable.addView(table, v_name);
     let newView = this.dtable.getViewByName(table, v_name);
 
@@ -143,15 +139,15 @@ class App extends React.Component {
   };
 
   // temporary implementation to replicate hiding/showing columns 
- handleShownColumn = (e) => {
+ handleShownColumn = (e:React.FormEvent<HTMLInputElement>) => {
    e.persist();
    const { currentTable } = this.state;
 
-   if(e.target.checked) {
-     let column = currentTable.columns.find(c => c.key === e.target.value);
+   if(e.currentTarget.checked) {
+     let column = currentTable.columns.find(c => c.key === e.currentTarget.value);
      this.setState(prev => ({shownColumns: [...prev.shownColumns, column]}));
    } else {
-     this.setState(prev => ({shownColumns: prev.shownColumns.filter(c => c.key !== e.target.value)}));
+     this.setState(prev => ({shownColumns: prev.shownColumns.filter(c => c.key !== e.currentTarget.value)}));
    }
  }
 
@@ -180,7 +176,6 @@ class App extends React.Component {
          <Modal
            subtables={subtables}
            currentTable={currentTable}
-           togglePlugin={this.onPluginToggle}
            linkedRows={linkedRows}
            allViews={allViews}
            currentView={currentView}
@@ -197,7 +192,5 @@ class App extends React.Component {
    );
  }
 }
-
-App.propTypes = propTypes;
 
 export default App;
