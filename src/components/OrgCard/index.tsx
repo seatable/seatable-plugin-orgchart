@@ -1,19 +1,12 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from '../../styles/Modal.module.scss';
-import { colors } from '../../utils/helpers/colors';
+import { colors } from '../../utils/helpers/colors.ts';
 import { BiSolidUpArrow, BiSolidDownArrow } from 'react-icons/bi';
+import { IOrgCardProps, IOrgCardState } from '../../utils/Interfaces/OrgCard.interface';
 
-const propTypes = {
-  currentTable: PropTypes.object,
-  columns: PropTypes.array,
-  row: PropTypes.object,
-  linkedRows: PropTypes.object,
-  shownColumns: PropTypes.array,
-};
 
-class OrgCard extends Component {
-  constructor(props) {
+class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
+  constructor(props: IOrgCardProps) {
     super(props);
     this.state = {
       collapsedCharts: [],
@@ -21,7 +14,7 @@ class OrgCard extends Component {
   }
 
   // logic to toggle collapsed charts 
-  toggleChartCollapse = (row_id) => {
+  toggleChartCollapse = (row_id: string) => {
     const { collapsedCharts } = this.state;
 
     if (collapsedCharts.includes(row_id)) {
@@ -35,19 +28,19 @@ class OrgCard extends Component {
     }
   };
 
-  renderCard(row) {
+  renderCard(row: any) {
     const { columns, linkedRows, currentTable, shownColumns } = this.props;
     const { collapsedCharts } = this.state;
 
     // getting all the sub employees of this specific row
     const sub = Object.keys(linkedRows)[0]
-      ? currentTable.rows?.filter((r) =>
+      ? currentTable.rows?.filter((r: any) =>
         linkedRows[r._id][Object.keys(linkedRows[r._id])[0]].includes(row._id)
       )
       : [];
 
     // check if row has image column (will display placeholder image if not)
-    const img = shownColumns.find((c) => c.type === 'image');
+    const img = shownColumns.find((c: any) => c.type === 'image');
     const isImage = img && row[img.key];
 
     // check if sub cards should be collapsed
@@ -79,7 +72,7 @@ class OrgCard extends Component {
             {/* render row data  */}
             <div className={styles.Person_columns}>
               {columns.map(
-                (c, i) =>
+                (c: any, i: number) =>
                   c.type === 'image' ? '' :
                     (row[c.key] && (
                       <div
@@ -104,7 +97,7 @@ class OrgCard extends Component {
                 gridTemplateColumns: `repeat(${sub.length}, 1fr)`,
               }}
             >
-              {sub.map((s, i) => (
+              {sub.map((s: any, i: number) => (
                 <div
                   className={`col ${styles.sub_cards} ${
                     sub.length === 1
@@ -133,6 +126,5 @@ class OrgCard extends Component {
   }
 }
 
-OrgCard.propTypes = propTypes;
 
 export default OrgCard;

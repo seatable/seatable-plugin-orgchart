@@ -1,0 +1,18 @@
+export interface IAppProps {
+    isDevelopment: boolean,
+    showDialog: boolean,
+    row: any
+}
+
+export interface IAppState {
+    isLoading: boolean,
+    showDialog: boolean,
+    plugin_settings: {},
+    subtables: any[],
+    linkedRows: any[],
+    allViews: any[],
+    currentView: any,
+    currentTable: any,
+    shownColumns: any[],
+    _rows: any[]
+}

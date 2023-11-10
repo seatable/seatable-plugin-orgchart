@@ -1,18 +1,11 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from '../../styles/NewViewPopUp.module.scss';
+import { INewViewProps } from '../../utils/Interfaces/NewViewPopUp.interface';
 
-const propTypes = {
-  viewName: PropTypes.string,
-  onViewNameChange: PropTypes.func,
-  onNewViewSubmit: PropTypes.func,
-  toggleNewViewPopUp: PropTypes.func,
-};
 
-class NewViewPopUp extends Component {
+class NewViewPopUp extends Component<INewViewProps> {
   render() {
-    const { viewName, onViewNameChange, onNewViewSubmit, toggleNewViewPopUp } =
-      this.props;
+    const { viewName, onViewNameChange, onNewViewSubmit, toggleNewViewPopUp } = this.props;
     return (
       <div className={styles.viewPopUp}>
         <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -59,5 +52,5 @@ class NewViewPopUp extends Component {
   }
 }
 
-NewViewPopUp.propTypes = propTypes;
 export default NewViewPopUp;
+
