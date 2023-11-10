@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './app.tsx';
-import './setting';
+import App from './app.js';
+import './setting.js';
 import './styles/main.scss';
 
 class TaskList {
