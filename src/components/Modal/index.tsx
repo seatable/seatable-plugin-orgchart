@@ -6,9 +6,13 @@ import NewViewPopUp from '../NewViewPopUp/index.tsx';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { BiSolidCog } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
-import { RiOrganizationChart  } from 'react-icons/ri';
+import { RiOrganizationChart } from 'react-icons/ri';
 import OrgChartSettings from '../OrgChartSettings/index.tsx';
-import { IModalProps, IModalState } from '../../utils/Interfaces/Modal.interface';
+import {
+  IModalProps,
+  IModalState,
+} from '../../utils/Interfaces/Modal.interface';
+import ViewItem from '../ViewItem/index.tsx';
 
 class Modal extends Component<IModalProps, IModalState> {
   constructor(props: IModalProps) {
@@ -20,26 +24,26 @@ class Modal extends Component<IModalProps, IModalState> {
     };
   }
 
-  // handle view name change 
-  onViewNameChange = (e:React.FormEvent<HTMLInputElement>) => {
+  // handle view name change
+  onViewNameChange = (e: React.FormEvent<HTMLInputElement>) => {
     this.setState({ viewName: e.currentTarget.value });
   };
 
-  // handle add view functionality 
+  // handle add view functionality
   onNewViewSubmit = () => {
-    const { addNewView, currentTable } = this.props;
+    const { addNewView } = this.props;
     const { viewName } = this.state;
 
     this.toggleNewViewPopUp();
-    addNewView(currentTable, viewName);
+    addNewView(viewName);
   };
 
-  // toggle new view popup display 
+  // toggle new view popup display
   toggleNewViewPopUp = () => {
     this.setState((prev) => ({ showNewViewPopUp: !prev.showNewViewPopUp }));
   };
 
-  // toggle settings display 
+  // toggle settings display
   toggleSettings = () => {
     this.setState((prev) => ({ showSettings: !prev.showSettings }));
   };
@@ -49,14 +53,16 @@ class Modal extends Component<IModalProps, IModalState> {
       currentTable,
       allViews,
       linkedRows,
-      currentView,
       toggle,
       subtables,
       shownColumns,
       onTablechange,
       rows,
       columns,
-      handleShownColumn
+      handleShownColumn,
+      onSelectView,
+      deleteView,
+      currentViewIdx,
     } = this.props;
     const { showNewViewPopUp, viewName, showSettings } = this.state;
 
@@ -76,8 +82,12 @@ class Modal extends Component<IModalProps, IModalState> {
         {/* header  */}
         <div className={styles.modal_header}>
           {/* logo and plugin name  */}
-          <div className='d-flex align-items-center'>
-            <div className={`bg-info py-1 px-2 rounded mr-2 ${styles.modal_header_logo}`}><RiOrganizationChart size={16} color='#fff' /></div>
+          <div className="d-flex align-items-center">
+            <div
+              className={`bg-info py-1 px-2 rounded mr-2 ${styles.modal_header_logo}`}
+            >
+              <RiOrganizationChart size={16} color="#fff" />
+            </div>
             <p className={styles.modal_header_name}>Org Chart</p>
           </div>
 
@@ -85,16 +95,14 @@ class Modal extends Component<IModalProps, IModalState> {
           <div className="d-flex w-50 align-items-center">
             <div className={styles.modal_header_views}>
               {allViews?.map((v) => (
-                <button
+                <ViewItem
                   key={v._id}
-                  className={
-                    currentView._id === v._id
-                      ? styles.modal_header_viewBtn_active
-                      : styles.modal_header_viewBtn
-                  }
-                >
-                  {v.name}
-                </button>
+                  v={v}
+                  onSelectView={onSelectView}
+                  allViews={allViews}
+                  currentViewIdx={currentViewIdx}
+                  deleteView={deleteView}
+                />
               ))}
             </div>
             {/* add new view button  */}
@@ -107,7 +115,9 @@ class Modal extends Component<IModalProps, IModalState> {
           </div>
 
           {/* settings and close icons  */}
-          <div className={`d-flex align-items-center justify-content-end ${styles.modal_header_settings}`}>
+          <div
+            className={`d-flex align-items-center justify-content-end ${styles.modal_header_settings}`}
+          >
             <button
               className={styles.modal_header_icon_btn}
               onClick={this.toggleSettings}
@@ -121,10 +131,13 @@ class Modal extends Component<IModalProps, IModalState> {
         </div>
 
         {/* main body  */}
-        <div className={styles.main}   style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
-        }}>
+        <div
+          className={styles.main}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
+          }}
+        >
           {rows.map((row) => (
             <OrgCard
               row={row}

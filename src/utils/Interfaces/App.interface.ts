@@ -7,12 +7,13 @@ export interface IAppProps {
 export interface IAppState {
     isLoading: boolean,
     showDialog: boolean,
-    plugin_settings: {},
+    plugin_settings: {views: any},
     subtables: any[],
     linkedRows: any[],
     allViews: any[],
     currentView: any,
     currentTable: any,
     shownColumns: any[],
-    _rows: any[]
+    _rows: any[],
+    currentViewIdx: number;    
 }
