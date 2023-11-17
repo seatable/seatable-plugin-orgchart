@@ -49,7 +49,7 @@
     &_views {
       display: flex;
       max-width: 50%;
-      overflow-x: scroll;
+      // overflow-x: scroll;
       align-items: center;
       flex-wrap: nowrap;
       padding-bottom: 15px;
@@ -92,6 +92,7 @@
       outline: none;
       cursor: pointer;
       white-space: nowrap;
+      outline: none !important; 
 
       &::after {
         content: "";
@@ -279,5 +280,26 @@
     font-size: 11px;
     display: inline-block;
     border-radius: 3px;
+  }
+}
+
+
+.view_dropdown {
+  position: absolute;
+  width: 200px;
+  top: 120%;
+  background-color: #fff;
+  border: 1px solid rgba(0,40,100,.12);
+  box-shadow: 0 0 5px #ccc;
+  z-index: 100;
+  
+  li {
+    padding: 10px 20px;
+    font-weight: 400;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #d7d7d7;
+    }
   }
 }

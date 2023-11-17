@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './app.tsx';
+import App from './app.js';
 
 class TaskList {
 
