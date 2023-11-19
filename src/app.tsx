@@ -100,6 +100,7 @@ class App extends React.Component<IAppProps, IAppState> {
     if (!views[currentViewIdx]) {
       currentViewIdx = views.length - 1;
     }
+  
     this.setState({
       isLoading: false,
       currentViewIdx,
@@ -204,6 +205,24 @@ class App extends React.Component<IAppProps, IAppState> {
     this.updateViews(currentViewIdx, newViews, plugin_settings);
   }
 
+  // edit view name
+  editView = (viewName: string) => {
+    let { currentViewIdx, plugin_settings } = this.state;
+    const { allViews } = this.state;
+    let newViews = deepCopy(allViews);
+    let oldView = allViews[currentViewIdx];
+    let _id: string = generatorViewId(allViews) || '';
+    let updatedView= new View({ ...oldView, _id, name: viewName });
+    
+    newViews.splice(currentViewIdx, 1, updatedView);
+    plugin_settings.views = newViews;
+
+    this.updateViews(currentViewIdx, newViews, plugin_settings);
+
+    console.log(newViews)
+  }
+
+  // delete view
   deleteView = () => {
     let { currentViewIdx, plugin_settings } = this.state;
     const { allViews } = this.state;
@@ -231,7 +250,7 @@ class App extends React.Component<IAppProps, IAppState> {
   }
 
   updateViews = (currentViewIdx: number, views: any[], plugin_settings: any, callBack: any = null) => {
-    this.setState({ currentViewIdx, allViews: views, plugin_settings}, () => {
+    this.setState({ currentViewIdx, allViews: views, plugin_settings }, () => {
       this.updatePluginSettings(views);
       callBack && callBack();
     });
@@ -302,6 +321,7 @@ class App extends React.Component<IAppProps, IAppState> {
             onTablechange={this.onTablechange}
             onSelectView={this.onSelectView}
             deleteView={this.deleteView}
+            editView={this.editView}
             rows={_rows}
             columns={columns}
           />

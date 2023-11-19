@@ -5,6 +5,7 @@ subtables: any[],
   currentTable: any,
   currentViewIdx: number,
   addNewView: (v_name: string) => void,
+  editView: (v_name: string) => void,
   toggle: () => void,
   shownColumns: any[],
   rows: any[],
@@ -17,6 +18,7 @@ subtables: any[],
 
 export interface IModalState {
     showNewViewPopUp: boolean,
+    showEditViewPopUp: boolean,
     viewName: string,
     showSettings: boolean,
 }
