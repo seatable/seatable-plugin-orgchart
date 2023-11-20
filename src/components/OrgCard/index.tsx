@@ -3,6 +3,7 @@ import styles from '../../styles/Modal.module.scss';
 import { colors } from '../../utils/helpers/colors.ts';
 import { BiSolidUpArrow, BiSolidDownArrow } from 'react-icons/bi';
 import { IOrgCardProps, IOrgCardState } from '../../utils/Interfaces/OrgCard.interface';
+import pluginContext from '../../plugin-context.ts';
 
 
 class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
@@ -27,6 +28,11 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
       }));
     }
   };
+
+  onRowExpand = () => {
+    let { row, currentTable } = this.props;
+    pluginContext.expandRow(row._id, currentTable);
+  }
 
   renderCard(row: any) {
     const { columns, linkedRows, currentTable, shownColumns } = this.props;
@@ -53,6 +59,7 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
             className={`${styles.Person} shadow-sm`}
             style={{ borderTop: `3px solid ${colors()}` }}
             key={row._id}
+            onClick={this.onRowExpand}
           >
             <button className={`${styles.Person_toggle_btn} bg-info`} onClick={() => this.toggleChartCollapse(row._id)}>
               {isCollapsed ? <BiSolidDownArrow size={8} color="#fff" /> : <BiSolidUpArrow size={8} color="#fff" />}
