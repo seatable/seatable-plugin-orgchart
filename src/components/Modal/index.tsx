@@ -19,6 +19,7 @@ class Modal extends Component<IModalProps, IModalState> {
     super(props);
     this.state = {
       showNewViewPopUp: false,
+      showEditViewPopUp: false,
       viewName: '',
       showSettings: false,
     };
@@ -29,18 +30,35 @@ class Modal extends Component<IModalProps, IModalState> {
     this.setState({ viewName: e.currentTarget.value });
   };
 
-  // handle add view functionality
-  onNewViewSubmit = () => {
-    const { addNewView } = this.props;
+  // handle add/edit view functionality
+  onNewViewSubmit = (e?, type?: "edit") => {
+    const { addNewView, editView } = this.props;
     const { viewName } = this.state;
 
-    this.toggleNewViewPopUp();
-    addNewView(viewName);
+    if (type === 'edit') {
+      editView(viewName);
+      this.setState({ viewName: '', showEditViewPopUp: false });
+    } else {
+      addNewView(viewName);
+      this.setState({ viewName: '', showNewViewPopUp: false });
+    }
   };
 
-  // toggle new view popup display
-  toggleNewViewPopUp = () => {
-    this.setState((prev) => ({ showNewViewPopUp: !prev.showNewViewPopUp }));
+  // toggle new/edit view popup display
+  toggleNewViewPopUp = (e?, type?: "edit") => {
+    const { allViews, currentViewIdx } = this.props;
+
+    if (type === 'edit') {
+      const viewName = allViews.find((v, i) => i === currentViewIdx).name;
+      this.setState((prev) => ({
+        showEditViewPopUp: !prev.showEditViewPopUp,
+        viewName,
+      }));
+    } else {
+      this.setState((prev) => ({ showNewViewPopUp: !prev.showNewViewPopUp }));
+    }
+
+
   };
 
   // toggle settings display
@@ -64,7 +82,8 @@ class Modal extends Component<IModalProps, IModalState> {
       deleteView,
       currentViewIdx,
     } = this.props;
-    const { showNewViewPopUp, viewName, showSettings } = this.state;
+    const { showNewViewPopUp, showEditViewPopUp, viewName, showSettings } =
+      this.state;
 
     return (
       <div className={styles.modal}>
@@ -101,6 +120,7 @@ class Modal extends Component<IModalProps, IModalState> {
                   onSelectView={onSelectView}
                   allViews={allViews}
                   currentViewIdx={currentViewIdx}
+                  toggleNewViewPopUp={this.toggleNewViewPopUp}
                   deleteView={deleteView}
                 />
               ))}
@@ -155,6 +175,16 @@ class Modal extends Component<IModalProps, IModalState> {
             onViewNameChange={this.onViewNameChange}
             toggleNewViewPopUp={this.toggleNewViewPopUp}
             onNewViewSubmit={this.onNewViewSubmit}
+          />
+        )}
+
+        {showEditViewPopUp && (
+          <NewViewPopUp
+            viewName={viewName}
+            onViewNameChange={this.onViewNameChange}
+            toggleNewViewPopUp={this.toggleNewViewPopUp}
+            onEditViewSubmit={this.onNewViewSubmit}
+            type="edit"
           />
         )}
       </div>

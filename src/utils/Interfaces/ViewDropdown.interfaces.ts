@@ -1,6 +1,6 @@
 export interface IViewDropdownProps {
   deleteView: () => void;
-  editView: () => void;
+  toggleEditViewPopUp: (e) => void,
 }
 
 export interface IViewDropdownState {

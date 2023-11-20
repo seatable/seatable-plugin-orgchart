@@ -30,6 +30,13 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
     this.toggleViewDropdown();
   };
 
+  // edit a view
+  onEditView = (e) => {
+    const { toggleNewViewPopUp } = this.props;
+    toggleNewViewPopUp(e, 'edit');
+    this.toggleViewDropdown();
+  }
+
   render() {
     const { v, allViews, currentViewIdx, onSelectView } = this.props;
     const { showViewDropdown } = this.state;
@@ -48,7 +55,7 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
             <BsFillCaretDownFill color="#A9A9A9" />
           </span>
         )}
-        {showViewDropdown && <ViewDropdown deleteView={this.onDeleteView} />}
+        {showViewDropdown && <ViewDropdown deleteView={this.onDeleteView} toggleEditViewPopUp={this.onEditView} />}
       </button>
     );
   }
