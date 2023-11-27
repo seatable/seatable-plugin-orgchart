@@ -13,7 +13,8 @@ subtables: any[],
   onTablechange: (id: string) => void,
   handleShownColumn: (e:React.FormEvent<HTMLInputElement>) => void,
   onSelectView: (viewId: string) => void,
-  deleteView: () => void;
+  deleteView: () => void;    
+  updateColumnFieldOrder: (shownColumns: any, _columns: any) => void
 }
 
 export interface IModalState {

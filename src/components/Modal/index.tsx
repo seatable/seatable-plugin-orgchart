@@ -81,6 +81,7 @@ class Modal extends Component<IModalProps, IModalState> {
       onSelectView,
       deleteView,
       currentViewIdx,
+      updateColumnFieldOrder
     } = this.props;
     const { showNewViewPopUp, showEditViewPopUp, viewName, showSettings } =
       this.state;
@@ -95,7 +96,9 @@ class Modal extends Component<IModalProps, IModalState> {
             subtables={subtables}
             currentTable={currentTable}
             shownColumns={shownColumns}
+            currentView={allViews[currentViewIdx]}
             handleShownColumn={handleShownColumn}
+            updateColumnFieldOrder={updateColumnFieldOrder}
           />
         )}
         {/* header  */}

@@ -17,7 +17,7 @@ const DEFAULT_PLUGIN_SETTINGS = {
     {
       _id: '0000',
       name: intl.get('Default_View'),
-      settings: { shown_column_names: {} },
+      settings: { shown_column_names: {}, all_columns: [] },
     },
   ],
 };
@@ -119,13 +119,21 @@ class App extends React.Component<IAppProps, IAppState> {
 
   // get required data and set states
   getData = () => {
-    let table = this.dtable.getActiveTable();  
+    let table = this.dtable.getActiveTable();
     const allViews = this.getPluginSettings();
     let subtables = this.dtable.getTables();
     let linkedRows = this.dtable.getTableLinkRows(table.rows, table);
     let shownColumns = table.columns.filter((c: any) =>
       allViews[0].settings.shown_column_names.includes(c.name)
     );
+
+    shownColumns.sort(
+      (a, b) =>
+        allViews[0].settings.shown_column_names.indexOf(a.name) -
+        allViews[0].settings.shown_column_names.indexOf(b.name)
+    );
+
+
     let _rows = getParentRows(linkedRows, table);
 
     this.setState({
@@ -149,6 +157,12 @@ class App extends React.Component<IAppProps, IAppState> {
     let shownColumns = currentTable.columns.filter((c: any) =>
       allViews[0].settings.shown_column_names.includes(c.name)
     );
+    shownColumns.sort(
+      (a, b) =>
+        allViews[0].settings.shown_column_names.indexOf(a.name) -
+        allViews[0].settings.shown_column_names.indexOf(b.name)
+    );
+
     let _rows = getParentRows(linkedRows, currentTable);
 
     this.setState({
@@ -187,7 +201,8 @@ class App extends React.Component<IAppProps, IAppState> {
       {},
       { shown_image_name: imageName },
       { shown_title_name: titleName },
-      { shown_column_names: selectedTable.columns.map((c: any) => c.name) }
+      { shown_column_names: selectedTable.columns.map((c: any) => c.name) },
+      { all_columns: selectedTable.columns }
     );
     return initUpdated;
   };
@@ -244,6 +259,12 @@ class App extends React.Component<IAppProps, IAppState> {
       allViews[viewIdx].settings.shown_column_names.includes(c.name)
     );
 
+    shownColumns.sort(
+      (a, b) =>
+        allViews[viewIdx].settings.shown_column_names.indexOf(a.name) -
+        allViews[viewIdx].settings.shown_column_names.indexOf(b.name)
+    );
+
     if (viewIdx > -1) {
       this.setState({ currentViewIdx: viewIdx, shownColumns });
     }
@@ -263,6 +284,25 @@ class App extends React.Component<IAppProps, IAppState> {
 
   updatePluginSettings = (pluginSettings: any) => {
     this.dtable.updatePluginSettings(PLUGIN_NAME, pluginSettings);
+  };
+
+  updateColumnFieldOrder = (shownColumns: any, _columns: any) => {
+    let { currentViewIdx, plugin_settings } = this.state;
+    const { allViews } = this.state;
+    let newViews = deepCopy(allViews);
+    let setting = {...newViews[currentViewIdx].settings};
+
+    this.setState({ shownColumns });
+
+    newViews[currentViewIdx].settings = {
+      ...setting,
+      shown_column_names: shownColumns.map((c: any) => c.name),
+      all_columns: _columns
+    };
+
+    plugin_settings.views = newViews;
+
+    this.updateViews(currentViewIdx, newViews, plugin_settings);
   };
 
   // implementation to hide/show columns
@@ -298,7 +338,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
     let updatedView = {
       ...oldView,
-      settings: { shown_column_names: newColumnNames },
+      settings: { ...oldView.settings, shown_column_names: newColumnNames },
     };
 
     newViews.splice(currentViewIdx, 1, updatedView);
@@ -347,6 +387,7 @@ class App extends React.Component<IAppProps, IAppState> {
             onSelectView={this.onSelectView}
             deleteView={this.deleteView}
             editView={this.editView}
+            updateColumnFieldOrder={this.updateColumnFieldOrder}
             rows={_rows}
             columns={columns}
           />
