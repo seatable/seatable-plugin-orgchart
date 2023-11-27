@@ -11,6 +11,7 @@ import { getParentRows } from './utils/helpers/tableRows.ts';
 import deepCopy from 'deep-copy';
 
 import { IAppProps, IAppState } from './utils/Interfaces/App.interface.ts';
+import pluginContext from './plugin-context.ts';
 
 const DEFAULT_PLUGIN_SETTINGS = {
   views: [
@@ -252,6 +253,7 @@ class App extends React.Component<IAppProps, IAppState> {
     this.updateViews(currentViewIdx, newViews, plugin_settings);
   };
 
+  // Change view
   onSelectView = (viewId: string) => {
     const { allViews, currentTable } = this.state;
     let viewIdx = allViews.findIndex((view) => view._id === viewId);
@@ -270,6 +272,7 @@ class App extends React.Component<IAppProps, IAppState> {
     }
   };
 
+  // Update views data
   updateViews = (
     currentViewIdx: number,
     views: any[],
@@ -282,10 +285,12 @@ class App extends React.Component<IAppProps, IAppState> {
     });
   };
 
+  // update plugin settings
   updatePluginSettings = (pluginSettings: any) => {
     this.dtable.updatePluginSettings(PLUGIN_NAME, pluginSettings);
   };
 
+  // sort field functionality
   updateColumnFieldOrder = (shownColumns: any, _columns: any) => {
     let { currentViewIdx, plugin_settings } = this.state;
     const { allViews } = this.state;
@@ -352,6 +357,61 @@ class App extends React.Component<IAppProps, IAppState> {
     return selectedViewIds ? JSON.parse(selectedViewIds) : {};
   };
 
+  // functions for add row functionality
+  onAddOrgChartItem = (view, table, rowID: string) => {
+    let rowData = this.getInsertedRowInitData(view, table, rowID);
+    this.onInsertRow(table, view, rowData);
+  }
+
+  getInsertedRowInitData = (view, table, rowID: string) => {
+    return this.dtable.getInsertedRowInitData(view, table, rowID);
+  }
+
+  onInsertRow = (table, view, rowData) => {
+    let columns = this.dtable.getColumns(table);
+    let newRowData = {};
+    for (let key in rowData) {
+      let column = columns.find(column => column.key === key);
+      if (!column) {
+        continue;
+      }
+      switch(column.type) {
+        case 'single-select': {
+          let singleSelectName = '';
+          singleSelectName = column.data.options.find(item => item.id === rowData[key]);
+          newRowData[column.name] = singleSelectName.name;
+          break;
+        }
+        case 'multiple-select': {
+          let multipleSelectNameList = [];
+          rowData[key].forEach(multiItemId => {
+            let multiSelectItemName = column.data.options.find(multiItem => multiItem.id === multiItemId);
+            if (multiSelectItemName) {
+              multipleSelectNameList.push(multiSelectItemName.name);
+            }
+          });
+          newRowData[column.name] = multipleSelectNameList;
+
+          break;
+        }
+        default:
+          newRowData[column.name] = rowData[key];
+      }
+    }
+    let row_data = Object.assign({}, newRowData);
+
+    this.dtable.appendRow(table, row_data, view);
+    let viewRows = this.dtable.getViewRows(view, table);
+    let insertedRow = viewRows[viewRows.length - 1];
+    if (insertedRow) {
+      pluginContext.expandRow(insertedRow, table);
+    }
+  }
+
+  getTablePermissionType = () => {
+    return  this.dtable.getTablePermissionType();
+  }
+
   render() {
     let { isLoading, showDialog } = this.state;
     if (isLoading) {
@@ -388,6 +448,8 @@ class App extends React.Component<IAppProps, IAppState> {
             deleteView={this.deleteView}
             editView={this.editView}
             updateColumnFieldOrder={this.updateColumnFieldOrder}
+            onAddOrgChartItem={this.onAddOrgChartItem}
+            getTablePermissionType={this.getTablePermissionType}
             rows={_rows}
             columns={columns}
           />
