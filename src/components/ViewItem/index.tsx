@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import styles from '../../styles/Modal.module.scss';
 import '../../assets/css/plugin-layout.css';
-
 import { BsFillCaretDownFill } from 'react-icons/bs';
-
 import ViewDropdown from '../ViewDropdown/index.tsx';
 import {
   IViewItemProps,

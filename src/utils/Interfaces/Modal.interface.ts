@@ -14,7 +14,9 @@ subtables: any[],
   handleShownColumn: (e:React.FormEvent<HTMLInputElement>) => void,
   onSelectView: (viewId: string) => void,
   deleteView: () => void;    
-  updateColumnFieldOrder: (shownColumns: any, _columns: any) => void
+  updateColumnFieldOrder: (shownColumns: any, _columns: any) => void,
+  onAddOrgChartItem : (view, table, rowID) => void,
+  getTablePermissionType: () =>  void;
 }
 
 export interface IModalState {

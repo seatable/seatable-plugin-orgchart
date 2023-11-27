@@ -11,6 +11,8 @@
     "@types/react-dom": "^18.2.14",
     "deep-copy": "^1.4.2",
     "dtable-sdk": "0.2.2",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
     "react": "16.14.0",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "16.14.0",

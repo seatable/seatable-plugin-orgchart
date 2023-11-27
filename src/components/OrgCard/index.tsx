@@ -74,15 +74,7 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
               )}
             </button>
             {/* render row image (or placeholder) */}
-            <figure>
-              <img
-                src={
-                  !isImage
-                    ? 'https://cdn-icons-png.flaticon.com/512/6596/6596121.png'
-                    : isImage[0]
-                }
-                alt=""
-              />
+            <figure style={{backgroundImage: `url(${isImage ? isImage[0] : 'https://cdn-icons-png.flaticon.com/512/6596/6596121.png'})`}}>
             </figure>
 
             {/* render row data  */}
