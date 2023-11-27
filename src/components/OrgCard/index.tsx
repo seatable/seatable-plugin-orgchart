@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import styles from '../../styles/Modal.module.scss';
 import { colors } from '../../utils/helpers/colors.ts';
 import { BiSolidUpArrow, BiSolidDownArrow } from 'react-icons/bi';
-import { IOrgCardProps, IOrgCardState } from '../../utils/Interfaces/OrgCard.interface';
-
+import {
+  IOrgCardProps,
+  IOrgCardState,
+} from '../../utils/Interfaces/OrgCard.interface';
+import pluginContext from '../../plugin-context.ts';
 
 class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
   constructor(props: IOrgCardProps) {
@@ -13,7 +16,7 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
     };
   }
 
-  // logic to toggle collapsed charts 
+  // logic to toggle collapsed charts
   toggleChartCollapse = (row_id: string) => {
     const { collapsedCharts } = this.state;
 
@@ -28,8 +31,13 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
     }
   };
 
+  onRowExpand = () => {
+    let { row, currentTable } = this.props;
+    pluginContext.expandRow(row._id, currentTable);
+  };
+
   renderCard(row: any) {
-    const { columns, linkedRows, currentTable, shownColumns } = this.props;
+    const { linkedRows, currentTable, shownColumns } = this.props;
     const { collapsedCharts } = this.state;
 
     // getting all the sub employees of this specific row
@@ -53,9 +61,17 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
             className={`${styles.Person} shadow-sm`}
             style={{ borderTop: `3px solid ${colors()}` }}
             key={row._id}
+            onClick={this.onRowExpand}
           >
-            <button className={`${styles.Person_toggle_btn} bg-info`} onClick={() => this.toggleChartCollapse(row._id)}>
-              {isCollapsed ? <BiSolidDownArrow size={8} color="#fff" /> : <BiSolidUpArrow size={8} color="#fff" />}
+            <button
+              className={`${styles.Person_toggle_btn} bg-info`}
+              onClick={() => this.toggleChartCollapse(row._id)}
+            >
+              {isCollapsed ? (
+                <BiSolidDownArrow size={8} color="#fff" />
+              ) : (
+                <BiSolidUpArrow size={8} color="#fff" />
+              )}
             </button>
             {/* render row image (or placeholder) */}
             <figure>
@@ -71,21 +87,17 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
 
             {/* render row data  */}
             <div className={styles.Person_columns}>
-              {columns.map(
-                (c: any, i: number) =>
-                  c.type === 'image' ? '' :
-                    (row[c.key] && (
-                      <div
-                        key={c.key}
-                        className={`${!shownColumns.includes(c) ? 'd-none' : ''}`}
-                      >
-                        <h6>{c.name}</h6>
-                        <p className={styles.Person_data}>{row[c.key]}</p>
-                      </div>
-                    ))
+              {shownColumns.map((c: any, i: number) =>
+                c.type === 'image'
+                  ? ''
+                  : row[c.key] && (
+                    <div key={c.key}>
+                      <h6>{c.name}</h6>
+                      <p className={styles.Person_data}>{row[c.key]}</p>
+                    </div>
+                  )
               )}
             </div>
-            
           </div>
 
           {/* check if row has sub rows and render them using recursion */}
@@ -125,6 +137,5 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
     return this.renderCard(row);
   }
 }
-
 
 export default OrgCard;
