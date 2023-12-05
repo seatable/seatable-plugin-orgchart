@@ -61,7 +61,7 @@ class OrgCard extends Component<IOrgCardProps, IOrgCardState> {
             className={`${styles.Person} shadow-sm`}
             style={{ borderTop: `3px solid ${colors()}` }}
             key={row._id}
-            onClick={this.onRowExpand}
+            // onClick={this.onRowExpand}
           >
             <button
               className={`${styles.Person_toggle_btn} bg-info`}

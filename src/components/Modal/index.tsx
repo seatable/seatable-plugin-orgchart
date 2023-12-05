@@ -88,8 +88,8 @@ class Modal extends Component<IModalProps, IModalState> {
       }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('l', 'mm', 'a4', true);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 300, 200);
-        pdf.save('chart.pdf');
+        pdf.addImage(imgData, 'JPEG', 0, 0, 230, 200);
+        pdf.save('org_chart.pdf');
       });
     }
   };
@@ -239,7 +239,7 @@ class Modal extends Component<IModalProps, IModalState> {
             </div>
           </div>
         </div>
-        
+
         {this._canCreateRows && (
           <button className={styles.add_row} onClick={this.addOrgChartItem}>
             <FaPlus size={30} color="#fff" />

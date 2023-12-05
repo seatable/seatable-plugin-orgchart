@@ -98,7 +98,8 @@ class OrgChartSettings extends Component<
   };
 
   render() {
-    const { handleShownColumn, currentView } = this.props;
+    const { handleShownColumn, currentView, currentTable } = this.props;
+    const columns = currentView?.settings?.all_columns[0] ? currentView?.settings?.all_columns : currentTable.columns;
 
     return (
       <div className={`p-5 bg-white ${styles.settings}`}>
@@ -125,7 +126,7 @@ class OrgChartSettings extends Component<
             </div>
 
             {/* hide or show columns (managed with state and not persisted)  */}
-            {currentView?.settings?.all_columns?.map((c: any, i: number) => (
+            {columns?.map((c: any, i: number) => (
               <div
                 key={c.key}
                 className="d-flex justify-content-between align-items-center mb-2"
