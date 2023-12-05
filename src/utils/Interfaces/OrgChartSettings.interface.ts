@@ -6,8 +6,10 @@ export interface IOrgChartSettingsProps {
     shownColumns: any[],
     currentView: any;
     onTablechange: (id: string) => void,
-    handleShownColumn: (e: React.FormEvent<HTMLInputElement>) => void,
-    updateColumnFieldOrder: (shownColumns: any, _columns: any) => void
+    handleShownColumn: (val: string, checked: boolean) => void,
+    updateColumnFieldOrder: (shownColumns: any, _columns: any) => void,
+    onSelectView: (viewId: string) => void,
+    allViews: any[]
 }
 
 export interface IOrgChartSettingsState {

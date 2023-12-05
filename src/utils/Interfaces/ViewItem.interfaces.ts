@@ -5,8 +5,13 @@ export interface IViewItemProps {
   toggleNewViewPopUp: (e, type?: 'edit') => void,
   deleteView: () => void,
   v: any;
+  viewName: string,
+  onViewNameChange: (e:React.FormEvent<HTMLInputElement>) => void ,
+  onEditViewSubmit: (e, type?: 'edit') => void,
+  showEditViewPopUp: boolean
 }
 
 export interface IViewItemState {
   showViewDropdown: boolean,
+  isEditing: boolean
 }

@@ -11,7 +11,7 @@ subtables: any[],
   rows: any[],
   columns: any[],
   onTablechange: (id: string) => void,
-  handleShownColumn: (e:React.FormEvent<HTMLInputElement>) => void,
+  handleShownColumn: (val: string, checked: boolean) => void,
   onSelectView: (viewId: string) => void,
   deleteView: () => void;    
   updateColumnFieldOrder: (shownColumns: any, _columns: any) => void,

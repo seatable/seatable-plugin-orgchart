@@ -147,21 +147,20 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   // switch tables
-  onTablechange = (id: string) => {
-    const { subtables } = this.state;
-    let currentTable = subtables.find((s) => s._id === id);
+  onTablechange = (table) => {
+    const { subtables, allViews, currentViewIdx } = this.state;
+    let currentTable = subtables.find((s) => s._id === table.value);
     let linkedRows = this.dtable.getTableLinkRows(
       currentTable.rows,
       currentTable
     );
-    let allViews = this.dtable.getViews(currentTable);
     let shownColumns = currentTable.columns.filter((c: any) =>
-      allViews[0].settings.shown_column_names.includes(c.name)
+      allViews[currentViewIdx].settings.shown_column_names.includes(c.name)
     );
     shownColumns.sort(
       (a, b) =>
-        allViews[0].settings.shown_column_names.indexOf(a.name) -
-        allViews[0].settings.shown_column_names.indexOf(b.name)
+        allViews[currentViewIdx].settings.shown_column_names.indexOf(a.name) -
+        allViews[currentViewIdx].settings.shown_column_names.indexOf(b.name)
     );
 
     let _rows = getParentRows(linkedRows, currentTable);
@@ -169,9 +168,6 @@ class App extends React.Component<IAppProps, IAppState> {
     this.setState({
       linkedRows,
       currentTable,
-      allViews,
-      currentView: allViews[0],
-      shownColumns,
       _rows,
     });
   };
@@ -311,17 +307,16 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   // implementation to hide/show columns
-  handleShownColumn = (e: React.FormEvent<HTMLInputElement>) => {
-    e.persist();
+  handleShownColumn = (val: string, checked: boolean) => {
     let { plugin_settings } = this.state;
     const { currentTable, allViews, currentViewIdx, shownColumns } = this.state;
     let newViews = deepCopy(allViews);
     let oldView = allViews[currentViewIdx];
     let newColumnNames: any[];
 
-    if (e.target.checked) {
+    if (!checked) {
       let column = currentTable.columns.find(
-        (c: any) => c.key === e.target?.value
+        (c: any) => c.key === val
       );
 
       this.setState((prev) => ({
@@ -332,12 +327,12 @@ class App extends React.Component<IAppProps, IAppState> {
     } else {
       this.setState((prev) => ({
         shownColumns: prev.shownColumns.filter(
-          (c) => c.key !== e.target?.value
+          (c) => c.key !== val
         ),
       }));
 
       newColumnNames = shownColumns
-        .filter((c) => c.key !== e.target.value)
+        .filter((c) => c.key !== val)
         .map((c) => c.name);
     }
 
