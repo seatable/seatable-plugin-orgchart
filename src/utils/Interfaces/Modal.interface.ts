@@ -17,6 +17,7 @@ subtables: any[],
   updateColumnFieldOrder: (shownColumns: any, _columns: any) => void,
   onAddOrgChartItem : (view, table, rowID) => void,
   getTablePermissionType: () =>  void;
+  duplicateView: (name: string) => void
 }
 
 export interface IModalState {

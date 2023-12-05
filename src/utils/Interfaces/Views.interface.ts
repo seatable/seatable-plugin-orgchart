@@ -8,6 +8,7 @@ export interface IViewsProps {
     onViewNameChange: (e:React.FormEvent<HTMLInputElement>) => void ,
     onNewViewSubmit?: (e, type?: 'edit') => void,
     onEditViewSubmit: (e, type?: 'edit') => void,
+    duplicateView: (name: string) => void,
     showNewViewPopUp: boolean,
     showEditViewPopUp: boolean
 }

@@ -42,12 +42,28 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
     toggleNewViewPopUp(e, 'edit');
   };
 
+  onDuplicateView = () => {
+    const { duplicateView, v } = this.props;
+
+    duplicateView(`${v.name} copy`);
+    this.toggleViewDropdown();
+  }
+
+  onClickView = (e) => {
+    const { onSelectView, v } = this.props;
+
+    if(e.detail === 2) {
+      this.onEditView(e);
+    } else {
+      onSelectView(v?._id);
+    }
+  }
+
   render() {
     const {
       v,
       allViews,
       currentViewIdx,
-      onSelectView,
       viewName,
       onViewNameChange,
       onEditViewSubmit,
@@ -69,7 +85,7 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
         </div>
 
         <div
-          onClick={() => onSelectView(v?._id)}
+          onClick={this.onClickView}
           style={{ display: isEditing ? 'none' : 'flex' }}
           className={
             allViews[currentViewIdx]?._id === v?._id
@@ -87,6 +103,7 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
             <ViewDropdown
               deleteView={this.onDeleteView}
               toggleEditViewPopUp={this.onEditView}
+              duplicateView={this.onDuplicateView}
             />
           )}
         </div>

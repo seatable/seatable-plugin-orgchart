@@ -130,6 +130,7 @@ class Modal extends Component<IModalProps, IModalState> {
       deleteView,
       currentViewIdx,
       updateColumnFieldOrder,
+      duplicateView
     } = this.props;
     const { showNewViewPopUp, showEditViewPopUp, viewName, showSettings } =
       this.state;
@@ -214,6 +215,7 @@ class Modal extends Component<IModalProps, IModalState> {
             toggleNewViewPopUp={this.toggleNewViewPopUp}
             onEditViewSubmit={this.onNewViewSubmit}
             showEditViewPopUp={showEditViewPopUp}
+            duplicateView={duplicateView}
           />
           <div className={styles.body}>
             <div
@@ -237,25 +239,7 @@ class Modal extends Component<IModalProps, IModalState> {
             </div>
           </div>
         </div>
-
-        {/* {showNewViewPopUp && (
-          <NewViewPopUp
-            viewName={viewName}
-            onViewNameChange={this.onViewNameChange}
-            toggleNewViewPopUp={this.toggleNewViewPopUp}
-            onNewViewSubmit={this.onNewViewSubmit}
-          />
-        )} */}
-
-        {/* {showEditViewPopUp && (
-          <NewViewPopUp
-            viewName={viewName}
-            onViewNameChange={this.onViewNameChange}
-            toggleNewViewPopUp={this.toggleNewViewPopUp}
-            onEditViewSubmit={this.onNewViewSubmit}
-            type="edit"
-          />
-        )} */}
+        
         {this._canCreateRows && (
           <button className={styles.add_row} onClick={this.addOrgChartItem}>
             <FaPlus size={30} color="#fff" />

@@ -8,7 +8,7 @@ import { IViewsProps } from '../../utils/Interfaces/Views.interface.js';
 
 class Views extends Component<IViewsProps> {
   render() {
-    const { allViews, onSelectView, currentViewIdx, deleteView , toggleNewViewPopUp, viewName, showNewViewPopUp, onNewViewSubmit, onViewNameChange, onEditViewSubmit, showEditViewPopUp} = this.props;
+    const { allViews, onSelectView, currentViewIdx, deleteView , toggleNewViewPopUp, viewName, showNewViewPopUp, onNewViewSubmit, onViewNameChange, onEditViewSubmit, duplicateView, showEditViewPopUp} = this.props;
     return (
       <div className={`${styles.views}`}>
         <div className='d-flex flex-column'>
@@ -25,6 +25,8 @@ class Views extends Component<IViewsProps> {
               onViewNameChange={onViewNameChange}
               onEditViewSubmit={onEditViewSubmit}
               showEditViewPopUp={showEditViewPopUp}
+              duplicateView={duplicateView}
+              
             />
           ))}
         </div>

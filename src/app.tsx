@@ -220,6 +220,11 @@ class App extends React.Component<IAppProps, IAppState> {
     this.updateViews(currentViewIdx, newViews, plugin_settings);
   };
 
+  // duplicate a view
+  duplicateView = (name: string) => {
+    this.addView(name);
+  }
+
   // edit view name
   editView = (viewName: string) => {
     let { currentViewIdx, plugin_settings } = this.state;
@@ -445,6 +450,7 @@ class App extends React.Component<IAppProps, IAppState> {
             updateColumnFieldOrder={this.updateColumnFieldOrder}
             onAddOrgChartItem={this.onAddOrgChartItem}
             getTablePermissionType={this.getTablePermissionType}
+            duplicateView={this.duplicateView}
             rows={_rows}
             columns={columns}
           />
