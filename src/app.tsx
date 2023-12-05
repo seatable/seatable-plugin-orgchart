@@ -17,8 +17,8 @@ const DEFAULT_PLUGIN_SETTINGS = {
   views: [
     {
       _id: '0000',
-      name: intl.get('Default_View'),
-      settings: { shown_column_names: {}, all_columns: [] },
+      name: 'Default View',
+      settings: { shown_column_names: [], all_columns: [] },
     },
   ],
 };
@@ -108,9 +108,9 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getPluginSettings = () => {
-    return (
-      this.dtable.getPluginSettings(PLUGIN_NAME) || DEFAULT_PLUGIN_SETTINGS
-    );
+    return this.dtable.getPluginSettings(PLUGIN_NAME)[0]
+      ? this.dtable.getPluginSettings(PLUGIN_NAME)
+      : DEFAULT_PLUGIN_SETTINGS.views;
   };
 
   onPluginToggle = () => {
@@ -125,15 +125,18 @@ class App extends React.Component<IAppProps, IAppState> {
     let subtables = this.dtable.getTables();
     let linkedRows = this.dtable.getTableLinkRows(table.rows, table);
     let shownColumns = table.columns.filter((c: any) =>
-      allViews[0].settings.shown_column_names.includes(c.name)
+      allViews[0]?.settings?.shown_column_names.includes(c.name)
     );
+
+    if (!shownColumns[0]) {
+      shownColumns = table.columns;
+    }
 
     shownColumns.sort(
       (a, b) =>
-        allViews[0].settings.shown_column_names.indexOf(a.name) -
-        allViews[0].settings.shown_column_names.indexOf(b.name)
+        allViews[0]?.settings?.shown_column_names.indexOf(a.name) -
+        allViews[0]?.settings?.shown_column_names.indexOf(b.name)
     );
-
 
     let _rows = getParentRows(linkedRows, table);
 
@@ -147,21 +150,20 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   // switch tables
-  onTablechange = (id: string) => {
-    const { subtables } = this.state;
-    let currentTable = subtables.find((s) => s._id === id);
+  onTablechange = (table) => {
+    const { subtables, allViews, currentViewIdx } = this.state;
+    let currentTable = subtables.find((s) => s._id === table.value);
     let linkedRows = this.dtable.getTableLinkRows(
       currentTable.rows,
       currentTable
     );
-    let allViews = this.dtable.getViews(currentTable);
     let shownColumns = currentTable.columns.filter((c: any) =>
-      allViews[0].settings.shown_column_names.includes(c.name)
+      allViews[currentViewIdx].settings.shown_column_names.includes(c.name)
     );
     shownColumns.sort(
       (a, b) =>
-        allViews[0].settings.shown_column_names.indexOf(a.name) -
-        allViews[0].settings.shown_column_names.indexOf(b.name)
+        allViews[currentViewIdx].settings.shown_column_names.indexOf(a.name) -
+        allViews[currentViewIdx].settings.shown_column_names.indexOf(b.name)
     );
 
     let _rows = getParentRows(linkedRows, currentTable);
@@ -169,9 +171,6 @@ class App extends React.Component<IAppProps, IAppState> {
     this.setState({
       linkedRows,
       currentTable,
-      allViews,
-      currentView: allViews[0],
-      shownColumns,
       _rows,
     });
   };
@@ -222,6 +221,11 @@ class App extends React.Component<IAppProps, IAppState> {
     plugin_settings.views = newViews;
 
     this.updateViews(currentViewIdx, newViews, plugin_settings);
+  };
+
+  // duplicate a view
+  duplicateView = (name: string) => {
+    this.addView(name);
   };
 
   // edit view name
@@ -279,10 +283,24 @@ class App extends React.Component<IAppProps, IAppState> {
     plugin_settings: any,
     callBack: any = null
   ) => {
-    this.setState({ currentViewIdx, allViews: views, plugin_settings }, () => {
-      this.updatePluginSettings(views);
-      callBack && callBack();
-    });
+    const { currentTable } = this.state;
+    let shownColumns = currentTable.columns.filter((c: any) =>
+      views[currentViewIdx]?.settings?.shown_column_names.includes(c.name)
+    );
+
+    shownColumns.sort(
+      (a, b) =>
+        views[currentViewIdx]?.settings?.shown_column_names.indexOf(a.name) -
+        views[currentViewIdx]?.settings?.shown_column_names.indexOf(b.name)
+    );
+
+    this.setState(
+      { currentViewIdx, allViews: views, plugin_settings, shownColumns },
+      () => {
+        this.updatePluginSettings(views);
+        callBack && callBack();
+      }
+    );
   };
 
   // update plugin settings
@@ -295,14 +313,14 @@ class App extends React.Component<IAppProps, IAppState> {
     let { currentViewIdx, plugin_settings } = this.state;
     const { allViews } = this.state;
     let newViews = deepCopy(allViews);
-    let setting = {...newViews[currentViewIdx].settings};
+    let setting = { ...newViews[currentViewIdx].settings };
 
     this.setState({ shownColumns });
 
     newViews[currentViewIdx].settings = {
       ...setting,
       shown_column_names: shownColumns.map((c: any) => c.name),
-      all_columns: _columns
+      all_columns: _columns,
     };
 
     plugin_settings.views = newViews;
@@ -311,18 +329,15 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   // implementation to hide/show columns
-  handleShownColumn = (e: React.FormEvent<HTMLInputElement>) => {
-    e.persist();
+  handleShownColumn = (val: string, checked: boolean) => {
     let { plugin_settings } = this.state;
     const { currentTable, allViews, currentViewIdx, shownColumns } = this.state;
     let newViews = deepCopy(allViews);
     let oldView = allViews[currentViewIdx];
     let newColumnNames: any[];
 
-    if (e.target.checked) {
-      let column = currentTable.columns.find(
-        (c: any) => c.key === e.target?.value
-      );
+    if (!checked) {
+      let column = currentTable.columns.find((c: any) => c.key === val);
 
       this.setState((prev) => ({
         shownColumns: [...prev.shownColumns, column],
@@ -331,13 +346,11 @@ class App extends React.Component<IAppProps, IAppState> {
       newColumnNames = [...shownColumns, column].map((c) => c.name);
     } else {
       this.setState((prev) => ({
-        shownColumns: prev.shownColumns.filter(
-          (c) => c.key !== e.target?.value
-        ),
+        shownColumns: prev.shownColumns.filter((c) => c.key !== val),
       }));
 
       newColumnNames = shownColumns
-        .filter((c) => c.key !== e.target.value)
+        .filter((c) => c.key !== val)
         .map((c) => c.name);
     }
 
@@ -361,31 +374,35 @@ class App extends React.Component<IAppProps, IAppState> {
   onAddOrgChartItem = (view, table, rowID: string) => {
     let rowData = this.getInsertedRowInitData(view, table, rowID);
     this.onInsertRow(table, view, rowData);
-  }
+  };
 
   getInsertedRowInitData = (view, table, rowID: string) => {
     return this.dtable.getInsertedRowInitData(view, table, rowID);
-  }
+  };
 
   onInsertRow = (table, view, rowData) => {
     let columns = this.dtable.getColumns(table);
     let newRowData = {};
     for (let key in rowData) {
-      let column = columns.find(column => column.key === key);
+      let column = columns.find((column) => column.key === key);
       if (!column) {
         continue;
       }
-      switch(column.type) {
+      switch (column.type) {
         case 'single-select': {
           let singleSelectName = '';
-          singleSelectName = column.data.options.find(item => item.id === rowData[key]);
+          singleSelectName = column.data.options.find(
+            (item) => item.id === rowData[key]
+          );
           newRowData[column.name] = singleSelectName.name;
           break;
         }
         case 'multiple-select': {
           let multipleSelectNameList = [];
-          rowData[key].forEach(multiItemId => {
-            let multiSelectItemName = column.data.options.find(multiItem => multiItem.id === multiItemId);
+          rowData[key].forEach((multiItemId) => {
+            let multiSelectItemName = column.data.options.find(
+              (multiItem) => multiItem.id === multiItemId
+            );
             if (multiSelectItemName) {
               multipleSelectNameList.push(multiSelectItemName.name);
             }
@@ -406,11 +423,11 @@ class App extends React.Component<IAppProps, IAppState> {
     if (insertedRow) {
       pluginContext.expandRow(insertedRow, table);
     }
-  }
+  };
 
   getTablePermissionType = () => {
-    return  this.dtable.getTablePermissionType();
-  }
+    return this.dtable.getTablePermissionType();
+  };
 
   render() {
     let { isLoading, showDialog } = this.state;
@@ -428,7 +445,7 @@ class App extends React.Component<IAppProps, IAppState> {
       _rows,
     } = this.state;
 
-    let columns = currentTable.columns;
+    let columns = currentTable?.columns;
 
     return (
       <div>
@@ -450,6 +467,7 @@ class App extends React.Component<IAppProps, IAppState> {
             updateColumnFieldOrder={this.updateColumnFieldOrder}
             onAddOrgChartItem={this.onAddOrgChartItem}
             getTablePermissionType={this.getTablePermissionType}
+            duplicateView={this.duplicateView}
             rows={_rows}
             columns={columns}
           />

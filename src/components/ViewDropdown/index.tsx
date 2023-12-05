@@ -7,10 +7,11 @@ import {
 
 class ViewDropdown extends Component<IViewDropdownProps, IViewDropdownState> {
   render() {
-    const { deleteView, toggleEditViewPopUp } = this.props;
+    const { deleteView, toggleEditViewPopUp, duplicateView } = this.props;
     return (
       <ul className={styles.view_dropdown}>
-        <li onClick={(e) => toggleEditViewPopUp(e, 'edit')}>Rename View</li>
+        <li onClick={toggleEditViewPopUp}>Rename View</li>
+        <li onClick={duplicateView}>Duplicate View</li>
         <li onClick={deleteView}>Delete View</li>
       </ul>
     );

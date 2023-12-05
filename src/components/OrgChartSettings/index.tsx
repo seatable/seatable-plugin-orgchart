@@ -1,22 +1,29 @@
 import React, { Component } from 'react';
-import modal_styles from '../../styles/Modal.module.scss';
 import styles from '../../styles/OrgChartSettings.module.scss';
-import { CgClose } from 'react-icons/cg';
-import { IOrgChartSettingsProps, IOrgChartSettingsState } from '../../utils/Interfaces/OrgChartSettings.interface';
+import DtableSelect from '../Elements/dtable-select';
+import { MdDragIndicator } from 'react-icons/md';
+import {
+  IOrgChartSettingsProps,
+  IOrgChartSettingsState,
+} from '../../utils/Interfaces/OrgChartSettings.interface';
+import FieldToggle from '../Elements/FieldToggle.tsx';
 
-class OrgChartSettings extends Component<IOrgChartSettingsProps, IOrgChartSettingsState> {
+class OrgChartSettings extends Component<
+  IOrgChartSettingsProps,
+  IOrgChartSettingsState
+> {
   constructor(props: IOrgChartSettingsProps) {
     super(props);
     this.state = {
       dragItemIndex: null,
       dragOverItemIndex: null,
-      _columns: this.props.columns
+      _columns: this.props.columns,
     };
   }
 
   // drag and drop logic
   handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    this.setState({dragItemIndex: index});
+    this.setState({ dragItemIndex: index });
   };
 
   handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -24,75 +31,102 @@ class OrgChartSettings extends Component<IOrgChartSettingsProps, IOrgChartSettin
   };
 
   handleDragEnter = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    this.setState({dragOverItemIndex: index});
+    this.setState({ dragOverItemIndex: index });
   };
 
   handleDragEnd = (e: React.DragEvent<HTMLDivElement>, c_id: string) => {
-    const { columns, shownColumns,  updateColumnFieldOrder } = this.props;
+    const { columns, shownColumns, updateColumnFieldOrder } = this.props;
     const { dragItemIndex, dragOverItemIndex } = this.state;
 
     const _columns = [...columns];
-    if(dragItemIndex !== null && dragOverItemIndex !== null) {
+    if (dragItemIndex !== null && dragOverItemIndex !== null) {
       const dragItem = _columns.splice(dragItemIndex, 1)[0];
       _columns.splice(dragOverItemIndex, 0, dragItem);
       this.setState({ _columns });
       this.setState({ dragItemIndex: null });
       this.setState({ dragOverItemIndex: null });
-  
-      updateColumnFieldOrder(_columns.filter(c => shownColumns.includes(c)), _columns);
+
+      updateColumnFieldOrder(
+        _columns.filter((c) => shownColumns.includes(c)),
+        _columns
+      );
     }
   };
 
   checkIfFieldShouldBeChecked = (c: any) => {
     const { shownColumns } = this.props;
 
-    return shownColumns.map(c => c.key).includes(c.key);
-  }
+    return shownColumns.map((c) => c.key).includes(c.key);
+  };
 
-  render() {
-    const {
-      toggleSettings,
-      subtables,
-      currentTable,
-      onTablechange,
-      handleShownColumn,
-      currentView
-    } = this.props;
-
+  renderTableSelector = () => {
+    let { currentTable, subtables, onTablechange } = this.props;
+    let options = subtables.map((item) => {
+      let value = item._id;
+      let label = item.name;
+      return { value, label };
+    });
+    let selectedOption = options.find(
+      (item) => item.value === currentTable._id
+    );
 
     return (
-      <div className={`p-5 shadow-lg bg-white ${styles.settings}`}>
-        <div className="d-flex justify-content-between align-items-center pb-3 border-bottom border-light">
-          <h5 className="font-weight-bold">Settings</h5>
-          <button
-            className={modal_styles.modal_header_icon_btn}
-            onClick={toggleSettings}
-          >
-            <CgClose size={17} />
-          </button>
-        </div>
+      <DtableSelect
+        value={selectedOption}
+        options={options}
+        onChange={onTablechange}
+      />
+    );
+  };
 
-        <div className="pt-3">
-          <div>
-            <h6 className="d-inline-block mb-3">Table</h6>
-            {/* toggle table view  */}
-            <select
-              value={currentTable._id}
-              onChange={(e) => onTablechange(e.target.value)}
-              className="w-100 p-2"
-            >
-              {subtables.map((sub) => (
-                <option key={sub._id} value={sub._id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
+  renderViewSelector = () => {
+    let { allViews, currentView, onSelectView } = this.props;
+    let options = allViews.map((item) => {
+      let value = item._id;
+      let label = item.name;
+      return { value, label };
+    });
+    let selectedOption = options.find((item) => item.value === currentView._id);
+
+    return (
+      <DtableSelect
+        value={selectedOption}
+        options={options}
+        onChange={(v) => onSelectView(v.value)}
+      />
+    );
+  };
+
+  render() {
+    const { handleShownColumn, currentView, currentTable } = this.props;
+    const columns = currentView?.settings?.all_columns[0] ? currentView?.settings?.all_columns : currentTable.columns;
+
+    return (
+      <div className={`p-5 bg-white ${styles.settings}`}>
+        <div>
+          <div className={styles.settings_dropdowns}>
+            <div>
+              <p className="d-inline-block mb-2">Table</p>
+              {/* toggle table view  */}
+              {this.renderTableSelector()}
+            </div>
+
+            <div>
+              <p className="d-inline-block mb-2 mt-3">View</p>
+              {/* toggle table view  */}
+              {this.renderViewSelector()}
+            </div>
           </div>
 
-          <div className="mt-6">
-            <h6 className="mb-3">Other fields</h6>
+          <div className={`mt-4 ${styles.settings_dropdowns}`}>
+            <div className="mb-3 d-flex justify-content-between align-items-center">
+              {' '}
+              <p>Other fields</p>{' '}
+              <button className={styles.settings_show_all}>Show all</button>
+            </div>
+
             {/* hide or show columns (managed with state and not persisted)  */}
-            {currentView.settings.all_columns?.map((c: any, i: number) => (
+            {columns?.map((c: any, i: number) => (
               <div
                 key={c.key}
                 className="d-flex justify-content-between align-items-center mb-2"
@@ -102,15 +136,33 @@ class OrgChartSettings extends Component<IOrgChartSettingsProps, IOrgChartSettin
                 onDragEnd={(e) => this.handleDragEnd(e, c.key)}
                 onDragOver={this.handleDragOver}
               >
-                <label>{c.name}</label>
-                <input
-                  value={c.key}
-                  defaultChecked={this.checkIfFieldShouldBeChecked(c)}
-                  type={'checkbox'}
-                  onChange={handleShownColumn}
+                <div className="d-flex align-items-center">
+                  {' '}
+                  <MdDragIndicator color="#C2C2C2" size={17} />
+                  <label className="ml-2 mb-0">{c.name}</label>
+                </div>
+
+                <FieldToggle
+                  checked={this.checkIfFieldShouldBeChecked(c)}
+                  onChange={() =>
+                    handleShownColumn(
+                      c.key,
+                      this.checkIfFieldShouldBeChecked(c)
+                    )
+                  }
                 />
               </div>
             ))}
+          </div>
+
+          <div className={'mt-3'}>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <label className="ml-2 mb-0">Show field names</label>
+              <FieldToggle
+                checked={currentView.settings.show_field_names || false}
+                onChange={() => {}}
+              />
+            </div>
           </div>
         </div>
       </div>

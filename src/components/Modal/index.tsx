@@ -4,8 +4,6 @@ import React, { Component } from 'react';
 import styles from '../../styles/Modal.module.scss';
 import OrgCard from '../OrgCard/index.tsx';
 import '../../assets/css/plugin-layout.css';
-import NewViewPopUp from '../NewViewPopUp/index.tsx';
-import { AiOutlinePlus } from 'react-icons/ai';
 import { BiSolidCog } from 'react-icons/bi';
 import { CgClose } from 'react-icons/cg';
 import { RiOrganizationChart } from 'react-icons/ri';
@@ -17,10 +15,10 @@ import {
   IModalProps,
   IModalState,
 } from '../../utils/Interfaces/Modal.interface';
-import ViewItem from '../ViewItem/index.tsx';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { canCreateRows } from '../../utils/utils.ts';
+import Views from '../Views/index.tsx';
 
 class Modal extends Component<IModalProps, IModalState> {
   _canCreateRows: boolean;
@@ -90,8 +88,8 @@ class Modal extends Component<IModalProps, IModalState> {
       }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('l', 'mm', 'a4', true);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 300, 200);
-        pdf.save('chart.pdf');
+        pdf.addImage(imgData, 'JPEG', 0, 0, 230, 200);
+        pdf.save('org_chart.pdf');
       });
     }
   };
@@ -132,6 +130,7 @@ class Modal extends Component<IModalProps, IModalState> {
       deleteView,
       currentViewIdx,
       updateColumnFieldOrder,
+      duplicateView
     } = this.props;
     const { showNewViewPopUp, showEditViewPopUp, viewName, showSettings } =
       this.state;
@@ -150,11 +149,14 @@ class Modal extends Component<IModalProps, IModalState> {
             subtables={subtables}
             currentTable={currentTable}
             shownColumns={shownColumns}
+            allViews={allViews}
             currentView={allViews[currentViewIdx]}
             handleShownColumn={handleShownColumn}
             updateColumnFieldOrder={updateColumnFieldOrder}
+            onSelectView={onSelectView}
           />
         )}
+
         {/* header  */}
         <div className={styles.modal_header}>
           {/* logo and plugin name  */}
@@ -167,30 +169,6 @@ class Modal extends Component<IModalProps, IModalState> {
             <p className={styles.modal_header_name}>Org Chart</p>
           </div>
 
-          {/* views  */}
-          <div className="d-flex w-50 align-items-center">
-            <div className={styles.modal_header_views}>
-              {allViews?.map((v) => (
-                <ViewItem
-                  key={v._id}
-                  v={v}
-                  onSelectView={onSelectView}
-                  allViews={allViews}
-                  currentViewIdx={currentViewIdx}
-                  toggleNewViewPopUp={this.toggleNewViewPopUp}
-                  deleteView={deleteView}
-                />
-              ))}
-            </div>
-            {/* add new view button  */}
-            <button
-              onClick={this.toggleNewViewPopUp}
-              className={styles.modal_header_icon_btn}
-            >
-              <AiOutlinePlus size={17} />
-            </button>
-          </div>
-
           {/* settings and close icons  */}
           <div
             className={`d-flex align-items-center justify-content-end ${styles.modal_header_settings}`}
@@ -199,69 +177,71 @@ class Modal extends Component<IModalProps, IModalState> {
               className={styles.modal_header_icon_btn}
               onClick={this.downloadPdfDocument}
             >
-              <PiDownloadSimpleBold size={17} />
+              <PiDownloadSimpleBold size={17} color="#45474B" />
             </button>
             <button
               className={styles.modal_header_icon_btn}
               onClick={this.printPdfDocument}
             >
-              <IoMdPrint size={17} />
+              <IoMdPrint size={17} color="#45474B" />
             </button>
             <button
-              className={styles.modal_header_icon_btn}
+              className={`${styles.modal_header_icon_btn} ${
+                showSettings ? styles.modal_header_icon_btn_active : ''
+              }`}
               onClick={this.toggleSettings}
             >
-              <BiSolidCog size={17} />
+              <BiSolidCog size={17} color="#45474B" />
+              {showSettings && <p>Settings</p>}
             </button>
             <button className={styles.modal_header_icon_btn} onClick={toggle}>
-              <CgClose size={17} />
+              <CgClose size={17} color="#45474B" />
             </button>
           </div>
         </div>
 
         {/* main body  */}
-        <div
-          className={styles.main}
-          id={'org_chart'}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
-          }}
-        >
-          {rows.map((row) => (
-            <OrgCard
-              row={row}
-              key={row._id}
-              columns={columns}
-              shownColumns={shownColumns}
-              currentTable={currentTable}
-              linkedRows={linkedRows}
-            />
-          ))}
-        </div>
-        {showNewViewPopUp && (
-          <NewViewPopUp
+        <div className="d-flex position-relative" style={{ height: '100%' }}>
+          {/* views  */}
+          <Views
             viewName={viewName}
             onViewNameChange={this.onViewNameChange}
-            toggleNewViewPopUp={this.toggleNewViewPopUp}
             onNewViewSubmit={this.onNewViewSubmit}
-          />
-        )}
-
-        {showEditViewPopUp && (
-          <NewViewPopUp
-            viewName={viewName}
-            onViewNameChange={this.onViewNameChange}
+            showNewViewPopUp={showNewViewPopUp}
+            allViews={allViews}
+            onSelectView={onSelectView}
+            currentViewIdx={currentViewIdx}
+            deleteView={deleteView}
             toggleNewViewPopUp={this.toggleNewViewPopUp}
             onEditViewSubmit={this.onNewViewSubmit}
-            type="edit"
+            showEditViewPopUp={showEditViewPopUp}
+            duplicateView={duplicateView}
           />
-        )}
+          <div className={styles.body}>
+            <div
+              className={styles.main}
+              id={'org_chart'}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
+              }}
+            >
+              {rows.map((row) => (
+                <OrgCard
+                  row={row}
+                  key={row._id}
+                  columns={columns}
+                  shownColumns={shownColumns}
+                  currentTable={currentTable}
+                  linkedRows={linkedRows}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
         {this._canCreateRows && (
-          <button
-            className={styles.add_row}
-            onClick={this.addOrgChartItem}
-          >
+          <button className={styles.add_row} onClick={this.addOrgChartItem}>
             <FaPlus size={30} color="#fff" />
           </button>
         )}
