@@ -18,7 +18,7 @@ const DEFAULT_PLUGIN_SETTINGS = {
     {
       _id: '0000',
       name: intl.get('Default_View'),
-      settings: { shown_column_names: {}, all_columns: [] },
+      settings: { shown_column_names: [], all_columns: [] },
     },
   ],
 };
@@ -125,13 +125,12 @@ class App extends React.Component<IAppProps, IAppState> {
     let subtables = this.dtable.getTables();
     let linkedRows = this.dtable.getTableLinkRows(table.rows, table);
     let shownColumns = table.columns.filter((c: any) =>
-      allViews[0].settings.shown_column_names.includes(c.name)
+      allViews[0]?.settings?.shown_column_names.includes(c.name)
     );
-
     shownColumns.sort(
       (a, b) =>
-        allViews[0].settings.shown_column_names.indexOf(a.name) -
-        allViews[0].settings.shown_column_names.indexOf(b.name)
+        allViews[0]?.settings?.shown_column_names.indexOf(a.name) -
+        allViews[0]?.settings?.shown_column_names.indexOf(b.name)
     );
 
 
@@ -428,7 +427,7 @@ class App extends React.Component<IAppProps, IAppState> {
       _rows,
     } = this.state;
 
-    let columns = currentTable.columns;
+    let columns = currentTable?.columns;
 
     return (
       <div>
