@@ -10,8 +10,10 @@ import App from "./app";
 
 class SeaTablePlugin {
   static execute(props = {}) {
-    let wrapper = document.querySelector("#plugin-wrapper");
-    ReactDOM.render(<App showDialog={true} {...props} />, wrapper);
+    ReactDOM.render(
+      <App showDialog={true} {...props} />,
+      document.querySelector("#plugin-wrapper")
+    );
   }
 }
 
