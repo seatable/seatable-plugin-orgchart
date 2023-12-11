@@ -1,16 +1,16 @@
 {
   "name": "OrgChart",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "display_name": {
-    "de": "",
+    "de": "OrgChart",
     "en": "OrgChart",
-    "fr": "",
+    "fr": "OrgChart",
     "zh-cn": "测试"
   },
   "description": {
-    "de": "德语描述",
-    "en": "英语描述",
-    "fr": "法语描述",
+    "de": "Description...",
+    "en": "Description...",
+    "fr": "Description...",
     "zh-cn": "中文描述"
   }
 }
