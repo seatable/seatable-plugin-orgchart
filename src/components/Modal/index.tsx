@@ -1,24 +1,26 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
 /* eslint-disable react/jsx-no-comment-textnodes */
-import React, { Component } from 'react';
-import styles from '../../styles/Modal.module.scss';
-import OrgCard from '../OrgCard/index.tsx';
-import '../../assets/css/plugin-layout.css';
-import { BiSolidCog } from 'react-icons/bi';
-import { CgClose } from 'react-icons/cg';
-import { RiOrganizationChart } from 'react-icons/ri';
-import { IoMdPrint } from 'react-icons/io';
-import { PiDownloadSimpleBold } from 'react-icons/pi';
-import { FaPlus } from 'react-icons/fa6';
-import OrgChartSettings from '../OrgChartSettings/index.tsx';
+import React, { Component } from "react";
+import styles from "../../styles/Modal.module.scss";
+import OrgCard from "../OrgCard/index.tsx";
+import "../../assets/css/plugin-layout.css";
+import { BiSolidCog } from "react-icons/bi";
+import { CgClose } from "react-icons/cg";
+import { RiOrganizationChart } from "react-icons/ri";
+import { IoMdPrint } from "react-icons/io";
+import { PiDownloadSimpleBold } from "react-icons/pi";
+import { FaPlus } from "react-icons/fa6";
+import OrgChartSettings from "../OrgChartSettings/index.tsx";
 import {
   IModalProps,
   IModalState,
-} from '../../utils/Interfaces/Modal.interface';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import { canCreateRows } from '../../utils/utils.ts';
-import Views from '../Views/index.tsx';
+} from "../../utils/Interfaces/Modal.interface";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { canCreateRows } from "../../utils/utils.ts";
+import Views from "../Views/index.tsx";
+
+import { Excalidraw } from "@excalidraw/excalidraw";
 
 class Modal extends Component<IModalProps, IModalState> {
   _canCreateRows: boolean;
@@ -28,7 +30,7 @@ class Modal extends Component<IModalProps, IModalState> {
     this.state = {
       showNewViewPopUp: false,
       showEditViewPopUp: false,
-      viewName: '',
+      viewName: "",
       showSettings: false,
     };
     this._canCreateRows = canCreateRows(
@@ -47,12 +49,12 @@ class Modal extends Component<IModalProps, IModalState> {
     const { addNewView, editView } = this.props;
     const { viewName } = this.state;
 
-    if (type === 'edit') {
+    if (type === "edit") {
       editView(viewName);
-      this.setState({ viewName: '', showEditViewPopUp: false });
+      this.setState({ viewName: "", showEditViewPopUp: false });
     } else {
       addNewView(viewName);
-      this.setState({ viewName: '', showNewViewPopUp: false });
+      this.setState({ viewName: "", showNewViewPopUp: false });
     }
   };
 
@@ -60,7 +62,7 @@ class Modal extends Component<IModalProps, IModalState> {
   toggleNewViewPopUp = (e?, type?: "edit") => {
     const { allViews, currentViewIdx } = this.props;
 
-    if (type === 'edit') {
+    if (type === "edit") {
       const viewName = allViews.find((v, i) => i === currentViewIdx).name;
       this.setState((prev) => ({
         showEditViewPopUp: !prev.showEditViewPopUp,
@@ -78,7 +80,7 @@ class Modal extends Component<IModalProps, IModalState> {
 
   // handle download functionality
   downloadPdfDocument = () => {
-    const input = document.getElementById('org_chart');
+    const input = document.getElementById("org_chart");
 
     if (input) {
       html2canvas(input, {
@@ -86,17 +88,17 @@ class Modal extends Component<IModalProps, IModalState> {
         allowTaint: false,
         useCORS: true,
       }).then((canvas) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('l', 'mm', 'a4', true);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 230, 200);
-        pdf.save('org_chart.pdf');
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("l", "mm", "a4", true);
+        pdf.addImage(imgData, "JPEG", 0, 0, 230, 200);
+        pdf.save("org_chart.pdf");
       });
     }
   };
 
   // handle print functionality
   printPdfDocument = () => {
-    const input = document.getElementById('org_chart');
+    const input = document.getElementById("org_chart");
 
     if (input) {
       let originalContents = document.body.innerHTML;
@@ -110,7 +112,7 @@ class Modal extends Component<IModalProps, IModalState> {
   addOrgChartItem = () => {
     let { rows, currentTable, allViews, currentViewIdx, onAddOrgChartItem } =
       this.props;
-    let row_id = rows.length > 0 ? rows[rows.length - 1]._id : '';
+    let row_id = rows.length > 0 ? rows[rows.length - 1]._id : "";
     onAddOrgChartItem(allViews[currentViewIdx], currentTable, row_id);
   };
 
@@ -130,16 +132,18 @@ class Modal extends Component<IModalProps, IModalState> {
       deleteView,
       currentViewIdx,
       updateColumnFieldOrder,
-      duplicateView
+      duplicateView,
     } = this.props;
     const { showNewViewPopUp, showEditViewPopUp, viewName, showSettings } =
       this.state;
+
+    //window.dtableSDK.getTables();
 
     return (
       <div className={styles.modal}>
         <iframe
           id="ifmcontentstoprint"
-          style={{ height: '0px', width: '0px', position: 'absolute' }}
+          style={{ height: "0px", width: "0px", position: "absolute" }}
         ></iframe>
         {showSettings && (
           <OrgChartSettings
@@ -156,7 +160,6 @@ class Modal extends Component<IModalProps, IModalState> {
             onSelectView={onSelectView}
           />
         )}
-
         {/* header  */}
         <div className={styles.modal_header}>
           {/* logo and plugin name  */}
@@ -187,7 +190,7 @@ class Modal extends Component<IModalProps, IModalState> {
             </button>
             <button
               className={`${styles.modal_header_icon_btn} ${
-                showSettings ? styles.modal_header_icon_btn_active : ''
+                showSettings ? styles.modal_header_icon_btn_active : ""
               }`}
               onClick={this.toggleSettings}
             >
@@ -199,9 +202,8 @@ class Modal extends Component<IModalProps, IModalState> {
             </button>
           </div>
         </div>
-
         {/* main body  */}
-        <div className="d-flex position-relative" style={{ height: '100%' }}>
+        <div className="d-flex position-relative" style={{ height: "100%" }}>
           {/* views  */}
           <Views
             viewName={viewName}
@@ -217,12 +219,19 @@ class Modal extends Component<IModalProps, IModalState> {
             showEditViewPopUp={showEditViewPopUp}
             duplicateView={duplicateView}
           />
+
+          {
+            <div>
+              <h3>{"Rows from this table+view"}</h3>
+              <pre>{`${JSON.stringify(rows, null, 2)}`}</pre>
+            </div>
+            /* }
           <div className={styles.body}>
             <div
               className={styles.main}
-              id={'org_chart'}
+              id={"org_chart"}
               style={{
-                display: 'grid',
+                display: "grid",
                 gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
               }}
             >
@@ -238,13 +247,14 @@ class Modal extends Component<IModalProps, IModalState> {
               ))}
             </div>
           </div>
+              */
+          }
         </div>
-
-        {this._canCreateRows && (
+        {/*this._canCreateRows && (
           <button className={styles.add_row} onClick={this.addOrgChartItem}>
             <FaPlus size={30} color="#fff" />
           </button>
-        )}
+        )*/}
       </div>
     );
   }

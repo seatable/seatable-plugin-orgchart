@@ -1,23 +1,23 @@
 //@ts-nocheck
-import React from 'react';
-import DTable from 'dtable-sdk';
-import intl from 'react-intl-universal';
-import { generatorViewId } from './utils/utils.ts';
-import { PLUGIN_NAME, SETTING_KEY } from './constants/index.ts';
-import View from './model/view.ts';
-import './locale/index.js';
-import Modal from './components/Modal/index.tsx';
-import { getParentRows } from './utils/helpers/tableRows.ts';
-import deepCopy from 'deep-copy';
+import React from "react";
+import DTable from "dtable-sdk";
+// import intl from "react-intl-universal";
+import { generatorViewId } from "./utils/utils.ts";
+import { PLUGIN_NAME, SETTING_KEY } from "./constants/index.ts";
+import View from "./model/view.ts";
+import "./locale/index.js";
+import Modal from "./components/Modal/index.tsx";
+import { getParentRows } from "./utils/helpers/tableRows.ts";
+import deepCopy from "deep-copy";
 
-import { IAppProps, IAppState } from './utils/Interfaces/App.interface.ts';
-import pluginContext from './plugin-context.ts';
+import { IAppProps, IAppState } from "./utils/Interfaces/App.interface.ts";
+import pluginContext from "./plugin-context.ts";
 
 const DEFAULT_PLUGIN_SETTINGS = {
   views: [
     {
-      _id: '0000',
-      name: 'Default View',
+      _id: "0000",
+      name: "Default View",
       settings: { shown_column_names: [], all_columns: [] },
     },
   ],
@@ -49,10 +49,10 @@ class App extends React.Component<IAppProps, IAppState> {
     this.unsubscribeRemoteDtableChanged();
   }
   unsubscribeLocalDtableChanged() {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
   unsubscribeRemoteDtableChanged() {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 
   async initPluginDTableData() {
@@ -61,7 +61,7 @@ class App extends React.Component<IAppProps, IAppState> {
       // local develop
       await this.dtable.init(window.dtablePluginConfig);
       await this.dtable.syncWithServer();
-      this.dtable.subscribe('dtable-connect', () => {
+      this.dtable.subscribe("dtable-connect", () => {
         this.onDTableConnect();
       });
     } else {
@@ -72,13 +72,13 @@ class App extends React.Component<IAppProps, IAppState> {
     this.getData();
 
     this.unsubscribeLocalDtableChanged = this.dtable.subscribe(
-      'local-dtable-changed',
+      "local-dtable-changed",
       () => {
         this.onDTableChanged();
       }
     );
     this.unsubscribeRemoteDtableChanged = this.dtable.subscribe(
-      'remote-dtable-changed',
+      "remote-dtable-changed",
       () => {
         this.onDTableChanged();
       }
@@ -99,7 +99,6 @@ class App extends React.Component<IAppProps, IAppState> {
     if (!views[currentViewIdx]) {
       currentViewIdx = views.length - 1;
     }
-
     this.setState({
       isLoading: false,
       currentViewIdx,
@@ -108,14 +107,14 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getPluginSettings = () => {
-    return this.dtable.getPluginSettings(PLUGIN_NAME)[0]
+    return this.dtable.getPluginSettings(PLUGIN_NAME)
       ? this.dtable.getPluginSettings(PLUGIN_NAME)
       : DEFAULT_PLUGIN_SETTINGS.views;
   };
 
   onPluginToggle = () => {
     this.setState({ showDialog: false });
-    window.app.onClosePlugin();
+    pluginContext.closePlugin();
   };
 
   // get required data and set states
@@ -190,10 +189,10 @@ class App extends React.Component<IAppProps, IAppState> {
     let tables = this.dtable.getTables();
     let selectedTable = this.getSelectedTable(tables, settings);
     let titleColumn = selectedTable.columns.find(
-      (column: any) => column.key === '0000'
+      (column: any) => column.key === "0000"
     );
     let imageColumn = selectedTable.columns.find(
-      (column: any) => column.type === 'image'
+      (column: any) => column.type === "image"
     );
     let imageName = imageColumn ? imageColumn.name : null;
     let titleName = titleColumn ? titleColumn.name : null;
@@ -211,7 +210,7 @@ class App extends React.Component<IAppProps, IAppState> {
   addView = (viewName: string) => {
     let { allViews, plugin_settings } = this.state;
     let currentViewIdx = allViews.length;
-    let _id: string = generatorViewId(allViews) || '';
+    let _id: string = generatorViewId(allViews) || "";
     let newView = new View({ _id, name: viewName });
     let newViews = deepCopy(allViews);
     newViews.push(newView);
@@ -234,7 +233,7 @@ class App extends React.Component<IAppProps, IAppState> {
     const { allViews } = this.state;
     let newViews = deepCopy(allViews);
     let oldView = allViews[currentViewIdx];
-    let _id: string = generatorViewId(allViews) || '';
+    let _id: string = generatorViewId(allViews) || "";
     let updatedView = new View({ ...oldView, _id, name: viewName });
 
     newViews.splice(currentViewIdx, 1, updatedView);
@@ -389,15 +388,15 @@ class App extends React.Component<IAppProps, IAppState> {
         continue;
       }
       switch (column.type) {
-        case 'single-select': {
-          let singleSelectName = '';
+        case "single-select": {
+          let singleSelectName = "";
           singleSelectName = column.data.options.find(
             (item) => item.id === rowData[key]
           );
           newRowData[column.name] = singleSelectName.name;
           break;
         }
-        case 'multiple-select': {
+        case "multiple-select": {
           let multipleSelectNameList = [];
           rowData[key].forEach((multiItemId) => {
             let multiSelectItemName = column.data.options.find(
@@ -421,7 +420,7 @@ class App extends React.Component<IAppProps, IAppState> {
     let viewRows = this.dtable.getViewRows(view, table);
     let insertedRow = viewRows[viewRows.length - 1];
     if (insertedRow) {
-      pluginContext.expandRow(insertedRow, table);
+      //pluginCom.expandRow(insertedRow, table);
     }
   };
 
@@ -432,7 +431,7 @@ class App extends React.Component<IAppProps, IAppState> {
   render() {
     let { isLoading, showDialog } = this.state;
     if (isLoading) {
-      return '';
+      return "";
     }
 
     const {
