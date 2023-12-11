@@ -1,11 +1,14 @@
 //@ts-nocheck
 import React from "react";
-import DTable from "dtable-sdk";
-// import intl from "react-intl-universal";
+
+// internationalization
+import intl from "react-intl-universal";
+import "./locale";
+
 import { generatorViewId } from "./utils/utils.ts";
 import { PLUGIN_NAME, SETTING_KEY } from "./constants/index.ts";
 import View from "./model/view.ts";
-import "./locale/index.js";
+
 import Modal from "./components/Modal/index.tsx";
 import { getParentRows } from "./utils/helpers/tableRows.ts";
 import deepCopy from "deep-copy";
@@ -33,7 +36,7 @@ class App extends React.Component<IAppProps, IAppState> {
       plugin_settings: { views: [] },
       currentViewIdx: 0,
     };
-    this.dtable = new DTable();
+    //this.dtable = new DTable();
   }
 
   componentDidMount() {
@@ -58,31 +61,36 @@ class App extends React.Component<IAppProps, IAppState> {
   async initPluginDTableData() {
     const { isDevelopment } = this.props;
     if (isDevelopment) {
-      // local develop
-      await this.dtable.init(window.dtablePluginConfig);
-      await this.dtable.syncWithServer();
-      this.dtable.subscribe("dtable-connect", () => {
+      window.dtableSDK.subscribe("dtable-connect", () => {
         this.onDTableConnect();
       });
-    } else {
-      // integrated to dtable app
-      this.dtable.initInBrowser(window.app.dtableStore);
     }
 
+    // local develop
+    //await this.dtable.init(window.dtablePluginConfig);
+    //await this.dtable.syncWithServer();
+    //this.dtable.subscribe("dtable-connect", () => {
+    //  this.onDTableConnect();
+    //});
+    //} else {
+    // integrated to dtable app
+    //this.dtable.initInBrowser(window.app.dtableStore);
+    //}
     this.getData();
 
-    this.unsubscribeLocalDtableChanged = this.dtable.subscribe(
+    this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe(
       "local-dtable-changed",
       () => {
         this.onDTableChanged();
       }
     );
-    this.unsubscribeRemoteDtableChanged = this.dtable.subscribe(
+    this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe(
       "remote-dtable-changed",
       () => {
         this.onDTableChanged();
       }
     );
+    this.resetData();
   }
 
   onDTableConnect = () => {
@@ -107,8 +115,8 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getPluginSettings = () => {
-    return this.dtable.getPluginSettings(PLUGIN_NAME)
-      ? this.dtable.getPluginSettings(PLUGIN_NAME)
+    return window.dtableSDK.getPluginSettings(PLUGIN_NAME)
+      ? window.dtableSDK.getPluginSettings(PLUGIN_NAME)
       : DEFAULT_PLUGIN_SETTINGS.views;
   };
 
@@ -119,10 +127,10 @@ class App extends React.Component<IAppProps, IAppState> {
 
   // get required data and set states
   getData = () => {
-    let table = this.dtable.getActiveTable();
+    let table = window.dtableSDK.getActiveTable();
     const allViews = this.getPluginSettings();
-    let subtables = this.dtable.getTables();
-    let linkedRows = this.dtable.getTableLinkRows(table.rows, table);
+    let subtables = window.dtableSDK.getTables();
+    let linkedRows = window.dtableSDK.getTableLinkRows(table.rows, table);
     let shownColumns = table.columns.filter((c: any) =>
       allViews[0]?.settings?.shown_column_names.includes(c.name)
     );
@@ -152,7 +160,7 @@ class App extends React.Component<IAppProps, IAppState> {
   onTablechange = (table) => {
     const { subtables, allViews, currentViewIdx } = this.state;
     let currentTable = subtables.find((s) => s._id === table.value);
-    let linkedRows = this.dtable.getTableLinkRows(
+    let linkedRows = window.dtableSDK.getTableLinkRows(
       currentTable.rows,
       currentTable
     );
@@ -175,7 +183,7 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getSelectedTable = (tables: any, settings = {}) => {
-    let selectedTable = this.dtable.getTableByName(
+    let selectedTable = window.dtableSDK.getTableByName(
       settings[SETTING_KEY.TABLE_NAME]
     );
     if (!selectedTable) {
@@ -186,7 +194,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
   initOrgChartSetting = (settings = {}) => {
     let initUpdated = {};
-    let tables = this.dtable.getTables();
+    let tables = window.dtableSDK.getTables();
     let selectedTable = this.getSelectedTable(tables, settings);
     let titleColumn = selectedTable.columns.find(
       (column: any) => column.key === "0000"
@@ -304,7 +312,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
   // update plugin settings
   updatePluginSettings = (pluginSettings: any) => {
-    this.dtable.updatePluginSettings(PLUGIN_NAME, pluginSettings);
+    window.dtableSDK.updatePluginSettings(PLUGIN_NAME, pluginSettings);
   };
 
   // sort field functionality
@@ -376,11 +384,11 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getInsertedRowInitData = (view, table, rowID: string) => {
-    return this.dtable.getInsertedRowInitData(view, table, rowID);
+    return window.dtableSDK.getInsertedRowInitData(view, table, rowID);
   };
 
   onInsertRow = (table, view, rowData) => {
-    let columns = this.dtable.getColumns(table);
+    let columns = window.dtableSDK.getColumns(table);
     let newRowData = {};
     for (let key in rowData) {
       let column = columns.find((column) => column.key === key);
@@ -416,16 +424,16 @@ class App extends React.Component<IAppProps, IAppState> {
     }
     let row_data = Object.assign({}, newRowData);
 
-    this.dtable.appendRow(table, row_data, view);
-    let viewRows = this.dtable.getViewRows(view, table);
+    window.dtableSDK.appendRow(table, row_data, view);
+    let viewRows = window.dtableSDK.getViewRows(view, table);
     let insertedRow = viewRows[viewRows.length - 1];
-    if (insertedRow) {
-      //pluginCom.expandRow(insertedRow, table);
-    }
+    //if (insertedRow) {
+    //pluginCom.expandRow(insertedRow, table);
+    //}
   };
 
   getTablePermissionType = () => {
-    return this.dtable.getTablePermissionType();
+    return window.dtableSDK.getTablePermissionType();
   };
 
   render() {

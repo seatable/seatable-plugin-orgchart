@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import styles from '../../styles/OrgChartSettings.module.scss';
-import DtableSelect from '../Elements/dtable-select';
-import { MdDragIndicator } from 'react-icons/md';
+import React, { Component } from "react";
+import styles from "../../styles/OrgChartSettings.module.scss";
+import DtableSelect from "../Elements/dtable-select";
+import { MdDragIndicator } from "react-icons/md";
 import {
   IOrgChartSettingsProps,
   IOrgChartSettingsState,
-} from '../../utils/Interfaces/OrgChartSettings.interface';
-import FieldToggle from '../Elements/FieldToggle.tsx';
+} from "../../utils/Interfaces/OrgChartSettings.interface";
+import FieldToggle from "../Elements/FieldToggle.tsx";
 
 class OrgChartSettings extends Component<
   IOrgChartSettingsProps,
@@ -99,7 +99,9 @@ class OrgChartSettings extends Component<
 
   render() {
     const { handleShownColumn, currentView, currentTable } = this.props;
-    const columns = currentView?.settings?.all_columns[0] ? currentView?.settings?.all_columns : currentTable.columns;
+    const columns = currentView?.settings?.all_columns[0]
+      ? currentView?.settings?.all_columns
+      : currentTable.columns;
 
     return (
       <div className={`p-5 bg-white ${styles.settings}`}>
@@ -120,8 +122,8 @@ class OrgChartSettings extends Component<
 
           <div className={`mt-4 ${styles.settings_dropdowns}`}>
             <div className="mb-3 d-flex justify-content-between align-items-center">
-              {' '}
-              <p>Other fields</p>{' '}
+              {" "}
+              <p>Other fields</p>{" "}
               <button className={styles.settings_show_all}>Show all</button>
             </div>
 
@@ -137,7 +139,7 @@ class OrgChartSettings extends Component<
                 onDragOver={this.handleDragOver}
               >
                 <div className="d-flex align-items-center">
-                  {' '}
+                  {" "}
                   <MdDragIndicator color="#C2C2C2" size={17} />
                   <label className="ml-2 mb-0">{c.name}</label>
                 </div>
@@ -155,7 +157,7 @@ class OrgChartSettings extends Component<
             ))}
           </div>
 
-          <div className={'mt-3'}>
+          <div className={"mt-3"}>
             <div className="d-flex justify-content-between align-items-center mb-2">
               <label className="ml-2 mb-0">Show field names</label>
               <FieldToggle

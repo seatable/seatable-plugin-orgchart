@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React, { Component } from "react";
 import styles from "../../styles/Modal.module.scss";
-import OrgCard from "../OrgCard/index.tsx";
+//import OrgCard from "../OrgCard/index.tsx";
 import "../../assets/css/plugin-layout.css";
 import { BiSolidCog } from "react-icons/bi";
 import { CgClose } from "react-icons/cg";
@@ -20,7 +20,7 @@ import { jsPDF } from "jspdf";
 import { canCreateRows } from "../../utils/utils.ts";
 import Views from "../Views/index.tsx";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+//import { Excalidraw } from "@excalidraw/excalidraw";
 
 class Modal extends Component<IModalProps, IModalState> {
   _canCreateRows: boolean;

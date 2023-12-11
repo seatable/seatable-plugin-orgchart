@@ -2,6 +2,7 @@
  * entrypoint for local plugin development.
  * This has only one task: open the plugin modal in a local development environment.
  * There is no need to change anything on this file.
+ * Since SeaTable 4.3, dtable-sdk is only a dev-requirements. dtable-utils is sufficient for production.
  */
 
 import React from "react";
@@ -42,6 +43,8 @@ class PluginModal {
   }
 }
 
+PluginModal.execute();
+
 document.getElementById("plugin-controller").addEventListener(
   "click",
   function () {
@@ -49,5 +52,3 @@ document.getElementById("plugin-controller").addEventListener(
   },
   false
 );
-
-PluginModal.execute();

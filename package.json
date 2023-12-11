@@ -1,14 +1,12 @@
 {
-  "name": "seatable-plugin-template",
+  "name": "seatable-plugin-orgchart",
+  "description": "Display organizational chart",
   "version": "0.1.1",
   "private": true,
   "dependencies": {
-    "@types/jest": "^29.5.7",
-    "@types/node": "^20.8.10",
     "deep-copy": "^1.4.2",
     "dtable-utils": "4.3.3",
-    "dtable-sdk": "4.3.2",
-    "dtable-ui-component": "^0.3.26",
+    "dtable-ui-component": "^0.3.29",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "react": "17.0.2",
@@ -20,8 +18,7 @@
     "react-select": "^5.8.0",
     "reactstrap": "8.9.0",
     "sass": "^1.69.0",
-    "typescript": "^5.2.2",
-    "uninstall": "^0.0.0"
+    "typescript": "^5.2.2"
   },
   "scripts": {
     "clean": "rm -rf plugin-zip && mkdir plugin-zip",
@@ -64,6 +61,7 @@
     "dayjs": "1.10.7",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
+    "dtable-sdk": "4.3.2",
     "eslint": "^6.6.0",
     "eslint-config-react-app": "5.2.1",
     "eslint-loader": "3.0.3",
