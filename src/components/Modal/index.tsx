@@ -197,6 +197,10 @@ class Modal extends Component<IModalProps, IModalState> {
               <BiSolidCog size={17} color="#45474B" />
               {showSettings && <p>Settings</p>}
             </button>
+            <span
+              className="dtable-font dtable-icon-set-up btn-settings"
+              onClick={this.toggleSettings}
+            ></span>
             <button className={styles.modal_header_icon_btn} onClick={toggle}>
               <CgClose size={17} color="#45474B" />
             </button>
