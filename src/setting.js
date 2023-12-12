@@ -7,7 +7,7 @@ let config = {};
 
 /** (2/5) load local development settings ./setting.local.js (if exist) */
 try {
-  config.local = require("./setting.local.dist.js").default || {};
+  config.local = require("./setting.local.js").default || {};
   config = { ...config, ...{ loadVerbose: true }, ...config.local };
   config.loadVerbose &&
     console.log(

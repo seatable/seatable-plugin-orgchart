@@ -32,6 +32,9 @@ const HOST = process.env.HOST || "0.0.0.0";
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
+const checkRequiredFiles = require("react-dev-utils/checkRequiredFiles");
+const { checkBrowsers } = require("react-dev-utils/browsersHelper");
+
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
