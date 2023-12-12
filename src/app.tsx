@@ -1,6 +1,9 @@
 //@ts-nocheck
 import React from "react";
 
+// do I need this?
+import PropTypes from "prop-types";
+
 //import DTable from 'dtable-sdk';  -> not needed anymore in the complete plugin. Only in index.js
 
 // internationalization
@@ -19,6 +22,13 @@ import deepCopy from "deep-copy";
 
 import { IAppProps, IAppState } from "./utils/Interfaces/App.interface.ts";
 import pluginContext from "./plugin-context.ts";
+
+const propTypes = {
+  isDevelopment: PropTypes.bool,
+  showDialog: PropTypes.bool,
+  row: PropTypes.object, // If the plugin is opened with a button, it will have a row parameter
+};
+console.log(propTypes);
 
 const DEFAULT_PLUGIN_SETTINGS = {
   views: [
@@ -64,6 +74,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
   async initPluginDTableData() {
     const { isDevelopment } = this.props;
+    console.log(isDevelopment);
     if (isDevelopment) {
       window.dtableSDK.subscribe("dtable-connect", () => {
         this.onDTableConnect();
@@ -116,7 +127,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
   onPluginToggle = () => {
     this.setState({ showDialog: false });
-    window.app.onClosePlugin();
+    window.app.onClosePlugin && window.app.onClosePlugin();
   };
 
   // get required data and set states
@@ -454,7 +465,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
   render() {
     let { isLoading, showDialog } = this.state;
-    if (isLoading) {
+    if (isLoading || !showDialog) {
       return "";
     }
 
@@ -508,4 +519,5 @@ class App extends React.Component<IAppProps, IAppState> {
   }
 }
 
+App.propTypes = propTypes;
 export default App;

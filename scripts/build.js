@@ -15,57 +15,55 @@ process.on("unhandledRejection", (err) => {
 require("../config/env");
 
 const path = require("path");
-const fs = require("fs-extra");
-const webpack = require("webpack");
-
 const chalk = require("react-dev-utils/chalk");
+const fs = require("fs-extra");
+const bfj = require("bfj");
+const webpack = require("webpack");
+const configFactory = require("../config/webpack.config");
+const paths = require("../config/paths");
 const checkRequiredFiles = require("react-dev-utils/checkRequiredFiles");
 const formatWebpackMessages = require("react-dev-utils/formatWebpackMessages");
 const printHostingInstructions = require("react-dev-utils/printHostingInstructions");
 const FileSizeReporter = require("react-dev-utils/FileSizeReporter");
 const printBuildError = require("react-dev-utils/printBuildError");
+
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
-const { checkBrowsers } = require("react-dev-utils/browsersHelper");
-
-const paths = require("../config/paths");
-const {
-  appHtml,
-  appIndexJs,
-  appBuild,
-  appPath,
-  yarnLockFile,
-  appPackageJson,
-  publicUrl,
-} = require("../config/paths");
-const useYarn = fs.existsSync(yarnLockFile);
+const useYarn = fs.existsSync(paths.yarnLockFile);
 
 // These sizes are pretty large. We'll warn for bundles exceeding them.
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
+
 const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([appHtml, appIndexJs])) {
+if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
 
+const argv = process.argv.slice(2);
+const writeStatsJson = argv.indexOf("--stats") !== -1;
+
 // Generate configuration
-const config = require("../config/webpack.config")("production");
+const config = configFactory("production");
 
 // We require that you explicitly set browsers and do not fall back to
 // browserslist defaults.
-checkBrowsers(appPath, isInteractive)
-  .then(async () => {
-    const previousFileSizes = await measureFileSizesBeforeBuild(appBuild);
-
-    fs.emptyDirSync(appBuild);
-    fs.copySync(paths.appPublic, paths.appBuild, {
-      dereference: true,
-      filter: (file) => file !== appHtml,
-    });
-
+const { checkBrowsers } = require("react-dev-utils/browsersHelper");
+checkBrowsers(paths.appPath, isInteractive)
+  .then(() => {
+    // First, read the current file sizes in build directory.
+    // This lets us display how much they changed later.
+    return measureFileSizesBeforeBuild(paths.appBuild);
+  })
+  .then((previousFileSizes) => {
+    // Remove all content but keep the directory so that
+    // if you're in it, you don't end up in Trash
+    fs.emptyDirSync(paths.appBuild);
+    // Merge with the public folder
+    copyPublicFolder();
     // Start the webpack build
     return build(previousFileSizes);
   })
@@ -75,14 +73,14 @@ checkBrowsers(appPath, isInteractive)
         console.log(chalk.yellow("Compiled with warnings.\n"));
         console.log(warnings.join("\n\n"));
         console.log(
-          `\nSearch for the ${chalk.underline(
-            chalk.yellow("keywords")
-          )} to learn more about each warning.`
+          "\nSearch for the " +
+            chalk.underline(chalk.yellow("keywords")) +
+            " to learn more about each warning."
         );
         console.log(
-          `To ignore, add ${chalk.cyan(
-            "// eslint-disable-next-line"
-          )} to the line before.\n`
+          "To ignore, add " +
+            chalk.cyan("// eslint-disable-next-line") +
+            " to the line before.\n"
         );
       } else {
         console.log(chalk.green("Compiled successfully.\n"));
@@ -92,16 +90,16 @@ checkBrowsers(appPath, isInteractive)
       printFileSizesAfterBuild(
         stats,
         previousFileSizes,
-        appBuild,
+        paths.appBuild,
         WARN_AFTER_BUNDLE_GZIP_SIZE,
         WARN_AFTER_CHUNK_GZIP_SIZE
       );
       console.log();
 
-      const appPackage = require(appPackageJson);
+      const appPackage = require(paths.appPackageJson);
+      const publicUrl = paths.publicUrlOrPath;
       const publicPath = config.output.publicPath;
-      const buildFolder = path.relative(process.cwd(), appBuild);
-
+      const buildFolder = path.relative(process.cwd(), paths.appBuild);
       printHostingInstructions(
         appPackage,
         publicUrl,
@@ -135,32 +133,35 @@ checkBrowsers(appPath, isInteractive)
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-  // We used to support resolving modules according to `NODE_PATH`.
-  // This now has been deprecated in favor of jsconfig/tsconfig.json
-  // This lets you use absolute paths in imports inside large monorepos:
-  if (process.env.NODE_PATH) {
-    console.log(
-      chalk.yellow(
-        "Setting NODE_PATH to resolve modules absolutely has been deprecated in favor of setting baseUrl in jsconfig.json (or tsconfig.json if you are using TypeScript) and will be removed in a future major release of create-react-app."
-      )
-    );
-    console.log();
-  }
-
   console.log("Creating an optimized production build...");
 
   const compiler = webpack(config);
-
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
+      let messages;
       if (err) {
-        return reject(err.message || err);
+        if (!err.message) {
+          return reject(err);
+        }
+
+        let errMessage = err.message;
+
+        // Add additional information for postcss errors
+        if (Object.prototype.hasOwnProperty.call(err, "postcssNode")) {
+          errMessage +=
+            "\nCompileError: Begins at CSS selector " +
+            err["postcssNode"].selector;
+        }
+
+        messages = formatWebpackMessages({
+          errors: [errMessage],
+          warnings: [],
+        });
+      } else {
+        messages = formatWebpackMessages(
+          stats.toJson({ all: false, warnings: true, errors: true })
+        );
       }
-
-      const messages = formatWebpackMessages(
-        stats.toJson({ all: false, warnings: true, errors: true })
-      );
-
       if (messages.errors.length) {
         // Only keep the first error. Others are often indicative
         // of the same problem, but confuse the reader with noise.
@@ -169,22 +170,48 @@ function build(previousFileSizes) {
         }
         return reject(new Error(messages.errors.join("\n\n")));
       }
-
       if (
         process.env.CI &&
-        (!process.env.CI || process.env.CI.toLowerCase() !== "false") &&
+        (typeof process.env.CI !== "string" ||
+          process.env.CI.toLowerCase() !== "false") &&
         messages.warnings.length
       ) {
-        console.log(
-          chalk.yellow(
-            "\nTreating warnings as errors because process.env.CI = true.\n" +
-              "Most CI servers set it automatically.\n"
-          )
+        // Ignore sourcemap warnings in CI builds. See #8227 for more info.
+        const filteredWarnings = messages.warnings.filter(
+          (w) => !/Failed to parse source map/.test(w)
         );
-        return reject(new Error(messages.warnings.join("\n\n")));
+        if (filteredWarnings.length) {
+          console.log(
+            chalk.yellow(
+              "\nTreating warnings as errors because process.env.CI = true.\n" +
+                "Most CI servers set it automatically.\n"
+            )
+          );
+          return reject(new Error(filteredWarnings.join("\n\n")));
+        }
       }
 
-      return resolve({ stats, previousFileSizes, warnings: messages.warnings });
+      const resolveArgs = {
+        stats,
+        previousFileSizes,
+        warnings: messages.warnings,
+      };
+
+      if (writeStatsJson) {
+        return bfj
+          .write(paths.appBuild + "/bundle-stats.json", stats.toJson())
+          .then(() => resolve(resolveArgs))
+          .catch((error) => reject(new Error(error)));
+      }
+
+      return resolve(resolveArgs);
     });
+  });
+}
+
+function copyPublicFolder() {
+  fs.copySync(paths.appPublic, paths.appBuild, {
+    dereference: true,
+    filter: (file) => file !== paths.appHtml,
   });
 }

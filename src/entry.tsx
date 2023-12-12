@@ -9,9 +9,9 @@ import ReactDOM from "react-dom";
 import App from "./app.tsx";
 
 class SeaTablePlugin {
-  static execute(props = {}) {
+  static execute() {
     ReactDOM.render(
-      <App showDialog={true} {...props} />,
+      <App showDialog={true} />,
       document.querySelector("#plugin-wrapper")
     );
   }
