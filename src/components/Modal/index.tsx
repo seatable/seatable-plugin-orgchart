@@ -4,11 +4,7 @@ import React, { Component } from 'react';
 import styles from '../../styles/Modal.module.scss';
 import OrgCard from '../OrgCard/index.tsx';
 import '../../assets/css/plugin-layout.css';
-import { BiSolidCog } from 'react-icons/bi';
-import { CgClose } from 'react-icons/cg';
 import { RiOrganizationChart } from 'react-icons/ri';
-import { IoMdPrint } from 'react-icons/io';
-import { PiDownloadSimpleBold } from 'react-icons/pi';
 import { FaPlus } from 'react-icons/fa6';
 import OrgChartSettings from '../OrgChartSettings/index.tsx';
 import {
@@ -30,12 +26,33 @@ class Modal extends Component<IModalProps, IModalState> {
       showEditViewPopUp: false,
       viewName: '',
       showSettings: false,
+      popupRef: React.createRef(),
     };
     this._canCreateRows = canCreateRows(
       props.currentTable,
       TABLE_PERMISSION_TYPE
     );
   }
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  handleOutsideClick = (event) => {
+    // console.log(this.state.popupRef, event.target);
+    if (
+      this.state.popupRef?.current &&
+      !this.state.popupRef.current.contains(event.target)
+    ) {
+      // Click outside the popup, close it
+      this.setState({
+        showSettings: false,
+      });
+    }
+  };
 
   // handle view name change
   onViewNameChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -122,6 +139,9 @@ class Modal extends Component<IModalProps, IModalState> {
       toggle,
       subtables,
       shownColumns,
+      baseViews,
+      currentBaseView,
+      plugin_settings,
       onTablechange,
       rows,
       columns,
@@ -130,10 +150,17 @@ class Modal extends Component<IModalProps, IModalState> {
       deleteView,
       currentViewIdx,
       updateColumnFieldOrder,
-      duplicateView
+      duplicateView,
+      updateBaseView,
+      updateViews,
     } = this.props;
-    const { showNewViewPopUp, showEditViewPopUp, viewName, showSettings } =
-      this.state;
+    const {
+      showNewViewPopUp,
+      showEditViewPopUp,
+      viewName,
+      showSettings,
+      popupRef,
+    } = this.state;
 
     return (
       <div className={styles.modal}>
@@ -143,6 +170,7 @@ class Modal extends Component<IModalProps, IModalState> {
         ></iframe>
         {showSettings && (
           <OrgChartSettings
+            settingsRef={popupRef}
             columns={columns}
             toggleSettings={this.toggleSettings}
             onTablechange={onTablechange}
@@ -151,9 +179,13 @@ class Modal extends Component<IModalProps, IModalState> {
             shownColumns={shownColumns}
             allViews={allViews}
             currentView={allViews[currentViewIdx]}
+            baseViews={baseViews}
+            currentBaseView={currentBaseView}
             handleShownColumn={handleShownColumn}
             updateColumnFieldOrder={updateColumnFieldOrder}
             onSelectView={onSelectView}
+            updateBaseView={updateBaseView}
+            plugin_settings={plugin_settings}
           />
         )}
 
@@ -177,13 +209,13 @@ class Modal extends Component<IModalProps, IModalState> {
               className={styles.modal_header_icon_btn}
               onClick={this.downloadPdfDocument}
             >
-              <PiDownloadSimpleBold size={17} color="#45474B" />
+              <span className="dtable-font dtable-icon-download"></span>
             </button>
             <button
               className={styles.modal_header_icon_btn}
               onClick={this.printPdfDocument}
             >
-              <IoMdPrint size={17} color="#45474B" />
+              <span className="dtable-font dtableprint-icon"></span>
             </button>
             <button
               className={`${styles.modal_header_icon_btn} ${
@@ -191,11 +223,11 @@ class Modal extends Component<IModalProps, IModalState> {
               }`}
               onClick={this.toggleSettings}
             >
-              <BiSolidCog size={17} color="#45474B" />
+              <span className="dtable-font dtable-icon-set-up"></span>
               {showSettings && <p>Settings</p>}
             </button>
             <button className={styles.modal_header_icon_btn} onClick={toggle}>
-              <CgClose size={17} color="#45474B" />
+              <span className="dtable-font dtable-icon-x btn-close"></span>
             </button>
           </div>
         </div>
@@ -211,9 +243,11 @@ class Modal extends Component<IModalProps, IModalState> {
             allViews={allViews}
             onSelectView={onSelectView}
             currentViewIdx={currentViewIdx}
+            plugin_settings={plugin_settings}
             deleteView={deleteView}
             toggleNewViewPopUp={this.toggleNewViewPopUp}
             onEditViewSubmit={this.onNewViewSubmit}
+            updateViews={updateViews}
             showEditViewPopUp={showEditViewPopUp}
             duplicateView={duplicateView}
           />

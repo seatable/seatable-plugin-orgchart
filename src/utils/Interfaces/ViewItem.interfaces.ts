@@ -14,5 +14,6 @@ export interface IViewItemProps {
 
 export interface IViewItemState {
   showViewDropdown: boolean,
-  isEditing: boolean
+  isEditing: boolean,
+  popupRef: React.RefObject<HTMLUListElement>  | undefined
 }

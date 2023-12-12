@@ -15,5 +15,8 @@ export interface IAppState {
     currentTable: any,
     shownColumns: any[],
     _rows: any[],
+    baseViews: any[],
+    currentBaseView: any,
+    updateBaseView: (pluginSettings) => void,
     currentViewIdx: number;    
 }

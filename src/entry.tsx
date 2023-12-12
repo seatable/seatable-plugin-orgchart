@@ -1,17 +1,22 @@
+/**
+ * entrypoint for the plugin in production environment
+ * There is no need to change anything on this file.
+ */
+
 // @ts-nocheck
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './app.js';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./app.tsx";
 
-class TaskList {
-
-  static execute(props = {}) {
-    let wrapper = document.querySelector('#plugin-wrapper');
-    ReactDOM.render(<App showDialog={true} {...props} />, wrapper);
+class SeaTablePlugin {
+  static execute() {
+    ReactDOM.render(
+      <App showDialog={true} />,
+      document.querySelector("#plugin-wrapper")
+    );
   }
-
 }
 
-export default TaskList;
+export default SeaTablePlugin;
 
-window.app.registerPluginItemCallback('OrgChart', TaskList.execute);
+window.app.registerPluginItemCallback("OrgChart", SeaTablePlugin.execute);

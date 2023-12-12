@@ -7,12 +7,22 @@ import {
 
 class ViewDropdown extends Component<IViewDropdownProps, IViewDropdownState> {
   render() {
-    const { deleteView, toggleEditViewPopUp, duplicateView } = this.props;
+    const { deleteView, toggleEditViewPopUp, duplicateView, dropdownRef } =
+      this.props;
     return (
-      <ul className={styles.view_dropdown}>
-        <li onClick={toggleEditViewPopUp}>Rename View</li>
-        <li onClick={duplicateView}>Duplicate View</li>
-        <li onClick={deleteView}>Delete View</li>
+      <ul ref={dropdownRef} className={styles.view_dropdown}>
+        <li onClick={toggleEditViewPopUp} className="d-flex align-items-center">
+          <i className="item-icon dtable-font dtable-icon-rename"></i>
+          <p className="ml-2">Rename View</p>
+        </li>
+        <li onClick={duplicateView} className="d-flex align-items-center">
+          <i className="item-icon dtable-font dtable-icon-copy"></i>
+          <p className="ml-2">Duplicate View</p>
+        </li>
+        <li onClick={deleteView} className="d-flex align-items-center">
+          <i className="item-icon dtable-font dtable-icon-delete"></i>
+          <p className="ml-2">Delete View</p>
+        </li>
       </ul>
     );
   }

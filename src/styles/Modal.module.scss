@@ -112,6 +112,17 @@
       @include mobile {
         font-size: 10px;
       }
+
+      &_icons {
+        opacity: 0;
+        color: #c2c2c2;
+      }
+
+      &:hover {
+        .modal_header_viewBtn_icons {
+          opacity: 1;
+        }
+      }
     }
 
     &_viewBtn_active {
@@ -277,9 +288,8 @@
 
 .view_dropdown {
   position: absolute;
-  width: 200px;
   top: 0;
-  right: -200px;
+  right: -160px;
   background-color: #fff;
   border: 1px solid rgba(0, 40, 100, 0.12);
   box-shadow: 0 0 5px #ccc;
