@@ -1,99 +1,95 @@
 const JSZip = require("jszip");
-const fs = require('fs-extra');
-const path = require('path');
-const dayjs = require('dayjs');
-const paths = require('../config/paths');
+const fs = require("fs-extra");
+const path = require("path");
+const dayjs = require("dayjs");
+const paths = require("../config/paths");
 
 const config = {
-  dir: paths.appBuild + '/static/'
-}
+  dir: paths.appBuild + "/static/",
+};
 
-const zip = new JSZip();
+(async () => {
+  const zip = new JSZip();
 
-// build file
-const jsFilePath = getFullFileName(config.dir + 'js');
-const cssFilePath = getFullFileName(config.dir + 'css');
+  zip.folder("task");
+  zip.folder("task/media");
 
-zip.folder('task');
-zip.folder('task/media');
+  const jsFilePath = await getFullFileName(config.dir + "js");
+  const cssFilePath = await getFullFileName(config.dir + "css");
 
-zip.file('task/main.js', getFileContent(jsFilePath));
-if (isDirExist(paths.appBuild + '/static/css') && cssFilePath) {
-  zip.file('task/media/main.css', getFileContent(cssFilePath));
-}
+  zip.file("task/main.js", await getFileContent(jsFilePath));
+  if (cssFilePath) {
+    zip.file("task/media/main.css", await getFileContent(cssFilePath));
+  }
 
-if (isFileExist(paths.pluginConfigPath, 'icon.png')) {
-  const iconPath = path.join(paths.pluginConfigPath, 'icon.png');
-  zip.file('task/media/icon.png', fs.readFileSync(iconPath));
-}
+  const iconExists = await isFileExist(paths.pluginConfigPath, "icon.png");
+  if (iconExists) {
+    const iconPath = path.join(paths.pluginConfigPath, "icon.png");
+    zip.file("task/media/icon.png", await fs.readFile(iconPath));
+  }
 
-if (isFileExist(paths.pluginConfigPath, 'card_image.png')) {
-  const cardImagePath = path.join(paths.pluginConfigPath, 'card_image.png'); 
-  zip.file('task/media/card_image.png', fs.readFileSync(cardImagePath));
-}
+  const cardImageExists = await isFileExist(
+    paths.pluginConfigPath,
+    "card_image.png"
+  );
+  if (cardImageExists) {
+    const cardImagePath = path.join(paths.pluginConfigPath, "card_image.png");
+    zip.file("task/media/card_image.png", await fs.readFile(cardImagePath));
+  }
 
-// info file
-const pluginInfoFilePath = path.join(paths.pluginConfigPath, 'info.json');
-const pluginInfoContent = JSON.parse(getFileContent(pluginInfoFilePath));
+  const pluginInfoFilePath = path.join(paths.pluginConfigPath, "info.json");
+  const pluginInfoContent = JSON.parse(
+    await getFileContent(pluginInfoFilePath)
+  );
 
-const pluginInfoContentExpand = {
-  "last_modified": dayjs().format(),
-  "has_css": (isDirExist(paths.appBuild + '/static/css') && cssFilePath) ? true : false,
-  "has_icon": isFileExist(paths.pluginConfigPath, 'icon.png'),
-  "has_card_image": isFileExist(paths.pluginConfigPath, 'card_image.png')
-}
+  const pluginInfoContentExpand = {
+    last_modified: dayjs().format(),
+    has_css: cssFilePath ? true : false,
+    has_icon: iconExists,
+    has_card_image: cardImageExists,
+  };
 
-let jsonFileContent = Object.assign({}, pluginInfoContent, pluginInfoContentExpand);
+  const jsonFileContent = { ...pluginInfoContent, ...pluginInfoContentExpand };
+  zip.file("task/info.json", JSON.stringify(jsonFileContent, null, "  "));
 
-zip.file('task/info.json', JSON.stringify(jsonFileContent, null, '  '));
+  try {
+    const content = await zip.generateAsync({ type: "nodebuffer" });
+    const zipFileName = `${pluginInfoContent.name}-${pluginInfoContent.version}.zip`;
+    await fs.writeFile(path.join(paths.zipPath, zipFileName), content);
+    console.log(zipFileName + " successful");
+  } catch (err) {
+    console.log(err);
+  }
+})();
 
-zip.generateAsync({type: "nodebuffer"}).then(function(content) { 
-  let zip = `${pluginInfoContent.name}-${pluginInfoContent.version}.zip`;
-  fs.writeFile(paths.zipPath + '/' + zip, content, function(err) {
-    if (err) {
-      console.log(zip + ' failed');
-      console.log(err)
-      return;
-    }
-    console.log(zip + ' successful');
-  })
-});
-
-function isDirExist(path) {
-  return fs.existsSync(path);
-}
-
-function isFileExist(overallPath, fileName) {
-  return fs.readdirSync(overallPath).includes(fileName);
-}
-
-/**
- * Get the full file path
- * @param  {string} overallPath File parent path 
- */
-function getFullFileName(overallPath) {
-  if (!isDirExist(overallPath)) {
+async function isFileExist(overallPath, fileName) {
+  try {
+    const files = await fs.readdir(overallPath);
+    return files.includes(fileName);
+  } catch (err) {
     return false;
   }
-  const moduleFileExtensions = ['js', 'css'];
-  const fileName = fs.readdirSync(overallPath).find(fileItem => {
-    let extension = fileItem.substring(fileItem.lastIndexOf('.') + 1);
-    if (moduleFileExtensions.includes(extension)) {
-      return fileItem
-    }
-  });
-  if (!fileName) {
-    return false;
-  }
-  return path.join(overallPath, fileName);
 }
 
-/**
- * Get file content
- * @param  {string} overallPath full file path
- */
-function getFileContent (overallPath) {
-　　// Specifying encoding returns a string, otherwise returns a Buffer
-  let content = fs.readFileSync(overallPath, { encoding: "utf-8" });
-  return content;
+async function getFullFileName(overallPath) {
+  try {
+    const files = await fs.readdir(overallPath);
+    const moduleFileExtensions = ["js", "css"];
+    const fileName = files.find((fileItem) => {
+      const extension = fileItem.substring(fileItem.lastIndexOf(".") + 1);
+      return moduleFileExtensions.includes(extension);
+    });
+    return fileName ? path.join(overallPath, fileName) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function getFileContent(overallPath) {
+  try {
+    const content = await fs.readFile(overallPath, { encoding: "utf-8" });
+    return content;
+  } catch (err) {
+    return null;
+  }
 }

@@ -1,27 +1,20 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from '../../styles/NewViewPopUp.module.scss';
+import { INewViewProps } from '../../utils/Interfaces/NewViewPopUp.interface';
 
-const propTypes = {
-  viewName: PropTypes.string,
-  onViewNameChange: PropTypes.func,
-  onNewViewSubmit: PropTypes.func,
-  toggleNewViewPopUp: PropTypes.func,
-};
-
-class NewViewPopUp extends Component {
+class NewViewPopUp extends Component<INewViewProps> {
   render() {
-    const { viewName, onViewNameChange, onNewViewSubmit, toggleNewViewPopUp } =
+    const { viewName, onViewNameChange, onNewViewSubmit, toggleNewViewPopUp, type, onEditViewSubmit } =
       this.props;
     return (
       <div className={styles.viewPopUp}>
         <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
-          <p className="font-weight-bold">New View</p>
+          <p className="font-weight-bold">{type === 'edit' ? 'Edit View' : 'New View'}</p>
           <button
             type="button"
             className="close"
             aria-label="Close"
-            onClick={toggleNewViewPopUp}
+            onClick={type === 'edit' ? (e) => toggleNewViewPopUp(e, 'edit') : toggleNewViewPopUp}
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -41,9 +34,9 @@ class NewViewPopUp extends Component {
             <button
               type="button"
               className="btn btn-primary mr-3"
-              onClick={onNewViewSubmit}
+              onClick={onEditViewSubmit ? (e) => onEditViewSubmit(e, 'edit') : onNewViewSubmit}
             >
-              Add
+              {type === 'edit' ? 'Edit' : 'Add'}
             </button>
             <button
               type="button"
@@ -59,5 +52,4 @@ class NewViewPopUp extends Component {
   }
 }
 
-NewViewPopUp.propTypes = propTypes;
 export default NewViewPopUp;
