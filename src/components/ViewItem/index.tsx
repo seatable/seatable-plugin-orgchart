@@ -8,8 +8,6 @@ import {
   IViewItemProps,
   IViewItemState,
 } from '../../utils/Interfaces/ViewItem.interfaces';
-import { IoMdClose } from 'react-icons/io';
-import { FaCheck } from 'react-icons/fa6';
 
 class ViewItem extends Component<IViewItemProps, IViewItemState> {
   constructor(props: IViewItemProps) {
@@ -17,8 +15,30 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
     this.state = {
       showViewDropdown: false,
       isEditing: false,
+      popupRef: React.createRef(),
     };
   }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  handleOutsideClick = (event) => {
+    // console.log(this.state.popupRef, event.target);
+    if (
+      this.state.popupRef?.current &&
+      !this.state.popupRef.current.contains(event.target)
+    ) {
+      // Click outside the popup, close it
+      this.setState({
+        showViewDropdown: false,
+      });
+    }
+  };
 
   // toggle view dropdown(edit/delete)
   toggleViewDropdown = () => {
@@ -47,17 +67,17 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
 
     duplicateView(`${v.name} copy`);
     this.toggleViewDropdown();
-  }
+  };
 
   onClickView = (e) => {
     const { onSelectView, v } = this.props;
 
-    if(e.detail === 2) {
+    if (e.detail === 2) {
       this.onEditView(e);
     } else {
       onSelectView(v?._id);
     }
-  }
+  };
 
   render() {
     const {
@@ -68,7 +88,7 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
       onViewNameChange,
       onEditViewSubmit,
     } = this.props;
-    const { showViewDropdown, isEditing } = this.state;
+    const { showViewDropdown, isEditing, popupRef } = this.state;
     return (
       <div>
         <div
@@ -77,10 +97,10 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
         >
           <input autoFocus value={viewName} onChange={onViewNameChange} />
           <button onClick={(e) => onEditViewSubmit(e, 'edit')}>
-            <FaCheck color="#ff8001" size={17} />
+            <span className="dtable-font dtable-icon-check-mark"></span>
           </button>
           <button onClick={this.onEditView}>
-            <IoMdClose size={17} />
+            <span className="dtable-font dtable-icon-x btn-close"></span>
           </button>
         </div>
 
@@ -93,14 +113,21 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
               : styles.modal_header_viewBtn
           }
         >
-          {v.name}
-          {v._id !== '0000' && (
-            <span onClick={this.toggleViewDropdown}>
-              <BsThreeDots color="#191717" />
-            </span>
-          )}
+          <div className="d-flex align-items-center">
+            <i className={`dtable-font dtable-icon-drag ${styles.modal_header_viewBtn_icons}`}></i>
+            <p className="ml-2 mb-0"> {v.name}</p>
+          </div>
+
+          <span onClick={this.toggleViewDropdown}>
+            <BsThreeDots
+              color="#191717"
+              className={styles.modal_header_viewBtn_icons}
+            />
+          </span>
+
           {showViewDropdown && (
             <ViewDropdown
+              dropdownRef={popupRef}
               deleteView={this.onDeleteView}
               toggleEditViewPopUp={this.onEditView}
               duplicateView={this.onDuplicateView}

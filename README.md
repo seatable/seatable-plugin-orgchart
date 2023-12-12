@@ -16,10 +16,10 @@ The configuration file is used for local development to get dtable data:
 
 ```
 let config = {
-  APIToken: process.env.REACT_APP_API_TOKEN, // replace with dtable api or create environment variable
+  APIToken: APP_API_TOKEN, // replace with dtable api 
   server: 'https://stage.seatable.io', // replace with server URL of the dtable to which the plugin needs to be added
-  workspaceID: process.env.REACT_APP_WORKSPACE_ID, // replace with the id value of the workspace where the dtable of the plugin needs to be added or create environment variable
-  dtableName: process.env.REACT_APP_DTABLE_NAME, // replace with name of dtable or create environment variable
+  workspaceID: WORKSPACE_ID, // replace with the id value of the workspace where the dtable of the plugin needs to be added 
+  dtableName: DTABLE_NAME, // replace with name of dtable 
   lang: 'zh-cn' // default language type, en or zh-cn
 };
 ```

@@ -1,5 +1,8 @@
+import React from 'react';
+import { SETTING_KEY } from '../../constants';
+
 export interface IModalProps {
-subtables: any[],
+  subtables: any[],
   linkedRows: any,
   allViews: any[],
   currentTable: any,
@@ -13,16 +16,22 @@ subtables: any[],
   onTablechange: (id: string) => void,
   handleShownColumn: (val: string, checked: boolean) => void,
   onSelectView: (viewId: string) => void,
-  deleteView: () => void;    
+  deleteView: () => void;
   updateColumnFieldOrder: (shownColumns: any, _columns: any) => void,
-  onAddOrgChartItem : (view, table, rowID) => void,
-  getTablePermissionType: () =>  void;
-  duplicateView: (name: string) => void
+  onAddOrgChartItem: (view, table, rowID) => void,
+  getTablePermissionType: () => void;
+  duplicateView: (name: string) => void,
+  baseViews: any[],
+  currentBaseView: any,
+  updateBaseView: (pluginSettings) => void,
+  updateViews: (currentIdx, views, plugin_settings) => void;
+  plugin_settings: { views: any, [SETTING_KEY.VIEW_NAME]: any }
 }
 
 export interface IModalState {
-    showNewViewPopUp: boolean,
-    showEditViewPopUp: boolean,
-    viewName: string,
-    showSettings: boolean,
+  showNewViewPopUp: boolean,
+  showEditViewPopUp: boolean,
+  viewName: string,
+  showSettings: boolean,
+  popupRef: React.RefObject<HTMLDivElement>  | undefined
 }

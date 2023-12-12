@@ -12,6 +12,7 @@
     "deep-copy": "^1.4.2",
     "dtable-sdk": "0.2.2",
     "dtable-ui-component": "^0.3.26",
+    "dtable-utils": "^4.3.4",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "react": "16.14.0",

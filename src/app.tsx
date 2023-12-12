@@ -1,9 +1,9 @@
 //@ts-nocheck
 import React from 'react';
 import DTable from 'dtable-sdk';
-import intl from 'react-intl-universal';
+// import intl from 'react-intl-universal';
 import { generatorViewId } from './utils/utils.ts';
-import { PLUGIN_NAME, SETTING_KEY } from './constants/index.ts';
+import { PLUGIN_NAME } from './constants/index.ts';
 import View from './model/view.ts';
 import './locale/index.js';
 import Modal from './components/Modal/index.tsx';
@@ -12,6 +12,7 @@ import deepCopy from 'deep-copy';
 
 import { IAppProps, IAppState } from './utils/Interfaces/App.interface.ts';
 import pluginContext from './plugin-context.ts';
+import { TABLE_NAME, VIEW_NAME } from './constants/setting-key.ts';
 
 const DEFAULT_PLUGIN_SETTINGS = {
   views: [
@@ -94,7 +95,8 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   resetData = () => {
-    const views = this.getPluginSettings();
+    const views = this.getPluginSettings().views;
+
     let { currentViewIdx } = this.state;
     if (!views[currentViewIdx]) {
       currentViewIdx = views.length - 1;
@@ -108,9 +110,9 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getPluginSettings = () => {
-    return this.dtable.getPluginSettings(PLUGIN_NAME)[0]
+    return this.dtable.getPluginSettings(PLUGIN_NAME).views
       ? this.dtable.getPluginSettings(PLUGIN_NAME)
-      : DEFAULT_PLUGIN_SETTINGS.views;
+      : DEFAULT_PLUGIN_SETTINGS;
   };
 
   onPluginToggle = () => {
@@ -121,12 +123,23 @@ class App extends React.Component<IAppProps, IAppState> {
   // get required data and set states
   getData = () => {
     let table = this.dtable.getActiveTable();
-    const allViews = this.getPluginSettings();
+    let plugin_settings = this.getPluginSettings();
+    let allViews = plugin_settings.views;
     let subtables = this.dtable.getTables();
     let linkedRows = this.dtable.getTableLinkRows(table.rows, table);
     let shownColumns = table.columns.filter((c: any) =>
       allViews[0]?.settings?.shown_column_names.includes(c.name)
     );
+    let baseViews = this.dtable.getViews(table);
+    let currentBaseView;
+
+    if (plugin_settings[VIEW_NAME]) {
+      currentBaseView = baseViews.find(
+        (v) => v.name === plugin_settings[VIEW_NAME]
+      );
+    } else {
+      currentBaseView = baseViews[0];
+    }
 
     if (!shownColumns[0]) {
       shownColumns = table.columns;
@@ -145,6 +158,9 @@ class App extends React.Component<IAppProps, IAppState> {
       linkedRows,
       currentTable: table,
       shownColumns,
+      baseViews,
+      plugin_settings,
+      currentBaseView,
       _rows,
     });
   };
@@ -176,9 +192,7 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getSelectedTable = (tables: any, settings = {}) => {
-    let selectedTable = this.dtable.getTableByName(
-      settings[SETTING_KEY.TABLE_NAME]
-    );
+    let selectedTable = this.dtable.getTableByName(settings[TABLE_NAME]);
     if (!selectedTable) {
       return tables[0];
     }
@@ -254,7 +268,7 @@ class App extends React.Component<IAppProps, IAppState> {
     }
     plugin_settings.views = newViews;
 
-    this.updateViews(currentViewIdx, newViews, plugin_settings);
+    this.updateViews(0, newViews, plugin_settings);
   };
 
   // Change view
@@ -297,10 +311,20 @@ class App extends React.Component<IAppProps, IAppState> {
     this.setState(
       { currentViewIdx, allViews: views, plugin_settings, shownColumns },
       () => {
-        this.updatePluginSettings(views);
+        this.updatePluginSettings(plugin_settings);
         callBack && callBack();
       }
     );
+  };
+
+  // update current base view
+  updateBaseView = (pluginSettings) => {
+    const { baseViews } = this.state;
+    let currentBaseView = baseViews.find(
+      (v) => v.name === pluginSettings[VIEW_NAME]
+    );
+    this.setState({ currentBaseView });
+    this.updatePluginSettings(pluginSettings);
   };
 
   // update plugin settings
@@ -442,6 +466,9 @@ class App extends React.Component<IAppProps, IAppState> {
       currentTable,
       currentViewIdx,
       shownColumns,
+      baseViews,
+      currentBaseView,
+      plugin_settings,
       _rows,
     } = this.state;
 
@@ -468,8 +495,13 @@ class App extends React.Component<IAppProps, IAppState> {
             onAddOrgChartItem={this.onAddOrgChartItem}
             getTablePermissionType={this.getTablePermissionType}
             duplicateView={this.duplicateView}
+            updateBaseView={this.updateBaseView}
+            updateViews={this.updateViews}
             rows={_rows}
             columns={columns}
+            baseViews={baseViews}
+            currentBaseView={currentBaseView}
+            plugin_settings={plugin_settings}
           />
         )}
       </div>

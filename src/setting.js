@@ -1,12 +1,13 @@
+/* eslint-disable no-console */
 
 import intl from 'react-intl-universal';
 
 /** (1/5) initialize config object */
 let config = {
-  APIToken: process.env.REACT_APP_API_TOKEN,
+  APIToken: 'd3f019a6b71490ff8ac497378982942210b8b86f',
   server: 'https://stage.seatable.io',
-  workspaceID: process.env.REACT_APP_WORKSPACE_ID,
-  dtableName: process.env.REACT_APP_DTABLE_NAME,
+  workspaceID: '314',
+  dtableName: 'Org Chart',
   lang: 'zh-cn'
 };
 

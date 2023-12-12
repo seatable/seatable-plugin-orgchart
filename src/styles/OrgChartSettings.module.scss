@@ -20,6 +20,14 @@
         border-bottom: 1px solid #e2e2e2;
     }
 
+    &_column_fields {
+        cursor: pointer;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.138);
+        }
+    }
+
     &_show_all {
         all: unset;
         color: #ff8001;
