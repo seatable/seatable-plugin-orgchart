@@ -38,8 +38,12 @@ class OrgChartSettings extends Component<
   };
 
   handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    const { columns, shownColumns, updateColumnFieldOrder } = this.props;
+    const { currentView, currentTable, shownColumns, updateColumnFieldOrder } = this.props;
     const { dragItemIndex, dragOverItemIndex } = this.state;
+
+    const columns = currentView?.settings?.all_columns[0]
+    ? currentView?.settings?.all_columns
+    : currentTable.columns;
 
     const _columns = [...columns];
     if (dragItemIndex !== null && dragOverItemIndex !== null) {
@@ -48,9 +52,10 @@ class OrgChartSettings extends Component<
       this.setState({ _columns });
       this.setState({ dragItemIndex: null });
       this.setState({ dragOverItemIndex: null });
+      let _shownColumns = _columns.filter((c) => shownColumns.map(c => c.key).includes(c.key))
 
       updateColumnFieldOrder(
-        _columns.filter((c) => shownColumns.includes(c)),
+        _shownColumns,
         _columns
       );
     }
