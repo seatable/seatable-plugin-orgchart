@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import ViewItem from '../ViewItem/index.tsx';
 import styles from '../../styles/Views.module.scss';
+import deepCopy from 'deep-copy';
+import View from '../../model/view.ts';
 import {
   IViewsProps,
   IViewsState,
-} from '../../utils/Interfaces/Views.interface.js';
+} from '../../utils/Interfaces/Views.interface.ts';
+import { generatorViewId } from '../../utils/utils.ts';
+import { TABLE_NAME } from '../../constants/setting-key.ts';
 
 class Views extends Component<IViewsProps, IViewsState> {
   constructor(props: IViewsProps) {
@@ -13,8 +17,126 @@ class Views extends Component<IViewsProps, IViewsState> {
       dragItemIndex: null,
       dragOverItemIndex: null,
       _allViews: this.props.allViews,
+      viewName: '',
+      showNewViewPopUp: false,
+      showEditViewPopUp: false,
     };
   }
+
+  getSelectedTable = (tables: any, settings = {}) => {
+    let selectedTable = window.dtableSDK.getTableByName(settings[TABLE_NAME]);
+    if (!selectedTable) {
+      return tables[0];
+    }
+    return selectedTable;
+  };
+
+  initOrgChartSetting = (settings = {}) => {
+    let initUpdated = {};
+    let tables = window.dtableSDK.getTables();
+    let selectedTable = this.getSelectedTable(tables, settings);
+    let titleColumn = selectedTable.columns.find(
+      (column: any) => column.key === '0000'
+    );
+    let imageColumn = selectedTable.columns.find(
+      (column: any) => column.type === 'image'
+    );
+    let imageName = imageColumn ? imageColumn.name : null;
+    let titleName = titleColumn ? titleColumn.name : null;
+    initUpdated = Object.assign(
+      {},
+      { shown_image_name: imageName },
+      { shown_title_name: titleName },
+      { shown_column_names: selectedTable.columns.map((c: any) => c.name) },
+      { all_columns: selectedTable.columns }
+    );
+    return initUpdated;
+  };
+
+  // handle view name change
+  onViewNameChange = (e: React.FormEvent<HTMLInputElement>) => {
+    this.setState({ viewName: e.currentTarget.value });
+  };
+
+  // handle add/edit view functionality
+  onNewViewSubmit = (e?, type?: "edit") => {
+    const { viewName } = this.state;
+
+    if (type === 'edit') {
+      this.editView(viewName);
+      this.setState({ viewName: '', showEditViewPopUp: false });
+    } else {
+      this.addView(viewName);
+      this.setState({ viewName: '', showNewViewPopUp: false });
+    }
+  };
+
+  // toggle new/edit view popup display
+  toggleNewViewPopUp = (e?, type?: "edit") => {
+    const { allViews, currentViewIdx } = this.props;
+
+    if (type === 'edit') {
+      const viewName = allViews.find((v, i) => i === currentViewIdx).name;
+      this.setState((prev) => ({
+        showEditViewPopUp: !prev.showEditViewPopUp,
+        viewName,
+      }));
+    } else {
+      this.setState((prev) => ({ showNewViewPopUp: !prev.showNewViewPopUp }));
+    }
+  };
+
+  // add new view
+  addView = (viewName: string) => {
+    let { allViews, plugin_settings } = this.props;
+    const { updateViews } = this.props;
+
+    let currentViewIdx = allViews.length;
+    let _id: string = generatorViewId(allViews) || '';
+    let newView = new View({ _id, name: viewName });
+    let newViews = deepCopy(allViews);
+    newViews.push(newView);
+
+    let initUpdated = this.initOrgChartSetting();
+    newViews[currentViewIdx].settings = Object.assign({}, initUpdated);
+    plugin_settings.views = newViews;
+
+    updateViews(currentViewIdx, newViews, plugin_settings);
+  };
+
+  // duplicate a view
+  duplicateView = (name: string) => {
+    this.addView(name);
+  };
+
+  // edit view name
+  editView = (viewName: string) => {
+    let { currentViewIdx, plugin_settings } = this.props;
+    const { allViews, updateViews } = this.props;
+    let newViews = deepCopy(allViews);
+    let oldView = allViews[currentViewIdx];
+    let _id: string = generatorViewId(allViews) || '';
+    let updatedView = new View({ ...oldView, _id, name: viewName });
+
+    newViews.splice(currentViewIdx, 1, updatedView);
+    plugin_settings.views = newViews;
+
+    updateViews(currentViewIdx, newViews, plugin_settings);
+  };
+
+  // delete view
+  deleteView = () => {
+    let { currentViewIdx, plugin_settings } = this.props;
+    const { allViews, updateViews } = this.props;
+    let newViews = deepCopy(allViews);
+    newViews.splice(currentViewIdx, 1);
+    if (currentViewIdx >= newViews.length) {
+      currentViewIdx = newViews.length - 1;
+    }
+    plugin_settings.views = newViews;
+
+    updateViews(0, newViews, plugin_settings);
+  };
 
   // drag and drop logic
   handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -48,21 +170,9 @@ class Views extends Component<IViewsProps, IViewsState> {
   };
 
   render() {
-    const {
-      allViews,
-      onSelectView,
-      currentViewIdx,
-      deleteView,
-      toggleNewViewPopUp,
-      viewName,
-      showNewViewPopUp,
-      onNewViewSubmit,
-      onViewNameChange,
-      onEditViewSubmit,
-      duplicateView,
-      showEditViewPopUp,
-    } = this.props;
-    const { dragOverItemIndex } = this.state;
+    const { allViews, onSelectView, currentViewIdx } = this.props;
+    const { dragOverItemIndex, viewName, showNewViewPopUp, showEditViewPopUp } =
+      this.state;
 
     return (
       <div className={`${styles.views}`}>
@@ -86,13 +196,13 @@ class Views extends Component<IViewsProps, IViewsState> {
                 onSelectView={onSelectView}
                 allViews={allViews}
                 currentViewIdx={currentViewIdx}
-                toggleNewViewPopUp={toggleNewViewPopUp}
-                deleteView={deleteView}
+                toggleNewViewPopUp={this.toggleNewViewPopUp}
+                deleteView={this.deleteView}
                 viewName={viewName}
-                onViewNameChange={onViewNameChange}
-                onEditViewSubmit={onEditViewSubmit}
+                onViewNameChange={this.onViewNameChange}
+                onEditViewSubmit={(e) => this.onNewViewSubmit(e, 'edit')}
                 showEditViewPopUp={showEditViewPopUp}
-                duplicateView={duplicateView}
+                duplicateView={this.duplicateView}
               />
             </div>
           ))}
@@ -100,11 +210,15 @@ class Views extends Component<IViewsProps, IViewsState> {
         {/* add new view input  */}
         {showNewViewPopUp && (
           <div className={styles.views_input}>
-            <input autoFocus value={viewName} onChange={onViewNameChange} />
-            <button onClick={onNewViewSubmit}>
+            <input
+              autoFocus
+              value={viewName}
+              onChange={this.onViewNameChange}
+            />
+            <button onClick={this.onNewViewSubmit}>
               <span className="dtable-font dtable-icon-check-mark"></span>
             </button>
-            <button onClick={toggleNewViewPopUp}>
+            <button onClick={this.toggleNewViewPopUp}>
               <span className="dtable-font dtable-icon-x btn-close"></span>
             </button>
           </div>
@@ -112,7 +226,7 @@ class Views extends Component<IViewsProps, IViewsState> {
         {/* add new view button  */}
         {!showNewViewPopUp && (
           <button
-            onClick={toggleNewViewPopUp}
+            onClick={this.toggleNewViewPopUp}
             className={styles.views_add_button}
           >
             <i className="dtable-font dtable-icon-add-table"></i>

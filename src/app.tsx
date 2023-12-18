@@ -1,40 +1,25 @@
+/* eslint-disable jsx-a11y/iframe-has-title */
 //@ts-nocheck
-import React from "react";
-
-// do I need this?
-import PropTypes from "prop-types";
-
-//import DTable from 'dtable-sdk';  -> not needed anymore in the complete plugin. Only in index.js
-
+import React from 'react';
 // internationalization
-import intl from "react-intl-universal";
-import "./locale";
+import intl from 'react-intl-universal';
+import './locale';
+import { PLUGIN_NAME } from './constants/index.ts';
+import { VIEW_NAME } from './constants/setting-key.ts';
+import styles from './styles/Modal.module.scss';
+import { getParentRows } from './utils/helpers/tableRows.ts';
+import deepCopy from 'deep-copy';
+import { IAppProps, IAppState } from './utils/Interfaces/App.interface.ts';
+import OrgChartHeader from './components/OrgChartHeader/index.tsx';
+import Views from './components/Views/index.tsx';
+import OrgChartSettings from './components/OrgChartSettings/index.tsx';
 
-import { generatorViewId } from "./utils/utils.ts";
-
-import { PLUGIN_NAME } from "./constants/index.ts";
-import { TABLE_NAME, VIEW_NAME } from "./constants/setting-key.ts";
-
-import View from "./model/view.ts";
-import Modal from "./components/Modal/index.tsx";
-import { getParentRows } from "./utils/helpers/tableRows.ts";
-import deepCopy from "deep-copy";
-
-import { IAppProps, IAppState } from "./utils/Interfaces/App.interface.ts";
-import pluginContext from "./plugin-context.ts";
-
-const propTypes = {
-  isDevelopment: PropTypes.bool,
-  showDialog: PropTypes.bool,
-  row: PropTypes.object, // If the plugin is opened with a button, it will have a row parameter
-};
-console.log(propTypes);
 
 const DEFAULT_PLUGIN_SETTINGS = {
   views: [
     {
-      _id: "0000",
-      name: "Default View",
+      _id: '0000',
+      name: 'Default View',
       settings: { shown_column_names: [], all_columns: [] },
     },
   ],
@@ -48,9 +33,9 @@ class App extends React.Component<IAppProps, IAppState> {
       isLoading: true,
       showDialog: props.showDialog || false,
       plugin_settings: { views: [] },
+      showSettings: false,
       currentViewIdx: 0,
     };
-    // this.dtable = new DTable(); not needed anymore... use window.dtableSDK instead.
   }
 
   componentDidMount() {
@@ -66,30 +51,29 @@ class App extends React.Component<IAppProps, IAppState> {
     this.unsubscribeRemoteDtableChanged();
   }
   unsubscribeLocalDtableChanged() {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   unsubscribeRemoteDtableChanged() {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   async initPluginDTableData() {
     const { isDevelopment } = this.props;
-    console.log(isDevelopment);
+
     if (isDevelopment) {
-      window.dtableSDK.subscribe("dtable-connect", () => {
+      window.dtableSDK.subscribe('dtable-connect', () => {
         this.onDTableConnect();
       });
     }
-    this.getData();
 
     this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe(
-      "local-dtable-changed",
+      'local-dtable-changed',
       () => {
         this.onDTableChanged();
       }
     );
     this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe(
-      "remote-dtable-changed",
+      'remote-dtable-changed',
       () => {
         this.onDTableChanged();
       }
@@ -105,20 +89,6 @@ class App extends React.Component<IAppProps, IAppState> {
     this.resetData();
   };
 
-  resetData = () => {
-    const views = this.getPluginSettings().views;
-    let { currentViewIdx } = this.state;
-    if (!views[currentViewIdx]) {
-      currentViewIdx = views.length - 1;
-    }
-
-    this.setState({
-      isLoading: false,
-      currentViewIdx,
-      allViews: views,
-    });
-  };
-
   getPluginSettings = () => {
     return window.dtableSDK.getPluginSettings(PLUGIN_NAME).views
       ? window.dtableSDK.getPluginSettings(PLUGIN_NAME)
@@ -131,7 +101,7 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   // get required data and set states
-  getData = () => {
+  resetData = () => {
     let table = window.dtableSDK.getActiveTable();
     let plugin_settings = this.getPluginSettings();
     let allViews = plugin_settings.views;
@@ -171,6 +141,8 @@ class App extends React.Component<IAppProps, IAppState> {
       baseViews,
       plugin_settings,
       currentBaseView,
+      isLoading: false,
+      allViews,
       _rows,
     });
   };
@@ -201,85 +173,6 @@ class App extends React.Component<IAppProps, IAppState> {
     });
   };
 
-  getSelectedTable = (tables: any, settings = {}) => {
-    let selectedTable = window.dtableSDK.getTableByName(settings[TABLE_NAME]);
-    if (!selectedTable) {
-      return tables[0];
-    }
-    return selectedTable;
-  };
-
-  initOrgChartSetting = (settings = {}) => {
-    let initUpdated = {};
-    let tables = window.dtableSDK.getTables();
-    let selectedTable = this.getSelectedTable(tables, settings);
-    let titleColumn = selectedTable.columns.find(
-      (column: any) => column.key === "0000"
-    );
-    let imageColumn = selectedTable.columns.find(
-      (column: any) => column.type === "image"
-    );
-    let imageName = imageColumn ? imageColumn.name : null;
-    let titleName = titleColumn ? titleColumn.name : null;
-    initUpdated = Object.assign(
-      {},
-      { shown_image_name: imageName },
-      { shown_title_name: titleName },
-      { shown_column_names: selectedTable.columns.map((c: any) => c.name) },
-      { all_columns: selectedTable.columns }
-    );
-    return initUpdated;
-  };
-
-  // add new view
-  addView = (viewName: string) => {
-    let { allViews, plugin_settings } = this.state;
-    let currentViewIdx = allViews.length;
-    let _id: string = generatorViewId(allViews) || "";
-    let newView = new View({ _id, name: viewName });
-    let newViews = deepCopy(allViews);
-    newViews.push(newView);
-
-    let initUpdated = this.initOrgChartSetting();
-    newViews[currentViewIdx].settings = Object.assign({}, initUpdated);
-    plugin_settings.views = newViews;
-
-    this.updateViews(currentViewIdx, newViews, plugin_settings);
-  };
-
-  // duplicate a view
-  duplicateView = (name: string) => {
-    this.addView(name);
-  };
-
-  // edit view name
-  editView = (viewName: string) => {
-    let { currentViewIdx, plugin_settings } = this.state;
-    const { allViews } = this.state;
-    let newViews = deepCopy(allViews);
-    let oldView = allViews[currentViewIdx];
-    let _id: string = generatorViewId(allViews) || "";
-    let updatedView = new View({ ...oldView, _id, name: viewName });
-
-    newViews.splice(currentViewIdx, 1, updatedView);
-    plugin_settings.views = newViews;
-
-    this.updateViews(currentViewIdx, newViews, plugin_settings);
-  };
-
-  // delete view
-  deleteView = () => {
-    let { currentViewIdx, plugin_settings } = this.state;
-    const { allViews } = this.state;
-    let newViews = deepCopy(allViews);
-    newViews.splice(currentViewIdx, 1);
-    if (currentViewIdx >= newViews.length) {
-      currentViewIdx = newViews.length - 1;
-    }
-    plugin_settings.views = newViews;
-
-    this.updateViews(0, newViews, plugin_settings);
-  };
 
   // Change view
   onSelectView = (viewId: string) => {
@@ -399,79 +292,19 @@ class App extends React.Component<IAppProps, IAppState> {
     this.updateViews(currentViewIdx, newViews, plugin_settings);
   };
 
-  getSelectedViewIds = (key: string) => {
-    let selectedViewIds = window.localStorage.getItem(key);
-    return selectedViewIds ? JSON.parse(selectedViewIds) : {};
-  };
-
-  // functions for add row functionality
-  onAddOrgChartItem = (view, table, rowID: string) => {
-    let rowData = this.getInsertedRowInitData(view, table, rowID);
-    this.onInsertRow(table, view, rowData);
-  };
-
-  getInsertedRowInitData = (view, table, rowID: string) => {
-    return window.dtableSDK.getInsertedRowInitData(view, table, rowID);
-  };
-
-  onInsertRow = (table, view, rowData) => {
-    let columns = window.dtableSDK.getColumns(table);
-    let newRowData = {};
-    for (let key in rowData) {
-      let column = columns.find((column) => column.key === key);
-      if (!column) {
-        continue;
-      }
-      switch (column.type) {
-        case "single-select": {
-          let singleSelectName = "";
-          singleSelectName = column.data.options.find(
-            (item) => item.id === rowData[key]
-          );
-          newRowData[column.name] = singleSelectName.name;
-          break;
-        }
-        case "multiple-select": {
-          let multipleSelectNameList = [];
-          rowData[key].forEach((multiItemId) => {
-            let multiSelectItemName = column.data.options.find(
-              (multiItem) => multiItem.id === multiItemId
-            );
-            if (multiSelectItemName) {
-              multipleSelectNameList.push(multiSelectItemName.name);
-            }
-          });
-          newRowData[column.name] = multipleSelectNameList;
-
-          break;
-        }
-        default:
-          newRowData[column.name] = rowData[key];
-      }
-    }
-    let row_data = Object.assign({}, newRowData);
-
-    window.dtableSDK.appendRow(table, row_data, view);
-    let viewRows = window.dtableSDK.getViewRows(view, table);
-    let insertedRow = viewRows[viewRows.length - 1];
-    if (insertedRow) {
-      pluginContext.expandRow(insertedRow, table);
-    }
-  };
-
-  getTablePermissionType = () => {
-    return window.dtableSDK.getTablePermissionType();
+  // toggle settings display
+  toggleSettings = () => {
+    this.setState((prev) => ({ showSettings: !prev.showSettings }));
   };
 
   render() {
     let { isLoading, showDialog } = this.state;
     if (isLoading || !showDialog) {
-      return "";
+      return '';
     }
 
     const {
       subtables,
-      linkedRows,
       allViews,
       currentTable,
       currentViewIdx,
@@ -479,7 +312,7 @@ class App extends React.Component<IAppProps, IAppState> {
       baseViews,
       currentBaseView,
       plugin_settings,
-      _rows,
+      showSettings,
     } = this.state;
 
     let columns = currentTable?.columns;
@@ -487,37 +320,60 @@ class App extends React.Component<IAppProps, IAppState> {
     return (
       <div>
         {showDialog && (
-          <Modal
-            subtables={subtables}
-            currentTable={currentTable}
-            linkedRows={linkedRows}
-            allViews={allViews}
-            currentViewIdx={currentViewIdx}
-            addNewView={this.addView}
-            toggle={this.onPluginToggle}
-            handleShownColumn={this.handleShownColumn}
-            shownColumns={shownColumns}
-            onTablechange={this.onTablechange}
-            onSelectView={this.onSelectView}
-            deleteView={this.deleteView}
-            editView={this.editView}
-            updateColumnFieldOrder={this.updateColumnFieldOrder}
-            onAddOrgChartItem={this.onAddOrgChartItem}
-            getTablePermissionType={this.getTablePermissionType}
-            duplicateView={this.duplicateView}
-            updateBaseView={this.updateBaseView}
-            updateViews={this.updateViews}
-            rows={_rows}
-            columns={columns}
-            baseViews={baseViews}
-            currentBaseView={currentBaseView}
-            plugin_settings={plugin_settings}
-          />
+          <div className={styles.modal}>
+            <iframe
+              id="ifmcontentstoprint"
+              style={{ height: '0px', width: '0px', position: 'absolute' }}
+            ></iframe>
+            {/* header  */}
+            <OrgChartHeader
+              toggleSettings={this.toggleSettings}
+              showSettings={showSettings}
+              toggle={this.onPluginToggle}
+            />
+            {/* main body  */}
+            <div
+              className="d-flex position-relative"
+              style={{ height: '100%' }}
+            >
+              {/* views  */}
+              <Views
+                allViews={allViews}
+                onSelectView={this.onSelectView}
+                currentViewIdx={currentViewIdx}
+                plugin_settings={plugin_settings}
+                updateViews={this.updateViews}
+              />
+
+              {/* content  */}
+              <div className={styles.body}>
+                <div>{`'dtable-subtables: '${JSON.stringify(subtables)}`}</div>
+              </div>
+
+              {/* settings  */}
+              {showSettings && (
+                <OrgChartSettings
+                  columns={columns}
+                  toggleSettings={this.toggleSettings}
+                  onTablechange={this.onTablechange}
+                  subtables={subtables}
+                  currentTable={currentTable}
+                  shownColumns={shownColumns}
+                  currentView={allViews[currentViewIdx]}
+                  baseViews={baseViews}
+                  currentBaseView={currentBaseView}
+                  handleShownColumn={this.handleShownColumn}
+                  updateColumnFieldOrder={this.updateColumnFieldOrder}
+                  updateBaseView={this.updateBaseView}
+                  plugin_settings={plugin_settings}
+                />
+              )}
+            </div>
+          </div>
         )}
       </div>
     );
   }
 }
 
-App.propTypes = propTypes;
 export default App;

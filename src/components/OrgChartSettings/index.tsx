@@ -21,8 +21,30 @@ class OrgChartSettings extends Component<
       dragItemIndex: null,
       dragOverItemIndex: null,
       _columns: this.props.columns,
+      popupRef: React.createRef(),
     };
   }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleOutsideClick);
+  }
+
+  handleOutsideClick = (event) => {
+    // console.log(this.state.popupRef, event.target);
+    if (
+      this.state.popupRef?.current &&
+      !this.state.popupRef.current.contains(event.target)
+    ) {
+      // Click outside the popup, close it
+      this.setState({
+        showSettings: false,
+      });
+    }
+  };
 
   // drag and drop logic
   handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -117,7 +139,7 @@ class OrgChartSettings extends Component<
   };
 
   render() {
-    const { handleShownColumn, currentView, currentTable, settingsRef } =
+    const { handleShownColumn, currentView, currentTable } =
       this.props;
     const { dragOverItemIndex } = this.state;
     const columns = currentView?.settings?.all_columns[0]
@@ -125,7 +147,7 @@ class OrgChartSettings extends Component<
       : currentTable.columns;
 
     return (
-      <div ref={settingsRef} className={`p-5 bg-white ${styles.settings}`}>
+      <div ref={this.state.popupRef} className={`p-5 bg-white ${styles.settings}`}>
         <div>
           <div className={styles.settings_dropdowns}>
             <div>
