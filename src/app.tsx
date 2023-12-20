@@ -120,7 +120,7 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   getPluginSettings = () => {
-    return window.dtableSDK.getPluginSettings(PLUGIN_NAME).views
+    return window.dtableSDK.getPluginSettings(PLUGIN_NAME)?.views
       ? window.dtableSDK.getPluginSettings(PLUGIN_NAME)
       : DEFAULT_PLUGIN_SETTINGS;
   };

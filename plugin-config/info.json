@@ -1,6 +1,7 @@
 {
   "name": "OrgChart",
   "version": "0.2.0",
+  "display_type": "overlay",
   "display_name": {
     "de": "OrgChart",
     "en": "OrgChart"

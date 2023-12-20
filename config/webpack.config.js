@@ -512,6 +512,12 @@ module.exports = function(webpackEnv) {
         },
       ],
     },
+    externals: {
+      // only define the dependencies you are NOT using as externals!
+      // https://github.com/parallax/jsPDF?tab=readme-ov-file#optional-dependencies
+      canvg: "canvg",
+      dompurify: "dompurify"
+    },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
