@@ -2,7 +2,7 @@
 //@ts-nocheck
 import React from 'react';
 // internationalization
-import intl from 'react-intl-universal';
+// import intl from 'react-intl-universal';
 import './locale';
 import { PLUGIN_NAME } from './constants/index.ts';
 import { VIEW_NAME } from './constants/setting-key.ts';
@@ -104,22 +104,24 @@ class App extends React.Component<IAppProps, IAppState> {
   resetData = () => {
     let table = window.dtableSDK.getActiveTable();
     let plugin_settings = this.getPluginSettings();
-    let allViews = plugin_settings.views;
-    let subtables = window.dtableSDK.getTables();
-    let linkedRows = window.dtableSDK.getTableLinkRows(table.rows, table);
-    let shownColumns = table.columns.filter((c: any) =>
-      allViews[0]?.settings?.shown_column_names.includes(c.name)
-    );
     let baseViews = window.dtableSDK.getViews(table);
     let currentBaseView;
+    let allViews = plugin_settings.views;
 
-    if (plugin_settings[VIEW_NAME]) {
+    if (allViews[0].settings[VIEW_NAME]) {
       currentBaseView = baseViews.find(
-        (v) => v.name === plugin_settings[VIEW_NAME]
+        (v) => v.name === allViews[0].settings[VIEW_NAME]
       );
     } else {
       currentBaseView = baseViews[0];
     }
+
+    let subtables = window.dtableSDK.getTables();
+    let rows = window.dtableSDK.getViewRows(currentBaseView, table);
+    let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
+    let shownColumns = table.columns.filter((c: any) =>
+      allViews[0]?.settings?.shown_column_names.includes(c.name)
+    );
 
     if (!shownColumns[0]) {
       shownColumns = table.columns;
@@ -131,7 +133,7 @@ class App extends React.Component<IAppProps, IAppState> {
         allViews[0]?.settings?.shown_column_names.indexOf(b.name)
     );
 
-    let _rows = getParentRows(linkedRows, table);
+    let _rows = getParentRows(linkedRows, rows);
 
     this.setState({
       subtables,
@@ -176,12 +178,16 @@ class App extends React.Component<IAppProps, IAppState> {
 
   // Change view
   onSelectView = (viewId: string) => {
-    const { allViews, currentTable } = this.state;
+    const { allViews, currentTable, baseViews } = this.state;
     let viewIdx = allViews.findIndex((view) => view._id === viewId);
     let shownColumns = currentTable.columns.filter((c: any) =>
       allViews[viewIdx].settings.shown_column_names.includes(c.name)
     );
-
+    let currentBaseView = baseViews.find(v => v.name === allViews[viewIdx].settings[VIEW_NAME]) || baseViews[0];
+    let rows = window.dtableSDK.getViewRows(currentBaseView, currentTable);
+    let linkedRows = window.dtableSDK.getTableLinkRows(rows, currentTable);
+    let _rows = getParentRows(linkedRows, rows);
+    
     shownColumns.sort(
       (a, b) =>
         allViews[viewIdx].settings.shown_column_names.indexOf(a.name) -
@@ -189,7 +195,7 @@ class App extends React.Component<IAppProps, IAppState> {
     );
 
     if (viewIdx > -1) {
-      this.setState({ currentViewIdx: viewIdx, shownColumns });
+      this.setState({ currentViewIdx: viewIdx, shownColumns, currentBaseView, _rows });
     }
   };
 
@@ -221,11 +227,12 @@ class App extends React.Component<IAppProps, IAppState> {
   };
 
   // update current base view
-  updateBaseView = (pluginSettings) => {
+  updateBaseView = (pluginSettings: any, name: string) => {
     const { baseViews } = this.state;
     let currentBaseView = baseViews.find(
-      (v) => v.name === pluginSettings[VIEW_NAME]
+      (v) => v.name === name
     );
+
     this.setState({ currentBaseView });
     this.updatePluginSettings(pluginSettings);
   };
@@ -312,7 +319,7 @@ class App extends React.Component<IAppProps, IAppState> {
       baseViews,
       currentBaseView,
       plugin_settings,
-      showSettings,
+      showSettings
     } = this.state;
 
     let columns = currentTable?.columns;
@@ -366,6 +373,7 @@ class App extends React.Component<IAppProps, IAppState> {
                   updateColumnFieldOrder={this.updateColumnFieldOrder}
                   updateBaseView={this.updateBaseView}
                   plugin_settings={plugin_settings}
+                  currentViewIdx={currentViewIdx}
                 />
               )}
             </div>

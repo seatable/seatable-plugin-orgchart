@@ -20,7 +20,10 @@ export interface IViewsProps {
 export interface IViewsState {
     dragItemIndex: number | null,
     dragOverItemIndex: number | null,
-    _allViews: any[]
+    _allViews: any[],
+    viewName: string,
+    showNewViewPopUp: boolean,
+    showEditViewPopUp: boolean,
 
 }
 

@@ -3,11 +3,12 @@ import styles from '../../styles/Modal.module.scss';
 import { RiOrganizationChart } from 'react-icons/ri';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { IOrgChartHeaderProps } from '../../utils/Interfaces/OrgChartHeader.interface';
 
-class OrgChartHeader extends Component {
+class OrgChartHeader extends Component<IOrgChartHeaderProps> {
   // handle print functionality
   printPdfDocument = () => {
-    const input = document.getElementById('org_chart');
+    const input = document.getElementById('org_chart');  // insert element id
 
     if (input) {
       let originalContents = document.body.innerHTML;
@@ -19,7 +20,7 @@ class OrgChartHeader extends Component {
 
     // handle download functionality
     downloadPdfDocument = () => {
-      const input = document.getElementById('org_chart');
+      const input = document.getElementById('org_chart'); // insert element id
     
       if (input) {
         html2canvas(input, {

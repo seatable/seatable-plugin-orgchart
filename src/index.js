@@ -5,13 +5,13 @@
  * Since SeaTable 4.3, dtable-sdk is only a dev-requirements. dtable-utils is sufficient for production.
  */
 
-import React from "react";
-import ReactDOM from "react-dom";
-import DTable from "dtable-sdk";
-import App from "./app.tsx";
-import "./setting.js";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import DTable from 'dtable-sdk';
+import App from './app.tsx';
+import './setting.js';
 
-import "./styles/main.scss";
+import './styles/main.scss';
 
 class PluginModal {
   static async init() {
@@ -38,15 +38,15 @@ class PluginModal {
     await this.init();
     ReactDOM.render(
       <App isDevelopment showDialog />,
-      document.getElementById("root")
+      document.getElementById('root')
     );
   }
 }
 
 PluginModal.execute();
 
-document.getElementById("plugin-controller").addEventListener(
-  "click",
+document.getElementById('plugin-controller').addEventListener(
+  'click',
   function () {
     PluginModal.execute();
   },

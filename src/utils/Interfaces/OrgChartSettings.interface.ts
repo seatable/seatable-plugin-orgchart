@@ -16,11 +16,13 @@ export interface IOrgChartSettingsProps {
     currentBaseView: any,
     updateBaseView: (pluginSettings) => void,
     plugin_settings: {views: any, [SETTING_KEY.VIEW_NAME]: any},
-    settingsRef: React.RefObject<HTMLDivElement>  | undefined
+    settingsRef: React.RefObject<HTMLDivElement>  | undefined,
+    currentViewIdx: string;
 }
 
 export interface IOrgChartSettingsState {
     dragItemIndex: number | null,
     dragOverItemIndex: number | null,
-    _columns: any[]
+    _columns: any[],
+    popupRef: React.RefObject<unknown>
 }

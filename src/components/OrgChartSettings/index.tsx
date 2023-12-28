@@ -3,7 +3,6 @@ import styles from "../../styles/OrgChartSettings.module.scss";
 import styles2 from "../../styles/Modal.module.scss";
 import DtableSelect from "../Elements/dtable-select";
 import { COLUMNS_ICON_CONFIG } from "dtable-utils";
-import { MdDragIndicator } from "react-icons/md";
 import {
   IOrgChartSettingsProps,
   IOrgChartSettingsState,
@@ -21,7 +20,7 @@ class OrgChartSettings extends Component<
       dragItemIndex: null,
       dragOverItemIndex: null,
       _columns: this.props.columns,
-      popupRef: React.createRef(),
+      popupRef: React.createRef()
     };
   }
 
@@ -34,15 +33,13 @@ class OrgChartSettings extends Component<
   }
 
   handleOutsideClick = (event) => {
-    // console.log(this.state.popupRef, event.target);
+    const { toggleSettings } = this.props;
+
     if (
       this.state.popupRef?.current &&
       !this.state.popupRef.current.contains(event.target)
     ) {
-      // Click outside the popup, close it
-      this.setState({
-        showSettings: false,
-      });
+      toggleSettings()
     }
   };
 
@@ -110,12 +107,14 @@ class OrgChartSettings extends Component<
   };
 
   onModifySettings = (selectedOption) => {
-    let { plugin_settings, baseViews, updateBaseView } = this.props;
+    let { plugin_settings, baseViews, updateBaseView, currentViewIdx } = this.props;
     let { value } = selectedOption;
     let name = baseViews.find((v) => v._id === value).name;
-    let updated = Object.assign({}, plugin_settings, { [VIEW_NAME]: name });
+    plugin_settings.views[currentViewIdx].settings[VIEW_NAME] =  name
 
-    updateBaseView(updated);
+    console.log(plugin_settings, name);
+
+    updateBaseView(plugin_settings);
   };
 
   renderViewSelector = () => {
@@ -209,7 +208,7 @@ class OrgChartSettings extends Component<
             ))}
           </div>
 
-          <div className={"mt-3"}>
+          {/* <div className={"mt-3"}>
             <div className="d-flex justify-content-between align-items-center mb-2">
               <label className="ml-2 mb-0">Show field names</label>
               <FieldToggle
@@ -217,7 +216,7 @@ class OrgChartSettings extends Component<
                 onChange={() => {}}
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     );
