@@ -110,9 +110,7 @@ class OrgChartSettings extends Component<
     let { plugin_settings, baseViews, updateBaseView, currentViewIdx } = this.props;
     let { value } = selectedOption;
     let name = baseViews.find((v) => v._id === value).name;
-    plugin_settings.views[currentViewIdx].settings[VIEW_NAME] =  name
-
-    console.log(plugin_settings, name);
+    plugin_settings.views[currentViewIdx].settings[VIEW_NAME] =  name;
 
     updateBaseView(plugin_settings);
   };

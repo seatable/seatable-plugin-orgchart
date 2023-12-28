@@ -28,7 +28,6 @@ class ViewItem extends Component<IViewItemProps, IViewItemState> {
   }
 
   handleOutsideClick = (event) => {
-    // console.log(this.state.popupRef, event.target);
     if (
       this.state.popupRef?.current &&
       !this.state.popupRef.current.contains(event.target)

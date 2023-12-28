@@ -42,7 +42,6 @@ class Modal extends Component<IModalProps, IModalState> {
   }
 
   handleOutsideClick = (event) => {
-    // console.log(this.state.popupRef, event.target);
     if (
       this.state.popupRef?.current &&
       !this.state.popupRef.current.contains(event.target)

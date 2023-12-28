@@ -319,7 +319,8 @@ class App extends React.Component<IAppProps, IAppState> {
       baseViews,
       currentBaseView,
       plugin_settings,
-      showSettings
+      showSettings,
+      _rows
     } = this.state;
 
     let columns = currentTable?.columns;
@@ -354,6 +355,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
               {/* content  */}
               <div className={styles.body}>
+                <div>{`'rows: '${JSON.stringify(_rows)}`}</div>
                 <div>{`'dtable-subtables: '${JSON.stringify(subtables)}`}</div>
               </div>
 
