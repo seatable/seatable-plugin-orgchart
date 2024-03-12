@@ -73,6 +73,7 @@
     opacity: 0;
     transition: 0.2s opacity ease-in-out;
     cursor: pointer;
+    outline: none !important;
 
     @include tablet {
       opacity: 1;

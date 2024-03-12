@@ -475,9 +475,11 @@ const App: React.FC<IAppProps> = (props) => {
 
             <button className={styles.add_row} onClick={addRowItem}>
               <FaPlus size={30} color="#fff" />
-              <div className={styles.add_row_toolTip}>
-                <p>Adding a row only works in production</p>
-              </div>
+              {isDevelopment && (
+                <div style={{ margin: 0 }} className={styles.add_row_toolTip}>
+                  <p>Adding a row only works in production</p>
+                </div>
+              )}
             </button>
           </div>
 

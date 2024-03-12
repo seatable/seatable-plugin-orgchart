@@ -7,6 +7,7 @@
   position: fixed;
   height: 95%;
   bottom: 0;
+  overflow: hidden;
   border-radius: 10px 10px 0 0;
   background: $modal-bgColor;
   display: flex;
@@ -42,7 +43,7 @@
     align-items: center;
     background: $modal-bgColor;
     padding: 15px 15px 10px;
-    border-bottom: 1px solid $modal-header-borderBottom;
+    border-block: 1px solid $modal-header-borderBottom;
     position: sticky;
     top: 0;
     left: 0;
@@ -194,148 +195,6 @@
   align-items: flex-start;
 }
 
-.sub {
-  position: relative;
-  padding-top: 10px;
-  max-width: fit-content;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: -50px;
-    height: 50px;
-    width: 2px;
-    background: $modal-cards-bgColor;
-  }
-
-  &_cards,
-  &_cards_f,
-  &_cards_l {
-    position: relative;
-    flex: 1;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: -10px;
-      height: 10px;
-      width: 2px;
-      background: $modal-cards-bgColor;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: -10px;
-      transform: translateX(-50%);
-      height: 2px;
-      width: 100%;
-      background: $modal-cards-bgColor;
-    }
-  }
-
-  &_cards_f {
-    &::after {
-      left: 50%;
-      transform: translateX(0);
-      width: 50%;
-    }
-  }
-
-  &_cards_l {
-    &::after {
-      left: 0%;
-      width: 50%;
-      transform: translateX(0);
-    }
-  }
-
-  &_cards_one {
-    &::after {
-      display: none;
-    }
-  }
-
-  &_ends {
-    position: relative;
-  }
-}
-
-.Person {
-  width: 150px;
-  border-radius: 5px;
-  position: relative;
-  padding: 130px 10px 10px;
-  margin-bottom: 50px;
-
-  &_columns {
-    max-height: 100px;
-    overflow-y: scroll;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    &::-webkit-scrollbar {
-      width: 0; /* Remove scrollbar space */
-      background: transparent; /* just make scrollbar invisible */
-    }
-  }
-
-  &_toggle_btn {
-    all: unset;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    display: grid;
-    place-items: center;
-    opacity: 0.5;
-    transition: opacity 0.3s ease-in-out;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    &:focus {
-      display: none;
-    }
-  }
-
-  figure {
-    width: 100%;
-    height: 120px;
-    background-repeat: no-repeat;
-    background-position: top;
-    background-size: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-bottom: 2px solid $figure-borderBottom;
-  }
-
-  h6 {
-    text-transform: uppercase;
-    color: $modal-cards-bgColor;
-    font-size: 10px;
-    font-weight: 600;
-  }
-
-  &_data {
-    font-size: 11px;
-    display: inline-block;
-    border-radius: 3px;
-  }
-}
-
 .preset_dropdown {
   position: absolute;
   top: 46px;
@@ -367,6 +226,7 @@
   bottom: 50px;
   right: 50px;
   border-radius: 50%;
+  outline: none !important;
 
   &:hover {
     opacity: 0.9;
