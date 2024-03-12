@@ -1,5 +1,5 @@
 import { PresetsArray } from './PluginPresets/Presets.interface';
-import { Table, TableRow, TableView } from './Table.interface';
+import { Table, TableColumn, TableRow, TableView } from './Table.interface';
 
 export interface IAppProps {
   isDevelopment?: boolean;
@@ -32,6 +32,7 @@ export interface AppActiveState {
   activeTableName: string; // Holds the name of the active table // TO REMOVE
   activeTableView: TableView | null; // Represents the currently active table view in the app
   activeViewRows?: TableRow[]; // Represents the currently active view rows in the app
+  activeRelationship?: TableColumn
 }
 
 export interface IPluginDataStore

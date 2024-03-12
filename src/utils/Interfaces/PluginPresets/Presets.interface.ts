@@ -1,7 +1,7 @@
 import { PLUGIN_NAME } from '../../constants';
 import { AppActiveState, IPluginDataStore } from '../App.interface';
 import { SelectOption } from '../PluginSettings.interface';
-import { TableArray } from '../Table.interface';
+import { TableArray, TableColumn } from '../Table.interface';
 
 export interface IPresetsProps {
   pluginPresets: PresetsArray;
@@ -38,6 +38,7 @@ export interface PresetSettings {
   shown_title_name?: string | undefined;
   selectedTable?: SelectOption;
   selectedView?: SelectOption;
+  relationship?: TableColumn;
 }
 
 export type PresetsArray = IPresetInfo[];

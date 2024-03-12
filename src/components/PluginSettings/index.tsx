@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DtableSelect from '../Elements/dtable-select';
 import styles from '../../styles/PluginSettings.module.scss';
 import styles2 from '../../styles/Presets.module.scss';
+import deepCopy from 'deep-copy';
 import {
   SelectOption,
   IPluginSettingsProps,
@@ -21,16 +22,22 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   isShowSettings,
   onToggleSettings,
   onTableOrViewChange,
+  pluginPresets,
+  activePresetIdx,
+  pluginDataStore,
+  updatePresets
 }) => {
   // State variables for table and view options
   const [tableOptions, setTableOptions] = useState<SelectOption[]>();
   const [viewOptions, setViewOptions] = useState<SelectOption[]>();
   const [tableSelectedOption, setTableSelectedOption] = useState<SelectOption>();
   const [viewSelectedOption, setViewSelectedOption] = useState<SelectOption>();
+  const [relationshipOptions, setRelationshipOptions] = useState<SelectOption[]>(); 
+  const [relationshipSelectedOption, setRelationshipSelectedOption] = useState<SelectOption>(); 
 
   // Change options when active table or view changes
   useEffect(() => {
-    const { activeTableView } = appActiveState;
+    const { activeTableView, activeTable } = appActiveState;
 
     // Create options for tables
     let tableOptions = allTables.map((item) => {
@@ -46,20 +53,45 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
       return { value, label };
     });
 
+    // Create options for relationship dropdown
+    let relationshipOptions = activeTable?.columns.filter((item) => item.type === 'link').map((item) => {
+      let value = item.key;
+      let label = truncateTableName(item.name);
+      return { value, label };
+    });
+
     // Set selected options based on activeTable and activeTableView
     let tableSelectedOption = {
       value: appActiveState?.activeTable?._id!,
       label: appActiveState.activeTableName,
     };
     let viewSelectedOption = viewOptions.find((item) => item.value === activeTableView?._id);
+    let relationshipSelectedOption = relationshipOptions?.find(item => item.value === appActiveState.activeRelationship?.key);
 
     // Update state with new options and selected values
     setTableOptions(tableOptions);
     setTableSelectedOption(tableSelectedOption);
     setViewOptions(viewOptions);
     setViewSelectedOption(viewSelectedOption);
+    setRelationshipOptions(relationshipOptions);
+    setRelationshipSelectedOption(relationshipSelectedOption);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActiveState]);
+
+  // Onchange function to update relationship value in preset settings
+  const editRelationship = (selectedOption: SelectOption) => {
+    let newPluginPresets = deepCopy(pluginPresets);
+    let oldPreset = pluginPresets[activePresetIdx];
+    let relationship = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
+    let settings = {...oldPreset.settings, relationship: relationship};
+    let updatedPreset = {...oldPreset, settings};
+
+
+    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
+    pluginDataStore.presets = newPluginPresets;
+
+    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
+  };
 
   return (
     <div className={`bg-white ${isShowSettings ? styles.settings : styles.settings_hide}`}>
@@ -99,7 +131,19 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               />
             </div>
           </div>
-          {/* Insert custom settings */}
+
+          {/* custom settings */}
+          <div className={styles.settings_dropdowns_noborder}>
+            <div className='mt-3'>
+              <p className="d-inline-block mb-2">Relationship</p>
+              {/* Toggle relationship value */}
+              <DtableSelect
+                value={relationshipSelectedOption}
+                options={relationshipOptions}
+                onChange={editRelationship}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

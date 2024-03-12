@@ -33,6 +33,10 @@
   &_dropdowns {
     padding-bottom: 20px;
     border-bottom: 1px solid $borderColor;
+
+    &_noborder {
+      border: none;
+    }
   }
 
   p {
