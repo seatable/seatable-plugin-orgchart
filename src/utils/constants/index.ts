@@ -73,7 +73,7 @@ const INITIAL_CURRENT_STATE: AppActiveState = {
   activeTableName: 'Table1',
   activeTableView: null,
   activePresetId: '0000',
-  activePresetIdx: 0,
+  activePresetIdx: 0
 };
 
 // Default Selected Preset

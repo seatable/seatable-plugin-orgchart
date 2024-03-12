@@ -45,6 +45,10 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
         style={{
           color: '#ff6666',
         }}>{`Active View: ${appActiveState?.activeTableView?.name}`}</div>
+      <div
+        style={{
+          color: '#ff6666',
+        }}>{`Active Title: ${appActiveState?.activeCardTitle?.name}`}</div>
     </div>
     <div
       style={{
