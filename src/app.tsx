@@ -244,7 +244,7 @@ const App: React.FC<IAppProps> = (props) => {
     setAppActiveState((prevState) => ({
       ...prevState,
       activePresetIdx: _activePresetIdx,
-      activeRelationship: updatedPresets[activePresetIdx].settings?.relationship
+      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship
     }));
     setPluginPresets(updatedPresets);
     setPluginDataStore(pluginDataStore);
@@ -281,6 +281,7 @@ const App: React.FC<IAppProps> = (props) => {
       activeTableName: table.name,
       activeTableView: view,
       activeViewRows: window.dtableSDK.getViewRows(view, table),
+      activeRelationship: pluginPresets[0].settings?.relationship
     };
 
     setAppActiveState(newPresetActiveState);

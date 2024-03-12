@@ -180,6 +180,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
       activeTable: _activeTableAndView.table,
       activeTableName: newPresetsArray[_activePresetIdx]?.settings?.selectedTable?.label!,
       activeTableView: _activeTableAndView.view,
+      activeRelationship: newPresetsArray[_activePresetIdx]?.settings?.relationship
     };
 
     onSelectPreset(_id, newPresetActiveState);
