@@ -135,7 +135,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
           {/* custom settings */}
           <div className={styles.settings_dropdowns_noborder}>
             <div className='mt-3'>
-              <p className="d-inline-block mb-2">Title</p>
+              <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
               {/* Toggle title value */}
               <DtableSelect
                 value={titleSelectedOption}
