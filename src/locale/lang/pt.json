@@ -6,5 +6,6 @@
   "preset_rename": "Renomear",
   "preset_duplicate": "Duplicado",
   "preset_delete": "Excluir",
-  "preset_warn_exist": "Introduza um nome de predefinição único"
+  "preset_warn_exist": "Introduza um nome de predefinição único",
+  "relationship": "Relação"
 }

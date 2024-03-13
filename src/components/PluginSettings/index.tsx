@@ -135,7 +135,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
           {/* custom settings */}
           <div className={styles.settings_dropdowns_noborder}>
             <div className='mt-3'>
-              <p className="d-inline-block mb-2">Relationship</p>
+              <p className="d-inline-block mb-2">{intl.get('relationship').d(`${d.relationship}/`)}</p>
               {/* Toggle relationship value */}
               <DtableSelect
                 value={relationshipSelectedOption}
