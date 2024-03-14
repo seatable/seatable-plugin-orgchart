@@ -1,5 +1,5 @@
 {
-  "name": "seatable-org-chart-plugin",
+  "name": "seatable-plugin-org-chart",
   "version": "0.1.2",
   "private": true,
   "dependencies": {
