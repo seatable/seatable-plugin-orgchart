@@ -40,6 +40,7 @@ export interface PresetSettings {
   selectedView?: SelectOption;
   title?: TableColumn;
   relationship?: TableColumn;
+  shown_columns?: TableColumn[];
 }
 
 export type PresetsArray = IPresetInfo[];

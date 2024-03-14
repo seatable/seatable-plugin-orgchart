@@ -210,7 +210,7 @@ const App: React.FC<IAppProps> = (props) => {
           updatedActiveTableViews.find((view) => view._id === _activeViewId) || activeTableViews[0],
         activePresetId: presetId,
         activePresetIdx: _activePresetIdx,
-        activeCardTitle: activePreset?.settings?.title || getTitleColumns(_activeTable?.columns)[0]
+        activeCardTitle: activePreset?.settings?.title || getTitleColumns(_activeTable?.columns)[0],
       };
 
       updatePluginDataStore({
@@ -248,7 +248,7 @@ const App: React.FC<IAppProps> = (props) => {
       ...prevState,
       activePresetIdx: _activePresetIdx,
       activeCardTitle: updatedPresets[_activePresetIdx].settings?.title,
-      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship
+      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship,
     }));
     setPluginPresets(updatedPresets);
     setPluginDataStore(pluginDataStore);
@@ -286,7 +286,7 @@ const App: React.FC<IAppProps> = (props) => {
       activeTableView: view,
       activeViewRows: window.dtableSDK.getViewRows(view, table),
       activeCardTitle: pluginPresets[0].settings?.title,
-      activeRelationship: pluginPresets[0].settings?.relationship
+      activeRelationship: pluginPresets[0].settings?.relationship,
     };
 
     setAppActiveState(newPresetActiveState);
@@ -329,7 +329,7 @@ const App: React.FC<IAppProps> = (props) => {
           activeTableView: _activeTable.views[0],
           activeViewRows: _activeViewRows,
           activeCardTitle: getTitleColumns(_activeTable.columns)[0],
-          activeRelationship: getDefaultLinkColumn(_activeTable)
+          activeRelationship: getDefaultLinkColumn(_activeTable),
         }));
 
         updatedPluginPresets = pluginPresets.map((preset) =>
@@ -344,7 +344,8 @@ const App: React.FC<IAppProps> = (props) => {
                     value: _activeTable.views[0]._id,
                     label: _activeTable.views[0].name,
                   },
-                  title: getTitleColumns(_activeTable.columns)[0]
+                  title: getTitleColumns(_activeTable.columns)[0],
+                  shown_columns: [],
                 },
               }
             : preset
@@ -481,6 +482,7 @@ const App: React.FC<IAppProps> = (props) => {
               pluginPresets={pluginPresets}
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}
+              shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
             />
 
             <button className={styles.add_row} onClick={addRowItem}>

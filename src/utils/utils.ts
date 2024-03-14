@@ -129,9 +129,9 @@ export const isTableEditable = (
 
 export const getTitleColumns = (columns?: TableColumn[]) => {
   const SHOW_TITLE_COLUMN_TYPE = [
-    CellType.TEXT, CellType.SINGLE_SELECT, CellType.MULTIPLE_SELECT, 
-    CellType.NUMBER, CellType.FORMULA,CellType.DATE, CellType.COLLABORATOR, 
-    CellType.GEOLOCATION, CellType.CTIME, CellType.MTIME, CellType.CREATOR, 
+    CellType.TEXT, CellType.SINGLE_SELECT, CellType.MULTIPLE_SELECT,
+    CellType.NUMBER, CellType.FORMULA, CellType.DATE, CellType.COLLABORATOR,
+    CellType.GEOLOCATION, CellType.CTIME, CellType.MTIME, CellType.CREATOR,
     CellType.LAST_MODIFIER];
   return columns?.filter(column => SHOW_TITLE_COLUMN_TYPE.find(type => type === column.type)) || [];
 };
@@ -417,5 +417,17 @@ export const isMobile = () => {
 };
 
 export const getDefaultLinkColumn = (table: Table) => {
-  return table.columns.filter((c:TableColumn ) => c.type === 'link')[0];
+  return table.columns.filter((c: TableColumn) => c.type === 'link')[0];
+};
+
+export const isAllColumnsShown = (shownColumns?: string[], columns?: TableColumn[]) => {
+  if (columns) {
+    for (let i = 0; i < columns.length; i++) {
+      if (!shownColumns?.includes(columns[i].key)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
 };

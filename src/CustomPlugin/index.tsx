@@ -6,6 +6,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginPresets,
   appActiveState,
   activeViewRows,
+  shownColumns,
 }) => (
   <>
     {pluginPresets.map((preset: IPresetInfo) => (
@@ -54,6 +55,27 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
           color: '#ff6666',
         }}>{`Active Relationship: ${appActiveState?.activeRelationship?.name}`}</div>
     </div>
+
+    <div
+      style={{
+        border: '1px solid #ddd',
+        padding: '10px',
+        marginBottom: '10px',
+        borderRadius: '5px',
+        backgroundColor: '#fff',
+      }}>
+      <p>Shown Columns</p>
+      {shownColumns?.map((c) => (
+        <div
+          key={c.key}
+          style={{
+            color: '#000',
+          }}>
+          {c.name}
+        </div>
+      ))}
+    </div>
+
     <div
       style={{
         border: '1px solid #ddd',
