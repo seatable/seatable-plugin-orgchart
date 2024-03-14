@@ -8,5 +8,6 @@
   "preset_delete": "Excluir",
   "preset_warn_exist": "Introduza um nome de predefinição único",
   "title": "Título",
-  "relationship": "Relação"
+  "relationship": "Relação",
+  "coverImg": "Imagem de capa"
 }

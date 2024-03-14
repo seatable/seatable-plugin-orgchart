@@ -8,5 +8,6 @@
   "preset_delete": "Supprimmer",
   "preset_warn_exist": "Veuillez saisir un nom de préréglage unique",
   "title": "Titre",
-  "relationship": "Relation"
+  "relationship": "Relation",
+  "coverImg": "Image de couverture"
 }

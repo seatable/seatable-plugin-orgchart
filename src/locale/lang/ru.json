@@ -8,5 +8,6 @@
   "preset_delete": "удалить",
   "preset_warn_exist": "Пожалуйста, введите уникальное имя предустановки",
   "title": "Заголовок",
-  "relationship": "Отношение"
+  "relationship": "Отношение",
+  "coverImg": "Обложка"
 }

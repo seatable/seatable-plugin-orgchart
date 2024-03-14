@@ -8,5 +8,6 @@
   "preset_delete": "Löschen",
   "preset_warn_exist": "Bitte wählen Sie einen einzigartigen Namen",
   "title": "Titel",
-  "relationship": "Beziehung"
+  "relationship": "Beziehung",
+  "coverImg": "Titelbild"
 }

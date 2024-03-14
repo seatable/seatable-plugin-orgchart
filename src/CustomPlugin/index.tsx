@@ -52,7 +52,13 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
       <div
         style={{
           color: '#ff6666',
-        }}>{`Active Relationship: ${appActiveState?.activeRelationship?.name}`}</div>
+        }}>{`Active Relationship: ${
+        appActiveState?.activeRelationship?.name || 'No Relationship'
+      }`}</div>
+      <div
+        style={{
+          color: '#ff6666',
+        }}>{`Active Cover Img: ${appActiveState?.activeCoverImg?.name || 'No Image'}`}</div>
     </div>
     <div
       style={{
