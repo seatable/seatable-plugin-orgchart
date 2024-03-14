@@ -6,5 +6,6 @@
   "preset_rename": "重命名预置",
   "preset_duplicate": "复制预置",
   "preset_delete": "删除预设",
-  "preset_warn_exist": "请输入唯一的预设名称"
+  "preset_warn_exist": "请输入唯一的预设名称",
+  "title": "標題"
 }

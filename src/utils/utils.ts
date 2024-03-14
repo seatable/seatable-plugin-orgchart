@@ -1,3 +1,6 @@
+import {
+  CellType
+} from 'dtable-utils';
 import pluginContext from '../plugin-context';
 import { AppActiveState, IPluginDataStore } from './Interfaces/App.interface';
 import { PresetSettings, PresetsArray } from './Interfaces/PluginPresets/Presets.interface';
@@ -5,6 +8,7 @@ import {
   IActiveTableAndView,
   Table,
   TableArray,
+  TableColumn,
   TableRow,
   TableView,
 } from './Interfaces/Table.interface';
@@ -123,6 +127,15 @@ export const isTableEditable = (
   return false;
 };
 
+export const getTitleColumns = (columns?: TableColumn[]) => {
+  const SHOW_TITLE_COLUMN_TYPE = [
+    CellType.TEXT, CellType.SINGLE_SELECT, CellType.MULTIPLE_SELECT, 
+    CellType.NUMBER, CellType.FORMULA,CellType.DATE, CellType.COLLABORATOR, 
+    CellType.GEOLOCATION, CellType.CTIME, CellType.MTIME, CellType.CREATOR, 
+    CellType.LAST_MODIFIER];
+  return columns?.filter(column => SHOW_TITLE_COLUMN_TYPE.find(type => type === column.type)) || [];
+};
+
 export const canCreateRows = (
   table: { table_permissions?: { add_rows_permission?: any } },
   TABLE_PERMISSION_TYPE: {
@@ -239,6 +252,7 @@ export const parsePluginDataToActiveState = (
   let tableView = table.views.find(
     (v) => v._id === pluginPresets[idx].settings?.selectedView?.value
   )!;
+  let title = pluginPresets[idx].settings?.title || getTitleColumns(table.columns)[0];
 
   // Create the appActiveState object with the extracted data
   const appActiveState = {
@@ -247,6 +261,7 @@ export const parsePluginDataToActiveState = (
     activeTable: table,
     activeTableName: tableName,
     activeTableView: tableView,
+    activeCardTitle: title
   };
 
   // Return the active state object
@@ -281,6 +296,7 @@ export const getActiveStateSafeGuard = (
     activePresetId: (pluginPresets[0] && pluginPresets[0]._id) || '0000', // '0000' as Safe guard if there are no presets
     activePresetIdx: 0,
     activeViewRows: activeViewRows,
+    activeCardTitle: getTitleColumns(activeTableAndView.table.columns)[0]
   };
 
   // Return the active state object considering presets or default values
@@ -348,6 +364,7 @@ export const createDefaultPluginDataStore = (
   const _presetSettings: PresetSettings = {
     selectedTable: { value: activeTable._id, label: activeTable.name },
     selectedView: { value: activeTable.views[0]._id, label: activeTable.views[0].name },
+    title: getTitleColumns(activeTable.columns)[0]
   };
 
   // Importing the default settings from the constants file and updating the presets array with the Default Settings
@@ -382,6 +399,7 @@ export const createDefaultPresetSettings = (allTables: TableArray) => {
     shown_title_name: 'Title',
     selectedTable: tableInfo,
     selectedView: viewInfo,
+    title: getTitleColumns(allTables[0].columns)[0]
   };
 };
 

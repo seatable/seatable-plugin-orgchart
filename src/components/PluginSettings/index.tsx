@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import DtableSelect from '../Elements/dtable-select';
 import styles from '../../styles/PluginSettings.module.scss';
 import styles2 from '../../styles/Presets.module.scss';
+import deepCopy from 'deep-copy';
 import {
   SelectOption,
   IPluginSettingsProps,
 } from '../../utils/Interfaces/PluginSettings.interface';
-import { truncateTableName } from '../../utils/utils';
+import { getTitleColumns, truncateTableName } from '../../utils/utils';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import { SettingsOption } from '../../utils/types';
 import intl from 'react-intl-universal';
@@ -21,16 +22,22 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   isShowSettings,
   onToggleSettings,
   onTableOrViewChange,
+  pluginPresets,
+  activePresetIdx,
+  pluginDataStore,
+  updatePresets
 }) => {
   // State variables for table and view options
   const [tableOptions, setTableOptions] = useState<SelectOption[]>();
   const [viewOptions, setViewOptions] = useState<SelectOption[]>();
   const [tableSelectedOption, setTableSelectedOption] = useState<SelectOption>();
   const [viewSelectedOption, setViewSelectedOption] = useState<SelectOption>();
+  const [titleOptions, setTitleOptions] = useState<SelectOption[]>(); 
+  const [titleSelectedOption, setTitleSelectedOption] = useState<SelectOption>(); 
 
   // Change options when active table or view changes
   useEffect(() => {
-    const { activeTableView } = appActiveState;
+    const { activeTableView, activeTable } = appActiveState;
 
     // Create options for tables
     let tableOptions = allTables.map((item) => {
@@ -46,20 +53,45 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
       return { value, label };
     });
 
+    // Create options for title dropdown
+    let titleOptions = getTitleColumns(activeTable?.columns).map((item) => {
+      let value = item.key;
+      let label = truncateTableName(item.name);
+      return { value, label };
+    });
+
     // Set selected options based on activeTable and activeTableView
     let tableSelectedOption = {
       value: appActiveState?.activeTable?._id!,
       label: appActiveState.activeTableName,
     };
     let viewSelectedOption = viewOptions.find((item) => item.value === activeTableView?._id);
+    let titleSelectedOption = titleOptions?.find(item => item.value === appActiveState.activeCardTitle?.key);
 
     // Update state with new options and selected values
     setTableOptions(tableOptions);
     setTableSelectedOption(tableSelectedOption);
     setViewOptions(viewOptions);
     setViewSelectedOption(viewSelectedOption);
+    setTitleOptions(titleOptions);
+    setTitleSelectedOption(titleSelectedOption);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActiveState]);
+
+   // Onchange function to update title value in preset settings
+   const editTitle = (selectedOption: SelectOption) => {
+    let newPluginPresets = deepCopy(pluginPresets);
+    let oldPreset = pluginPresets[activePresetIdx];
+    let title = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
+    let settings = {...oldPreset.settings, title};
+    let updatedPreset = {...oldPreset, settings};
+
+
+    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
+    pluginDataStore.presets = newPluginPresets;
+
+    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
+  };
 
   return (
     <div className={`bg-white ${isShowSettings ? styles.settings : styles.settings_hide}`}>
@@ -99,7 +131,19 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               />
             </div>
           </div>
-          {/* Insert custom settings */}
+
+          {/* custom settings */}
+          <div className={styles.settings_dropdowns_noborder}>
+            <div className='mt-3'>
+              <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
+              {/* Toggle title value */}
+              <DtableSelect
+                value={titleSelectedOption}
+                options={titleOptions}
+                onChange={editTitle}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

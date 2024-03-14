@@ -43,6 +43,7 @@ import {
   getActiveStateSafeGuard,
   getActiveTableAndActiveView,
   getPluginDataStore,
+  getTitleColumns,
   isMobile,
   parsePluginDataToActiveState,
 } from './utils/utils';
@@ -65,7 +66,7 @@ const App: React.FC<IAppProps> = (props) => {
   // For better understanding read the comments in the AppActiveState interface
   const [appActiveState, setAppActiveState] = useState<AppActiveState>(INITIAL_CURRENT_STATE);
   // Destructure properties from the app's active state for easier access
-  const { activeTable, activePresetId, activePresetIdx, activeViewRows, activeTableView } =
+  const { activeTable, activePresetId, activePresetIdx, activeViewRows, activeCardTitle } =
     appActiveState;
   const { collaborators } = window.app.state;
 
@@ -195,17 +196,19 @@ const App: React.FC<IAppProps> = (props) => {
       const _activeTableName = selectedTable?.label as string;
       const _activeTableId = selectedTable?.value as string;
       const _activeViewId = selectedView?.value as string;
+      const _activeTable = allTables.find((table) => table._id === _activeTableId) || activeTable;
 
       updatedActiveTableViews =
         allTables.find((table) => table._id === _activeTableId)?.views || [];
 
       updatedActiveState = {
-        activeTable: allTables.find((table) => table._id === _activeTableId) || activeTable,
+        activeTable: _activeTable,
         activeTableName: _activeTableName,
         activeTableView:
           updatedActiveTableViews.find((view) => view._id === _activeViewId) || activeTableViews[0],
         activePresetId: presetId,
         activePresetIdx: _activePresetIdx,
+        activeCardTitle: activePreset?.settings?.title || getTitleColumns(_activeTable?.columns)[0]
       };
 
       updatePluginDataStore({
@@ -242,6 +245,7 @@ const App: React.FC<IAppProps> = (props) => {
     setAppActiveState((prevState) => ({
       ...prevState,
       activePresetIdx: _activePresetIdx,
+      activeCardTitle: updatedPresets[_activePresetIdx].settings?.title
     }));
     setPluginPresets(updatedPresets);
     setPluginDataStore(pluginDataStore);
@@ -278,6 +282,7 @@ const App: React.FC<IAppProps> = (props) => {
       activeTableName: table.name,
       activeTableView: view,
       activeViewRows: window.dtableSDK.getViewRows(view, table),
+      activeCardTitle: pluginPresets[0].settings?.title
     };
 
     setAppActiveState(newPresetActiveState);
@@ -319,6 +324,7 @@ const App: React.FC<IAppProps> = (props) => {
           activeTableName: _activeTable.name,
           activeTableView: _activeTable.views[0],
           activeViewRows: _activeViewRows,
+          activeCardTitle: getTitleColumns(_activeTable.columns)[0]
         }));
 
         updatedPluginPresets = pluginPresets.map((preset) =>
@@ -332,6 +338,7 @@ const App: React.FC<IAppProps> = (props) => {
                     value: _activeTable.views[0]._id,
                     label: _activeTable.views[0].name,
                   },
+                  title: getTitleColumns(_activeTable.columns)[0]
                 },
               }
             : preset
@@ -391,11 +398,10 @@ const App: React.FC<IAppProps> = (props) => {
   const onInsertRow = (table: Table, view: TableView, rowData: any) => {
     let columns = window.dtableSDK.getColumns(table);
     let newRowData: { [key: string]: any } = {};
-    console.log('columns', columns);
+
     for (let key in rowData) {
-      console.log('key', key);
       let column = columns.find((column: TableColumn) => column.name === key);
-      console.log('column.type', column.type);
+
       if (!column) {
         continue;
       }
@@ -489,6 +495,9 @@ const App: React.FC<IAppProps> = (props) => {
             appActiveState={appActiveState}
             activeTableViews={activeTableViews}
             pluginPresets={pluginPresets}
+            activePresetIdx={activePresetIdx}
+            pluginDataStore={pluginDataStore}
+            updatePresets={updatePresets}
             onTableOrViewChange={onTableOrViewChange}
             onToggleSettings={toggleSettings}
           />
