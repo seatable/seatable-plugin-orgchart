@@ -42,6 +42,7 @@ import {
   findPresetName,
   getActiveStateSafeGuard,
   getActiveTableAndActiveView,
+  getDefaultLinkColumn,
   getPluginDataStore,
   getTitleColumns,
   isMobile,
@@ -203,6 +204,7 @@ const App: React.FC<IAppProps> = (props) => {
 
       updatedActiveState = {
         activeTable: _activeTable,
+        activeRelationship: activePreset?.settings?.relationship,
         activeTableName: _activeTableName,
         activeTableView:
           updatedActiveTableViews.find((view) => view._id === _activeViewId) || activeTableViews[0],
@@ -245,7 +247,8 @@ const App: React.FC<IAppProps> = (props) => {
     setAppActiveState((prevState) => ({
       ...prevState,
       activePresetIdx: _activePresetIdx,
-      activeCardTitle: updatedPresets[_activePresetIdx].settings?.title
+      activeCardTitle: updatedPresets[_activePresetIdx].settings?.title,
+      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship
     }));
     setPluginPresets(updatedPresets);
     setPluginDataStore(pluginDataStore);
@@ -282,7 +285,8 @@ const App: React.FC<IAppProps> = (props) => {
       activeTableName: table.name,
       activeTableView: view,
       activeViewRows: window.dtableSDK.getViewRows(view, table),
-      activeCardTitle: pluginPresets[0].settings?.title
+      activeCardTitle: pluginPresets[0].settings?.title,
+      activeRelationship: pluginPresets[0].settings?.relationship
     };
 
     setAppActiveState(newPresetActiveState);
@@ -324,7 +328,8 @@ const App: React.FC<IAppProps> = (props) => {
           activeTableName: _activeTable.name,
           activeTableView: _activeTable.views[0],
           activeViewRows: _activeViewRows,
-          activeCardTitle: getTitleColumns(_activeTable.columns)[0]
+          activeCardTitle: getTitleColumns(_activeTable.columns)[0],
+          activeRelationship: getDefaultLinkColumn(_activeTable)
         }));
 
         updatedPluginPresets = pluginPresets.map((preset) =>
@@ -333,6 +338,7 @@ const App: React.FC<IAppProps> = (props) => {
                 ...preset,
                 settings: {
                   ...preset.settings,
+                  relationship: getDefaultLinkColumn(_activeTable),
                   selectedTable: { value: _activeTable._id, label: _activeTable.name },
                   selectedView: {
                     value: _activeTable.views[0]._id,
@@ -398,10 +404,8 @@ const App: React.FC<IAppProps> = (props) => {
   const onInsertRow = (table: Table, view: TableView, rowData: any) => {
     let columns = window.dtableSDK.getColumns(table);
     let newRowData: { [key: string]: any } = {};
-
     for (let key in rowData) {
       let column = columns.find((column: TableColumn) => column.name === key);
-
       if (!column) {
         continue;
       }

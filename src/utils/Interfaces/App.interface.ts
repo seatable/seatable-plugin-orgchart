@@ -33,6 +33,7 @@ export interface AppActiveState {
   activeTableView: TableView | null; // Represents the currently active table view in the app
   activeViewRows?: TableRow[]; // Represents the currently active view rows in the app
   activeCardTitle?: TableColumn; // Represents which column will be the title of the org chart cards
+  activeRelationship?: TableColumn;
 }
 
 export interface IPluginDataStore

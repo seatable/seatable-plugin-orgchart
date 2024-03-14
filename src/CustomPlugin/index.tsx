@@ -49,6 +49,10 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
         style={{
           color: '#ff6666',
         }}>{`Active Title: ${appActiveState?.activeCardTitle?.name}`}</div>
+      <div
+        style={{
+          color: '#ff6666',
+        }}>{`Active Relationship: ${appActiveState?.activeRelationship?.name}`}</div>
     </div>
     <div
       style={{

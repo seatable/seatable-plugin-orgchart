@@ -7,5 +7,6 @@
   "preset_duplicate": "Duplicate",
   "preset_delete": "Delete",
   "preset_warn_exist": "Please enter a unique preset name",
-  "title": "Title"
+  "title": "Title",
+  "relationship": "Relationship"
 }

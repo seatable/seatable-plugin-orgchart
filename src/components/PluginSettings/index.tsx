@@ -34,6 +34,8 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   const [viewSelectedOption, setViewSelectedOption] = useState<SelectOption>();
   const [titleOptions, setTitleOptions] = useState<SelectOption[]>(); 
   const [titleSelectedOption, setTitleSelectedOption] = useState<SelectOption>(); 
+  const [relationshipOptions, setRelationshipOptions] = useState<SelectOption[]>(); 
+  const [relationshipSelectedOption, setRelationshipSelectedOption] = useState<SelectOption>(); 
 
   // Change options when active table or view changes
   useEffect(() => {
@@ -59,6 +61,13 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
       let label = truncateTableName(item.name);
       return { value, label };
     });
+    
+    // Create options for relationship dropdown
+    let relationshipOptions = activeTable?.columns.filter((item) => item.type === 'link').map((item) => {
+      let value = item.key;
+      let label = truncateTableName(item.name);
+      return { value, label };
+    });
 
     // Set selected options based on activeTable and activeTableView
     let tableSelectedOption = {
@@ -67,6 +76,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     };
     let viewSelectedOption = viewOptions.find((item) => item.value === activeTableView?._id);
     let titleSelectedOption = titleOptions?.find(item => item.value === appActiveState.activeCardTitle?.key);
+    let relationshipSelectedOption = relationshipOptions?.find(item => item.value === appActiveState.activeRelationship?.key);
 
     // Update state with new options and selected values
     setTableOptions(tableOptions);
@@ -75,15 +85,32 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     setViewSelectedOption(viewSelectedOption);
     setTitleOptions(titleOptions);
     setTitleSelectedOption(titleSelectedOption);
+    setRelationshipOptions(relationshipOptions);
+    setRelationshipSelectedOption(relationshipSelectedOption);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActiveState]);
 
-   // Onchange function to update title value in preset settings
-   const editTitle = (selectedOption: SelectOption) => {
+  // Onchange function to update title value in preset settings
+  const editTitle = (selectedOption: SelectOption) => {
     let newPluginPresets = deepCopy(pluginPresets);
     let oldPreset = pluginPresets[activePresetIdx];
     let title = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
     let settings = {...oldPreset.settings, title};
+    let updatedPreset = {...oldPreset, settings};
+
+
+    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
+    pluginDataStore.presets = newPluginPresets;
+
+    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
+  };
+
+  // Onchange function to update relationship value in preset settings
+  const editRelationship = (selectedOption: SelectOption) => {
+    let newPluginPresets = deepCopy(pluginPresets);
+    let oldPreset = pluginPresets[activePresetIdx];
+    let relationship = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
+    let settings = {...oldPreset.settings, relationship: relationship};
     let updatedPreset = {...oldPreset, settings};
 
 
@@ -135,7 +162,16 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
           {/* custom settings */}
           <div className={styles.settings_dropdowns_noborder}>
             <div className='mt-3'>
-              <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
+              <p className="d-inline-block mb-2">{intl.get('relationship').d(`${d.relationship}/`)}</p>
+              {/* Toggle relationship value */}
+              <DtableSelect
+                value={relationshipSelectedOption}
+                options={relationshipOptions}
+                onChange={editRelationship}
+              />
+            </div>
+            <div className='mt-3'>
+            <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
               {/* Toggle title value */}
               <DtableSelect
                 value={titleSelectedOption}

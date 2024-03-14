@@ -253,6 +253,7 @@ export const parsePluginDataToActiveState = (
     (v) => v._id === pluginPresets[idx].settings?.selectedView?.value
   )!;
   let title = pluginPresets[idx].settings?.title || getTitleColumns(table.columns)[0];
+  let relationship = pluginPresets[idx].settings?.relationship || getDefaultLinkColumn(table);
 
   // Create the appActiveState object with the extracted data
   const appActiveState = {
@@ -261,7 +262,8 @@ export const parsePluginDataToActiveState = (
     activeTable: table,
     activeTableName: tableName,
     activeTableView: tableView,
-    activeCardTitle: title
+    activeCardTitle: title,
+    activeRelationship: relationship
   };
 
   // Return the active state object
@@ -296,7 +298,8 @@ export const getActiveStateSafeGuard = (
     activePresetId: (pluginPresets[0] && pluginPresets[0]._id) || '0000', // '0000' as Safe guard if there are no presets
     activePresetIdx: 0,
     activeViewRows: activeViewRows,
-    activeCardTitle: getTitleColumns(activeTableAndView.table.columns)[0]
+    activeCardTitle: getTitleColumns(activeTableAndView.table.columns)[0],
+    activeRelationship: getDefaultLinkColumn(activeTableAndView?.table)
   };
 
   // Return the active state object considering presets or default values
@@ -364,7 +367,8 @@ export const createDefaultPluginDataStore = (
   const _presetSettings: PresetSettings = {
     selectedTable: { value: activeTable._id, label: activeTable.name },
     selectedView: { value: activeTable.views[0]._id, label: activeTable.views[0].name },
-    title: getTitleColumns(activeTable.columns)[0]
+    title: getTitleColumns(activeTable.columns)[0],
+    relationship: getDefaultLinkColumn(activeTable)
   };
 
   // Importing the default settings from the constants file and updating the presets array with the Default Settings
@@ -399,7 +403,8 @@ export const createDefaultPresetSettings = (allTables: TableArray) => {
     shown_title_name: 'Title',
     selectedTable: tableInfo,
     selectedView: viewInfo,
-    title: getTitleColumns(allTables[0].columns)[0]
+    title: getTitleColumns(allTables[0].columns)[0],
+    relationship: getDefaultLinkColumn(allTables[0])
   };
 };
 
@@ -409,4 +414,8 @@ export const findPresetName = (presets: PresetsArray, presetId: string) => {
 
 export const isMobile = () => {
   return window.innerWidth <= 800;
+};
+
+export const getDefaultLinkColumn = (table: Table) => {
+  return table.columns.filter((c:TableColumn ) => c.type === 'link')[0];
 };

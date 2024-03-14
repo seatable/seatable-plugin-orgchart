@@ -7,5 +7,6 @@
   "preset_duplicate": "Duplicado",
   "preset_delete": "Excluir",
   "preset_warn_exist": "Introduza um nome de predefinição único",
-  "title": "Título"
+  "title": "Título",
+  "relationship": "Relação"
 }
