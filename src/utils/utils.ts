@@ -129,9 +129,9 @@ export const isTableEditable = (
 
 export const getTitleColumns = (columns?: TableColumn[]) => {
   const SHOW_TITLE_COLUMN_TYPE = [
-    CellType.TEXT, CellType.SINGLE_SELECT, CellType.MULTIPLE_SELECT, 
-    CellType.NUMBER, CellType.FORMULA,CellType.DATE, CellType.COLLABORATOR, 
-    CellType.GEOLOCATION, CellType.CTIME, CellType.MTIME, CellType.CREATOR, 
+    CellType.TEXT, CellType.SINGLE_SELECT, CellType.MULTIPLE_SELECT,
+    CellType.NUMBER, CellType.FORMULA, CellType.DATE, CellType.COLLABORATOR,
+    CellType.GEOLOCATION, CellType.CTIME, CellType.MTIME, CellType.CREATOR,
     CellType.LAST_MODIFIER];
   return columns?.filter(column => SHOW_TITLE_COLUMN_TYPE.find(type => type === column.type)) || [];
 };
@@ -254,6 +254,7 @@ export const parsePluginDataToActiveState = (
   )!;
   let title = pluginPresets[idx].settings?.title || getTitleColumns(table.columns)[0];
   let relationship = pluginPresets[idx].settings?.relationship || getDefaultLinkColumn(table);
+  let coverImg = pluginPresets[idx].settings?.coverImg;
 
   // Create the appActiveState object with the extracted data
   const appActiveState = {
@@ -263,7 +264,8 @@ export const parsePluginDataToActiveState = (
     activeTableName: tableName,
     activeTableView: tableView,
     activeCardTitle: title,
-    activeRelationship: relationship
+    activeRelationship: relationship,
+    activeCoverImg: coverImg
   };
 
   // Return the active state object
@@ -417,5 +419,9 @@ export const isMobile = () => {
 };
 
 export const getDefaultLinkColumn = (table: Table) => {
-  return table.columns.filter((c:TableColumn ) => c.type === 'link')[0];
+  return table.columns.filter((c: TableColumn) => c.type === 'link')[0];
+};
+
+export const getImageColumns = (columns?: TableColumn[]) => {
+  return columns?.filter(c => c.type === 'image') || [];
 };

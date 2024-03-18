@@ -181,7 +181,8 @@ const PluginPresets: React.FC<IPresetsProps> = ({
       activeTableName: newPresetsArray[_activePresetIdx]?.settings?.selectedTable?.label!,
       activeTableView: _activeTableAndView.view,
       activeCardTitle: newPresetsArray[_activePresetIdx]?.settings?.title,
-      activeRelationship: newPresetsArray[_activePresetIdx]?.settings?.relationship
+      activeRelationship: newPresetsArray[_activePresetIdx]?.settings?.relationship,
+      activeCoverImg: newPresetsArray[_activePresetIdx]?.settings?.coverImg,
     };
 
     onSelectPreset(_id, newPresetActiveState);

@@ -8,5 +8,6 @@
   "preset_delete": "删除预设",
   "preset_warn_exist": "请输入唯一的预设名称",
   "title": "標題",
-  "relationship": "關係"
+  "relationship": "關係",
+  "coverImg": "封面圖片"
 }

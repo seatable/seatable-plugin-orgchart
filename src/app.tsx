@@ -43,6 +43,7 @@ import {
   getActiveStateSafeGuard,
   getActiveTableAndActiveView,
   getDefaultLinkColumn,
+  getImageColumns,
   getPluginDataStore,
   getTitleColumns,
   isMobile,
@@ -67,8 +68,7 @@ const App: React.FC<IAppProps> = (props) => {
   // For better understanding read the comments in the AppActiveState interface
   const [appActiveState, setAppActiveState] = useState<AppActiveState>(INITIAL_CURRENT_STATE);
   // Destructure properties from the app's active state for easier access
-  const { activeTable, activePresetId, activePresetIdx, activeViewRows, activeCardTitle } =
-    appActiveState;
+  const { activeTable, activePresetId, activePresetIdx, activeViewRows } = appActiveState;
   const { collaborators } = window.app.state;
 
   useEffect(() => {
@@ -210,7 +210,8 @@ const App: React.FC<IAppProps> = (props) => {
           updatedActiveTableViews.find((view) => view._id === _activeViewId) || activeTableViews[0],
         activePresetId: presetId,
         activePresetIdx: _activePresetIdx,
-        activeCardTitle: activePreset?.settings?.title || getTitleColumns(_activeTable?.columns)[0]
+        activeCardTitle: activePreset?.settings?.title || getTitleColumns(_activeTable?.columns)[0],
+        activeCoverImg: activePreset?.settings?.coverImg,
       };
 
       updatePluginDataStore({
@@ -244,11 +245,13 @@ const App: React.FC<IAppProps> = (props) => {
       activePresetId: activePresetId,
       activePresetIdx: _activePresetIdx,
     };
+
     setAppActiveState((prevState) => ({
       ...prevState,
       activePresetIdx: _activePresetIdx,
       activeCardTitle: updatedPresets[_activePresetIdx].settings?.title,
-      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship
+      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship,
+      activeCoverImg: updatedPresets[_activePresetIdx].settings?.coverImg,
     }));
     setPluginPresets(updatedPresets);
     setPluginDataStore(pluginDataStore);
@@ -286,7 +289,8 @@ const App: React.FC<IAppProps> = (props) => {
       activeTableView: view,
       activeViewRows: window.dtableSDK.getViewRows(view, table),
       activeCardTitle: pluginPresets[0].settings?.title,
-      activeRelationship: pluginPresets[0].settings?.relationship
+      activeRelationship: pluginPresets[0].settings?.relationship,
+      activeCoverImg: pluginPresets[0].settings?.coverImg,
     };
 
     setAppActiveState(newPresetActiveState);
@@ -329,7 +333,8 @@ const App: React.FC<IAppProps> = (props) => {
           activeTableView: _activeTable.views[0],
           activeViewRows: _activeViewRows,
           activeCardTitle: getTitleColumns(_activeTable.columns)[0],
-          activeRelationship: getDefaultLinkColumn(_activeTable)
+          activeRelationship: getDefaultLinkColumn(_activeTable),
+          activeCoverImg: getImageColumns(_activeTable.columns)[0],
         }));
 
         updatedPluginPresets = pluginPresets.map((preset) =>
@@ -344,7 +349,8 @@ const App: React.FC<IAppProps> = (props) => {
                     value: _activeTable.views[0]._id,
                     label: _activeTable.views[0].name,
                   },
-                  title: getTitleColumns(_activeTable.columns)[0]
+                  title: getTitleColumns(_activeTable.columns)[0],
+                  coverImg: getImageColumns(_activeTable.columns)[0],
                 },
               }
             : preset

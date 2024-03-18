@@ -8,5 +8,6 @@
   "preset_delete": "Delete",
   "preset_warn_exist": "Please enter a unique preset name",
   "title": "Title",
-  "relationship": "Relationship"
+  "relationship": "Relationship",
+  "coverImg": "Cover Image"
 }

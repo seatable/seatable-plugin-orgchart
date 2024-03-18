@@ -7,7 +7,7 @@ import {
   SelectOption,
   IPluginSettingsProps,
 } from '../../utils/Interfaces/PluginSettings.interface';
-import { getTitleColumns, truncateTableName } from '../../utils/utils';
+import { getImageColumns, getTitleColumns, truncateTableName } from '../../utils/utils';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import { SettingsOption } from '../../utils/types';
 import intl from 'react-intl-universal';
@@ -25,17 +25,19 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   pluginPresets,
   activePresetIdx,
   pluginDataStore,
-  updatePresets
+  updatePresets,
 }) => {
   // State variables for table and view options
   const [tableOptions, setTableOptions] = useState<SelectOption[]>();
   const [viewOptions, setViewOptions] = useState<SelectOption[]>();
   const [tableSelectedOption, setTableSelectedOption] = useState<SelectOption>();
   const [viewSelectedOption, setViewSelectedOption] = useState<SelectOption>();
-  const [titleOptions, setTitleOptions] = useState<SelectOption[]>(); 
-  const [titleSelectedOption, setTitleSelectedOption] = useState<SelectOption>(); 
-  const [relationshipOptions, setRelationshipOptions] = useState<SelectOption[]>(); 
-  const [relationshipSelectedOption, setRelationshipSelectedOption] = useState<SelectOption>(); 
+  const [titleOptions, setTitleOptions] = useState<SelectOption[]>();
+  const [titleSelectedOption, setTitleSelectedOption] = useState<SelectOption>();
+  const [relationshipOptions, setRelationshipOptions] = useState<SelectOption[]>();
+  const [relationshipSelectedOption, setRelationshipSelectedOption] = useState<SelectOption>();
+  const [coverImgOptions, setCoverImgOptions] = useState<SelectOption[]>();
+  const [coverImgSelectedOption, setCoverImgSelectedOption] = useState<SelectOption>();
 
   // Change options when active table or view changes
   useEffect(() => {
@@ -61,13 +63,25 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
       let label = truncateTableName(item.name);
       return { value, label };
     });
-    
+
     // Create options for relationship dropdown
-    let relationshipOptions = activeTable?.columns.filter((item) => item.type === 'link').map((item) => {
-      let value = item.key;
-      let label = truncateTableName(item.name);
-      return { value, label };
-    });
+    let relationshipOptions = activeTable?.columns
+      .filter((item) => item.type === 'link')
+      .map((item) => {
+        let value = item.key;
+        let label = truncateTableName(item.name);
+        return { value, label };
+      });
+
+    // Create options for title dropdown
+    let coverImgOptions = [
+      { value: '_0000', label: 'No Image' },
+      ...getImageColumns(activeTable?.columns).map((item) => {
+        let value = item.key;
+        let label = truncateTableName(item.name);
+        return { value, label };
+      }),
+    ];
 
     // Set selected options based on activeTable and activeTableView
     let tableSelectedOption = {
@@ -75,8 +89,15 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
       label: appActiveState.activeTableName,
     };
     let viewSelectedOption = viewOptions.find((item) => item.value === activeTableView?._id);
-    let titleSelectedOption = titleOptions?.find(item => item.value === appActiveState.activeCardTitle?.key);
-    let relationshipSelectedOption = relationshipOptions?.find(item => item.value === appActiveState.activeRelationship?.key);
+    let titleSelectedOption = titleOptions?.find(
+      (item) => item.value === appActiveState.activeCardTitle?.key
+    );
+    let relationshipSelectedOption = relationshipOptions?.find(
+      (item) => item.value === appActiveState.activeRelationship?.key
+    );
+    let coverImgSelectedOption = coverImgOptions?.find(
+      (item) => item.value === appActiveState.activeCoverImg?.key
+    ) || { value: '_0000', label: 'No Image' };
 
     // Update state with new options and selected values
     setTableOptions(tableOptions);
@@ -87,32 +108,26 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     setTitleSelectedOption(titleSelectedOption);
     setRelationshipOptions(relationshipOptions);
     setRelationshipSelectedOption(relationshipSelectedOption);
+    setCoverImgOptions(coverImgOptions);
+    setCoverImgSelectedOption(coverImgSelectedOption);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appActiveState]);
 
   // Onchange function to update title value in preset settings
-  const editTitle = (selectedOption: SelectOption) => {
+  const editDropdowns = (selectedOption: SelectOption, option: string) => {
     let newPluginPresets = deepCopy(pluginPresets);
     let oldPreset = pluginPresets[activePresetIdx];
-    let title = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
-    let settings = {...oldPreset.settings, title};
-    let updatedPreset = {...oldPreset, settings};
+    let col = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
+    let settings;
+    if (option === 'title') {
+      settings = { ...oldPreset.settings, title: col };
+    } else if (option === 'relationship') {
+      settings = { ...oldPreset.settings, relationship: col };
+    } else {
+      settings = { ...oldPreset.settings, coverImg: col };
+    }
 
-
-    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
-    pluginDataStore.presets = newPluginPresets;
-
-    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
-  };
-
-  // Onchange function to update relationship value in preset settings
-  const editRelationship = (selectedOption: SelectOption) => {
-    let newPluginPresets = deepCopy(pluginPresets);
-    let oldPreset = pluginPresets[activePresetIdx];
-    let relationship = appActiveState.activeTable?.columns.find((c) => c.key === selectedOption.value);
-    let settings = {...oldPreset.settings, relationship: relationship};
-    let updatedPreset = {...oldPreset, settings};
-
+    let updatedPreset = { ...oldPreset, settings };
 
     newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
     pluginDataStore.presets = newPluginPresets;
@@ -161,22 +176,33 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
 
           {/* custom settings */}
           <div className={styles.settings_dropdowns_noborder}>
-            <div className='mt-3'>
-              <p className="d-inline-block mb-2">{intl.get('relationship').d(`${d.relationship}/`)}</p>
+            <div className="mt-3">
+              <p className="d-inline-block mb-2">
+                {intl.get('relationship').d(`${d.relationship}/`)}
+              </p>
               {/* Toggle relationship value */}
               <DtableSelect
                 value={relationshipSelectedOption}
                 options={relationshipOptions}
-                onChange={editRelationship}
+                onChange={(v: SelectOption) => editDropdowns(v, 'relationship')}
               />
             </div>
-            <div className='mt-3'>
-            <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
+            <div className="mt-3">
+              <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
               {/* Toggle title value */}
               <DtableSelect
                 value={titleSelectedOption}
                 options={titleOptions}
-                onChange={editTitle}
+                onChange={(v: SelectOption) => editDropdowns(v, 'title')}
+              />
+            </div>
+            <div className="mt-3">
+              <p className="d-inline-block mb-2">{intl.get('coverImg').d(`${d.coverImg}/`)}</p>
+              {/* Toggle title value */}
+              <DtableSelect
+                value={coverImgSelectedOption}
+                options={coverImgOptions}
+                onChange={(v: SelectOption) => editDropdowns(v, 'coverImg')}
               />
             </div>
           </div>
