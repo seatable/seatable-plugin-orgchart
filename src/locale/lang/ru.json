@@ -6,5 +6,8 @@
   "preset_rename": "переименовать",
   "preset_duplicate": "дубликат",
   "preset_delete": "удалить",
-  "preset_warn_exist": "Пожалуйста, введите уникальное имя предустановки"
+  "preset_warn_exist": "Пожалуйста, введите уникальное имя предустановки",
+  "title": "Заголовок",
+  "relationship": "Отношение",
+  "coverImg": "Обложка"
 }

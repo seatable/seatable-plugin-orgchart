@@ -42,7 +42,10 @@ import {
   findPresetName,
   getActiveStateSafeGuard,
   getActiveTableAndActiveView,
+  getDefaultLinkColumn,
+  getImageColumns,
   getPluginDataStore,
+  getTitleColumns,
   isMobile,
   parsePluginDataToActiveState,
 } from './utils/utils';
@@ -65,8 +68,7 @@ const App: React.FC<IAppProps> = (props) => {
   // For better understanding read the comments in the AppActiveState interface
   const [appActiveState, setAppActiveState] = useState<AppActiveState>(INITIAL_CURRENT_STATE);
   // Destructure properties from the app's active state for easier access
-  const { activeTable, activePresetId, activePresetIdx, activeViewRows, activeTableView } =
-    appActiveState;
+  const { activeTable, activePresetId, activePresetIdx, activeViewRows } = appActiveState;
   const { collaborators } = window.app.state;
 
   useEffect(() => {
@@ -195,17 +197,21 @@ const App: React.FC<IAppProps> = (props) => {
       const _activeTableName = selectedTable?.label as string;
       const _activeTableId = selectedTable?.value as string;
       const _activeViewId = selectedView?.value as string;
+      const _activeTable = allTables.find((table) => table._id === _activeTableId) || activeTable;
 
       updatedActiveTableViews =
         allTables.find((table) => table._id === _activeTableId)?.views || [];
 
       updatedActiveState = {
-        activeTable: allTables.find((table) => table._id === _activeTableId) || activeTable,
+        activeTable: _activeTable,
+        activeRelationship: activePreset?.settings?.relationship,
         activeTableName: _activeTableName,
         activeTableView:
           updatedActiveTableViews.find((view) => view._id === _activeViewId) || activeTableViews[0],
         activePresetId: presetId,
         activePresetIdx: _activePresetIdx,
+        activeCardTitle: activePreset?.settings?.title || getTitleColumns(_activeTable?.columns)[0],
+        activeCoverImg: activePreset?.settings?.coverImg,
       };
 
       updatePluginDataStore({
@@ -239,9 +245,13 @@ const App: React.FC<IAppProps> = (props) => {
       activePresetId: activePresetId,
       activePresetIdx: _activePresetIdx,
     };
+
     setAppActiveState((prevState) => ({
       ...prevState,
       activePresetIdx: _activePresetIdx,
+      activeCardTitle: updatedPresets[_activePresetIdx].settings?.title,
+      activeRelationship: updatedPresets[_activePresetIdx].settings?.relationship,
+      activeCoverImg: updatedPresets[_activePresetIdx].settings?.coverImg,
     }));
     setPluginPresets(updatedPresets);
     setPluginDataStore(pluginDataStore);
@@ -278,6 +288,9 @@ const App: React.FC<IAppProps> = (props) => {
       activeTableName: table.name,
       activeTableView: view,
       activeViewRows: window.dtableSDK.getViewRows(view, table),
+      activeCardTitle: pluginPresets[0].settings?.title,
+      activeRelationship: pluginPresets[0].settings?.relationship,
+      activeCoverImg: pluginPresets[0].settings?.coverImg,
     };
 
     setAppActiveState(newPresetActiveState);
@@ -319,6 +332,9 @@ const App: React.FC<IAppProps> = (props) => {
           activeTableName: _activeTable.name,
           activeTableView: _activeTable.views[0],
           activeViewRows: _activeViewRows,
+          activeCardTitle: getTitleColumns(_activeTable.columns)[0],
+          activeRelationship: getDefaultLinkColumn(_activeTable),
+          activeCoverImg: getImageColumns(_activeTable.columns)[0],
         }));
 
         updatedPluginPresets = pluginPresets.map((preset) =>
@@ -327,11 +343,15 @@ const App: React.FC<IAppProps> = (props) => {
                 ...preset,
                 settings: {
                   ...preset.settings,
+                  relationship: getDefaultLinkColumn(_activeTable),
                   selectedTable: { value: _activeTable._id, label: _activeTable.name },
                   selectedView: {
                     value: _activeTable.views[0]._id,
                     label: _activeTable.views[0].name,
                   },
+                  title: getTitleColumns(_activeTable.columns)[0],
+                  coverImg: getImageColumns(_activeTable.columns)[0],
+                  shown_columns: [],
                 },
               }
             : preset
@@ -391,11 +411,8 @@ const App: React.FC<IAppProps> = (props) => {
   const onInsertRow = (table: Table, view: TableView, rowData: any) => {
     let columns = window.dtableSDK.getColumns(table);
     let newRowData: { [key: string]: any } = {};
-    console.log('columns', columns);
     for (let key in rowData) {
-      console.log('key', key);
       let column = columns.find((column: TableColumn) => column.name === key);
-      console.log('column.type', column.type);
       if (!column) {
         continue;
       }
@@ -471,6 +488,7 @@ const App: React.FC<IAppProps> = (props) => {
               pluginPresets={pluginPresets}
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}
+              shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
             />
 
             <button className={styles.add_row} onClick={addRowItem}>
@@ -489,6 +507,9 @@ const App: React.FC<IAppProps> = (props) => {
             appActiveState={appActiveState}
             activeTableViews={activeTableViews}
             pluginPresets={pluginPresets}
+            activePresetIdx={activePresetIdx}
+            pluginDataStore={pluginDataStore}
+            updatePresets={updatePresets}
             onTableOrViewChange={onTableOrViewChange}
             onToggleSettings={toggleSettings}
           />
