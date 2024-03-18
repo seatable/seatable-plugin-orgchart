@@ -13,6 +13,7 @@ import {
   getTitleColumns,
   truncateTableName,
   isAllColumnsShown,
+  showFieldNames,
 } from '../../utils/utils';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import { SettingsOption } from '../../utils/types';
@@ -145,22 +146,6 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
   };
 
-  // Onchange function to update relationship value in preset settings
-  const editRelationship = (selectedOption: SelectOption) => {
-    let newPluginPresets = deepCopy(pluginPresets);
-    let oldPreset = pluginPresets[activePresetIdx];
-    let relationship = appActiveState.activeTable?.columns.find(
-      (c) => c.key === selectedOption.value
-    );
-    let settings = { ...oldPreset.settings, relationship: relationship };
-    let updatedPreset = { ...oldPreset, settings };
-
-    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
-    pluginDataStore.presets = newPluginPresets;
-
-    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
-  };
-
   const handleShownColumn = (
     c?: TableColumn,
     isPreviouslyChecked?: boolean,
@@ -181,6 +166,26 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     }
 
     let settings = { ...oldPreset.settings, shown_columns };
+    let updatedPreset = { ...oldPreset, settings };
+
+    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
+    pluginDataStore.presets = newPluginPresets;
+
+    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
+  };
+
+  const handleShownFieldNames = (isShown: boolean) => {
+    let newPluginPresets = deepCopy(pluginPresets);
+    let oldPreset = pluginPresets[activePresetIdx];
+    let show_field_names;
+
+    if (isShown) {
+      show_field_names = false;
+    } else {
+      show_field_names = true;
+    }
+
+    let settings = { ...oldPreset.settings, show_field_names };
     let updatedPreset = { ...oldPreset, settings };
 
     newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
@@ -293,6 +298,22 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
                       } `}></button>
                   </div>
                 ))}
+              </div>
+              <div className={`mt-5 ${styles.settings_fields}`}>
+                <div className="mb-2 d-flex align-items-center justify-content-between">
+                  <p>Show field names</p>
+                  <button
+                    onClick={() =>
+                      handleShownFieldNames(
+                        showFieldNames(pluginPresets[activePresetIdx].settings!)
+                      )
+                    }
+                    className={`${
+                      showFieldNames(pluginPresets[activePresetIdx].settings!)
+                        ? styles.settings_fields_toggle_btns_active
+                        : styles.settings_fields_toggle_btns
+                    } `}></button>
+                </div>
               </div>
             </div>
           </div>

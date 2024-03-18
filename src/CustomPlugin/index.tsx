@@ -1,6 +1,7 @@
 import React from 'react';
 import { ICustomPluginProps } from '../utils/Interfaces/CustomPlugin';
 import { IPresetInfo } from '../utils/Interfaces/PluginPresets/Presets.interface';
+import { showFieldNames } from '../utils/utils';
 
 const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginPresets,
@@ -60,6 +61,15 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
         style={{
           color: '#ff6666',
         }}>{`Active Cover Img: ${appActiveState?.activeCoverImg?.name || 'No Image'}`}</div>
+
+      <div
+        style={{
+          color: '#ff6666',
+        }}>
+        {`Field names shown: ${showFieldNames(
+          pluginPresets[appActiveState.activePresetIdx].settings!
+        )}`}{' '}
+      </div>
     </div>
 
     <div
