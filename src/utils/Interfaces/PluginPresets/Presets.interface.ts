@@ -41,6 +41,7 @@ export interface PresetSettings {
   title?: TableColumn;
   relationship?: TableColumn;
   coverImg?: TableColumn;
+  shown_columns?: TableColumn[];
 }
 
 export type PresetsArray = IPresetInfo[];

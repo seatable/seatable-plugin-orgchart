@@ -425,3 +425,15 @@ export const getDefaultLinkColumn = (table: Table) => {
 export const getImageColumns = (columns?: TableColumn[]) => {
   return columns?.filter(c => c.type === 'image') || [];
 };
+
+export const isAllColumnsShown = (shownColumns?: string[], columns?: TableColumn[]) => {
+  if (columns) {
+    for (let i = 0; i < columns.length; i++) {
+      if (!shownColumns?.includes(columns[i].key)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+};

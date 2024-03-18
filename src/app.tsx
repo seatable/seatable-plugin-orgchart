@@ -351,6 +351,7 @@ const App: React.FC<IAppProps> = (props) => {
                   },
                   title: getTitleColumns(_activeTable.columns)[0],
                   coverImg: getImageColumns(_activeTable.columns)[0],
+                  shown_columns: [],
                 },
               }
             : preset
@@ -487,6 +488,7 @@ const App: React.FC<IAppProps> = (props) => {
               pluginPresets={pluginPresets}
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}
+              shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
             />
 
             <button className={styles.add_row} onClick={addRowItem}>

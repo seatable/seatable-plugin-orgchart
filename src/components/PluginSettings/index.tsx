@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { COLUMNS_ICON_CONFIG } from 'dtable-utils';
 import DtableSelect from '../Elements/dtable-select';
 import styles from '../../styles/PluginSettings.module.scss';
 import styles2 from '../../styles/Presets.module.scss';
@@ -7,11 +8,17 @@ import {
   SelectOption,
   IPluginSettingsProps,
 } from '../../utils/Interfaces/PluginSettings.interface';
-import { getImageColumns, getTitleColumns, truncateTableName } from '../../utils/utils';
+import {
+  getImageColumns,
+  getTitleColumns,
+  truncateTableName,
+  isAllColumnsShown,
+} from '../../utils/utils';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import { SettingsOption } from '../../utils/types';
 import intl from 'react-intl-universal';
 import { AVAILABLE_LOCALES, DEFAULT_LOCALE } from '../../locale';
+import { TableColumn } from '../../utils/Interfaces/Table.interface';
 const { [DEFAULT_LOCALE]: d } = AVAILABLE_LOCALES;
 
 // PluginSettings component for managing table and view options
@@ -38,6 +45,9 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   const [relationshipSelectedOption, setRelationshipSelectedOption] = useState<SelectOption>();
   const [coverImgOptions, setCoverImgOptions] = useState<SelectOption[]>();
   const [coverImgSelectedOption, setCoverImgSelectedOption] = useState<SelectOption>();
+  const { activeTable } = appActiveState;
+  let shownColumns = pluginPresets[activePresetIdx].settings?.shown_columns?.map((c) => c.key);
+  let isAllShown = isAllColumnsShown(shownColumns, activeTable?.columns);
 
   // Change options when active table or view changes
   useEffect(() => {
@@ -135,42 +145,88 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
   };
 
+  // Onchange function to update relationship value in preset settings
+  const editRelationship = (selectedOption: SelectOption) => {
+    let newPluginPresets = deepCopy(pluginPresets);
+    let oldPreset = pluginPresets[activePresetIdx];
+    let relationship = appActiveState.activeTable?.columns.find(
+      (c) => c.key === selectedOption.value
+    );
+    let settings = { ...oldPreset.settings, relationship: relationship };
+    let updatedPreset = { ...oldPreset, settings };
+
+    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
+    pluginDataStore.presets = newPluginPresets;
+
+    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
+  };
+
+  const handleShownColumn = (
+    c?: TableColumn,
+    isPreviouslyChecked?: boolean,
+    all?: 'show' | 'hide'
+  ) => {
+    let newPluginPresets = deepCopy(pluginPresets);
+    let oldPreset = pluginPresets[activePresetIdx];
+    let shown_columns;
+
+    if (all === 'show') {
+      shown_columns = activeTable?.columns;
+    } else if (all === 'hide') {
+      shown_columns = [];
+    } else if (!isPreviouslyChecked) {
+      shown_columns = [...(oldPreset.settings?.shown_columns || []), c];
+    } else {
+      shown_columns = oldPreset.settings?.shown_columns?.filter((sc) => sc.key !== c?.key);
+    }
+
+    let settings = { ...oldPreset.settings, shown_columns };
+    let updatedPreset = { ...oldPreset, settings };
+
+    newPluginPresets.splice(activePresetIdx, 1, updatedPreset);
+    pluginDataStore.presets = newPluginPresets;
+
+    updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
+  };
+
   return (
     <div className={`bg-white ${isShowSettings ? styles.settings : styles.settings_hide}`}>
-      <div className="p-5">
+      <div>
         <div
-          className={`d-flex align-items-center justify-content-between ${styles.settings_header}`}>
+          className={`d-flex align-items-center justify-content-between mx-5 pt-5 ${styles.settings_header}`}>
           <h4 className="m-0">{intl.get('settings_headline').d(`${d.settings_headline}`)}</h4>
           <button className={styles2.presets_uncollapse_btn2_settings} onClick={onToggleSettings}>
             <HiOutlineChevronDoubleRight />
           </button>
         </div>
-        <div>
-          <div className={styles.settings_dropdowns}>
-            <div>
-              <p className="d-inline-block mb-2">{intl.get('table').d(`${d.table}`)}</p>
-              {/* Toggle table view */}
-              <DtableSelect
-                value={tableSelectedOption}
-                options={tableOptions}
-                onChange={(selectedOption: SelectOption) => {
-                  let type = 'table' as SettingsOption;
-                  onTableOrViewChange(type, selectedOption);
-                }}
-              />
-            </div>
+        <div className={`px-5 ${styles.settings_inner_wrapper}`}>
+          <div>
+            <div className={styles.settings_dropdowns}>
+              <div>
+                <p className="d-inline-block mb-2">{intl.get('table').d(`${d.table}`)}</p>
+                {/* Toggle table view */}
+                <DtableSelect
+                  value={tableSelectedOption}
+                  options={tableOptions}
+                  onChange={(selectedOption: SelectOption) => {
+                    let type = 'table' as SettingsOption;
+                    onTableOrViewChange(type, selectedOption);
+                  }}
+                />
+              </div>
 
-            <div>
-              <p className="d-inline-block mb-2 mt-3">{intl.get('view').d(`${d.view}/`)}</p>
-              {/* Toggle table view */}
-              <DtableSelect
-                value={viewSelectedOption}
-                options={viewOptions}
-                onChange={(selectedOption: SelectOption) => {
-                  let type = 'view' as SettingsOption;
-                  onTableOrViewChange(type, selectedOption);
-                }}
-              />
+              <div>
+                <p className="d-inline-block mb-2 mt-3">{intl.get('view').d(`${d.view}/`)}</p>
+                {/* Toggle table view */}
+                <DtableSelect
+                  value={viewSelectedOption}
+                  options={viewOptions}
+                  onChange={(selectedOption: SelectOption) => {
+                    let type = 'view' as SettingsOption;
+                    onTableOrViewChange(type, selectedOption);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -204,6 +260,40 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
                 options={coverImgOptions}
                 onChange={(v: SelectOption) => editDropdowns(v, 'coverImg')}
               />
+              <div className={`mt-5 ${styles.settings_fields}`}>
+                <div className="mb-2 d-flex align-items-center justify-content-between">
+                  <p>Other fields</p>
+                  <button
+                    onClick={() =>
+                      handleShownColumn(undefined, undefined, isAllShown ? 'hide' : 'show')
+                    }
+                    className={styles.settings_fields_show_all_btn}>
+                    {isAllShown ? 'Hide all' : 'Show all'}
+                  </button>
+                </div>
+                {activeTable?.columns.map((c) => (
+                  <div key={c.key} className={styles.settings_fields_columns} draggable="true">
+                    <div className="d-flex align-items-center">
+                      <div className={`field-dragbar ${styles.settings_fields_dragbar}`}>
+                        <i className="dtable-font dtable-icon-drag pr-2" />
+                      </div>
+                      <i
+                        className={`dtable-font ${COLUMNS_ICON_CONFIG[c.type]} ${
+                          styles.settings_fields_icons
+                        }`}
+                      />
+                      <p className="ml-2 mb-0">{c.name}</p>
+                    </div>
+                    <button
+                      onClick={() => handleShownColumn(c, shownColumns?.includes(c.key)!)}
+                      className={`${
+                        shownColumns?.includes(c.key)
+                          ? styles.settings_fields_toggle_btns_active
+                          : styles.settings_fields_toggle_btns
+                      } `}></button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
