@@ -406,7 +406,8 @@ export const createDefaultPresetSettings = (allTables: TableArray) => {
     selectedTable: tableInfo,
     selectedView: viewInfo,
     title: getTitleColumns(allTables[0].columns)[0],
-    relationship: getDefaultLinkColumn(allTables[0])
+    relationship: getDefaultLinkColumn(allTables[0]),
+    show_field_names: true
   };
 };
 
@@ -436,4 +437,12 @@ export const isAllColumnsShown = (shownColumns?: string[], columns?: TableColumn
 
     return true;
   };
+};
+
+export const showFieldNames = (settings: PresetSettings) => {
+  if (!Object.prototype.hasOwnProperty.call(settings, 'show_field_names') || settings.show_field_names) {
+    return true;
+  } else {
+    return false;
+  }
 };
