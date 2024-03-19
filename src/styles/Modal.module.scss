@@ -270,6 +270,10 @@
   overflow: scroll;
   padding-bottom: 50px;
   background-color: $main-content-bgColor;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &::-webkit-scrollbar {
     display: none;
