@@ -446,3 +446,28 @@ export const showFieldNames = (settings: PresetSettings) => {
     return false;
   }
 };
+
+export function convertToCSV(arr: any[]) {
+  const array = [Object.keys(arr[0])].concat(arr);
+
+  return array.map(it => {
+    return Object.values(it).toString();
+  }).join('\n');
+};
+
+export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
+  let parentId: any;
+  let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
+
+  let _rows = rows.map((r: any) => {
+    parentId = linkedRows[r._id][relationship?.key!][0];
+
+    return ({
+      ...r,
+      id: r._id,
+      parentId
+    });
+  });
+
+  return _rows;
+};
