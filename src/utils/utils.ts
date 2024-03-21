@@ -1,6 +1,4 @@
-import {
-  CellType
-} from 'dtable-utils';
+import { CellType } from 'dtable-utils';
 import pluginContext from '../plugin-context';
 import { AppActiveState, IPluginDataStore } from './Interfaces/App.interface';
 import { PresetSettings, PresetsArray } from './Interfaces/PluginPresets/Presets.interface';
@@ -129,11 +127,22 @@ export const isTableEditable = (
 
 export const getTitleColumns = (columns?: TableColumn[]) => {
   const SHOW_TITLE_COLUMN_TYPE = [
-    CellType.TEXT, CellType.SINGLE_SELECT, CellType.MULTIPLE_SELECT,
-    CellType.NUMBER, CellType.FORMULA, CellType.DATE, CellType.COLLABORATOR,
-    CellType.GEOLOCATION, CellType.CTIME, CellType.MTIME, CellType.CREATOR,
-    CellType.LAST_MODIFIER];
-  return columns?.filter(column => SHOW_TITLE_COLUMN_TYPE.find(type => type === column.type)) || [];
+    CellType.TEXT,
+    CellType.SINGLE_SELECT,
+    CellType.MULTIPLE_SELECT,
+    CellType.NUMBER,
+    CellType.FORMULA,
+    CellType.DATE,
+    CellType.COLLABORATOR,
+    CellType.GEOLOCATION,
+    CellType.CTIME,
+    CellType.MTIME,
+    CellType.CREATOR,
+    CellType.LAST_MODIFIER,
+  ];
+  return (
+    columns?.filter((column) => SHOW_TITLE_COLUMN_TYPE.find((type) => type === column.type)) || []
+  );
 };
 
 export const canCreateRows = (
@@ -265,7 +274,7 @@ export const parsePluginDataToActiveState = (
     activeTableView: tableView,
     activeCardTitle: title,
     activeRelationship: relationship,
-    activeCoverImg: coverImg
+    activeCoverImg: coverImg,
   };
 
   // Return the active state object
@@ -301,7 +310,7 @@ export const getActiveStateSafeGuard = (
     activePresetIdx: 0,
     activeViewRows: activeViewRows,
     activeCardTitle: getTitleColumns(activeTableAndView.table.columns)[0],
-    activeRelationship: getDefaultLinkColumn(activeTableAndView?.table)
+    activeRelationship: getDefaultLinkColumn(activeTableAndView?.table),
   };
 
   // Return the active state object considering presets or default values
@@ -370,7 +379,7 @@ export const createDefaultPluginDataStore = (
     selectedTable: { value: activeTable._id, label: activeTable.name },
     selectedView: { value: activeTable.views[0]._id, label: activeTable.views[0].name },
     title: getTitleColumns(activeTable.columns)[0],
-    relationship: getDefaultLinkColumn(activeTable)
+    relationship: getDefaultLinkColumn(activeTable),
   };
 
   // Importing the default settings from the constants file and updating the presets array with the Default Settings
@@ -407,7 +416,7 @@ export const createDefaultPresetSettings = (allTables: TableArray) => {
     selectedView: viewInfo,
     title: getTitleColumns(allTables[0].columns)[0],
     relationship: getDefaultLinkColumn(allTables[0]),
-    show_field_names: true
+    show_field_names: true,
   };
 };
 
@@ -424,7 +433,7 @@ export const getDefaultLinkColumn = (table: Table) => {
 };
 
 export const getImageColumns = (columns?: TableColumn[]) => {
-  return columns?.filter(c => c.type === 'image') || [];
+  return columns?.filter((c) => c.type === 'image') || [];
 };
 
 export const isAllColumnsShown = (shownColumns?: string[], columns?: TableColumn[]) => {
@@ -436,11 +445,14 @@ export const isAllColumnsShown = (shownColumns?: string[], columns?: TableColumn
     }
 
     return true;
-  };
+  }
 };
 
 export const showFieldNames = (settings: PresetSettings) => {
-  if (!Object.prototype.hasOwnProperty.call(settings, 'show_field_names') || settings.show_field_names) {
+  if (
+    !Object.prototype.hasOwnProperty.call(settings, 'show_field_names') ||
+    settings.show_field_names
+  ) {
     return true;
   } else {
     return false;
@@ -450,23 +462,26 @@ export const showFieldNames = (settings: PresetSettings) => {
 export function convertToCSV(arr: any[]) {
   const array = [Object.keys(arr[0])].concat(arr);
 
-  return array.map(it => {
-    return Object.values(it).toString();
-  }).join('\n');
-};
+  return array
+    .map((it) => {
+      return Object.values(it).toString();
+    })
+    .join('\n');
+}
 
 export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
   let parentId: any;
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
-
+  // console.log('relationship', relationship);
+  // console.log('linkedRows', linkedRows);
   let _rows = rows.map((r: any) => {
     parentId = linkedRows[r._id][relationship?.key!][0];
 
-    return ({
+    return {
       ...r,
       id: r._id,
-      parentId
-    });
+      parentId,
+    };
   });
 
   return _rows;

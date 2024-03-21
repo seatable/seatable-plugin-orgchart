@@ -189,6 +189,12 @@ const App: React.FC<IAppProps> = (props) => {
         ...newPresetActiveState,
       };
       updatedActiveTableViews = newPresetActiveState?.activeTable?.views!;
+      const activeViewRows: TableRow[] = window.dtableSDK.getViewRows(
+        updatedActiveState?.activeTableView,
+        updatedActiveState?.activeTable
+      );
+      setActiveTableViews(updatedActiveTableViews);
+      setAppActiveState({ ...updatedActiveState, activeViewRows });
     } else {
       const activePreset = pluginPresets.find((preset) => preset._id === presetId);
       const selectedTable = activePreset?.settings?.selectedTable;
@@ -214,20 +220,20 @@ const App: React.FC<IAppProps> = (props) => {
         activeCoverImg: activePreset?.settings?.coverImg,
       };
 
+      const activeViewRows: TableRow[] = window.dtableSDK.getViewRows(
+        updatedActiveState?.activeTableView,
+        updatedActiveState?.activeTable
+      );
+
+      setActiveTableViews(updatedActiveTableViews);
+      setAppActiveState({ ...updatedActiveState, activeViewRows });
       updatePluginDataStore({
         ...pluginDataStore,
         activePresetId: presetId,
         activePresetIdx: _activePresetIdx,
       });
     }
-
-    const activeViewRows: TableRow[] = window.dtableSDK.getViewRows(
-      updatedActiveState?.activeTableView,
-      updatedActiveState?.activeTable
-    );
-
-    setActiveTableViews(updatedActiveTableViews);
-    setAppActiveState({ ...updatedActiveState, activeViewRows });
+    // onSelectPreset function's subsequent code block called twice Do not write any code after this line
   };
 
   /**
