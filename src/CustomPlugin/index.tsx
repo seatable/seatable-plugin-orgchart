@@ -78,7 +78,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
             </figure>
             <h5 class="${styles.card_title}">${d.data[appActiveState.activeCardTitle?.key!]}</h5>
             <div class="${styles.card_columns}">
-              ${shownColumns?.map((c: any, i) =>
+              ${shownColumns ? shownColumns?.map((c: any, i) =>
                 c.type === 'image'
                   ? ''
                   : c.type === 'multiple-select' && d.data[c.key]
@@ -97,7 +97,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
                         <h6>${c.name}</h6>
                         <p class="${styles.card_data}">${d.data[c.key]}</p>
                       </div>`
-              )}
+              ) : ''}
             </div></div>
           </div></div>`.replaceAll(',', '');
         })
