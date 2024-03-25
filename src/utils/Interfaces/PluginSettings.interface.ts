@@ -11,9 +11,15 @@ interface IPluginSettingsProps {
   onTableOrViewChange: (type: SettingsOption, option: SelectOption) => void;
   onToggleSettings: () => void;
   isShowSettings: boolean;
-  activePresetIdx: number,
-  pluginDataStore: IPluginDataStore,
-  updatePresets: (_activePresetIdx: number, updatedPresets: PresetsArray, pluginDataStore: IPluginDataStore, activePresetId: string, callBack?: any) => void;
+  activePresetIdx: number;
+  pluginDataStore: IPluginDataStore;
+  updatePresets: (
+    _activePresetIdx: number,
+    updatedPresets: PresetsArray,
+    pluginDataStore: IPluginDataStore,
+    activePresetId: string,
+    callBack?: any
+  ) => void;
 }
 
 interface SelectOption {
