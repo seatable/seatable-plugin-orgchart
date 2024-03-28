@@ -10,7 +10,8 @@ const POSSIBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz
 
 const PLUGIN_NAME = info.name
   .replace(/-([a-z])/g, (_, match) => ' ' + match.toUpperCase())
-  .replace(/^./, (str) => str.toUpperCase()).replace('Plugin', '');
+  .replace(/^./, (str) => str.toUpperCase())
+  .replace('Plugin', '');
 const PLUGIN_ID = `${info.name}-component`;
 
 // Table and Preset Defaults
@@ -73,7 +74,7 @@ const INITIAL_CURRENT_STATE: AppActiveState = {
   activeTableName: 'Table1',
   activeTableView: null,
   activePresetId: '0000',
-  activePresetIdx: 0
+  activePresetIdx: 0,
 };
 
 // Default Selected Preset
