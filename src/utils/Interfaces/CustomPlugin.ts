@@ -8,3 +8,11 @@ export interface ICustomPluginProps {
   activeViewRows?: TableRow[];
   shownColumns?: TableColumn[];
 }
+
+export interface OrgChartComponentProps {
+  // Add any props you need for your component here
+  pluginPresets: PresetsArray;
+  appActiveState: AppActiveState;
+  shownColumns: TableColumn[] | undefined;
+  cardData: any[] | undefined;
+}
