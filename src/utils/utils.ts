@@ -12,6 +12,7 @@ import {
 } from './Interfaces/Table.interface';
 import { DEFAULT_PLUGIN_DATA, PLUGIN_NAME, POSSIBLE, PresetHandleAction } from './constants';
 
+
 export const generatorBase64Code = (keyLength = 4) => {
   let key = '';
   for (let i = 0; i < keyLength; i++) {
@@ -459,21 +460,9 @@ export const showFieldNames = (settings: PresetSettings) => {
   }
 };
 
-export function convertToCSV(arr: any[]) {
-  const array = [Object.keys(arr[0])].concat(arr);
-
-  return array
-    .map((it) => {
-      return Object.values(it).toString();
-    })
-    .join('\n');
-}
-
 export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
   let parentId: any;
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
-  // console.log('relationship', relationship);
-  // console.log('linkedRows', linkedRows);
   let _rows = rows.map((r: any) => {
     parentId = linkedRows[r._id][relationship?.key!][0];
 
@@ -484,5 +473,62 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
     };
   });
 
+  return filterMultipleParentNodes(_rows);
+};
+
+// Function to filter out multiple parent nodes to one primary parent node 
+const filterMultipleParentNodes = (rows: TableRow[]) => {
+  let parentNode;
+  let parentNodes = rows.filter((row) => !row.parentId);
+  let childNodes = rows.filter((row) => row.parentId);
+
+  // if no parents and no child, return an empty array
+  if (parentNodes.length === 0 && childNodes.length === 0) {
+    return [];
+  }
+
+  // get all parent nodes
+  parentNodes = parentNodes.filter((parent) => {
+    return childNodes.some((child) => child.parentId === parent.id);
+  });
+
+  // get all child nodes of each parent
+  parentNodes = parentNodes.map((parent) => { return ({ ...parent, children: getAllChildNodes(parent, childNodes) }); });
+
+  // get parent node with the most children
+  parentNode = parentNodes.sort((a, b) => (b.children as any[]).length - (a.children as any[]).length)[0];
+
+  // set childNodes to the children of parent node
+  childNodes = parentNode?.children as TableRow[];
+
+  // delete children property (not needed anymore)
+  delete parentNode.children;
+
+  // create new array that includes one parentNode and all its children
+  const _rows = [parentNode, ...childNodes];
+
   return _rows;
+};
+
+/**  Function to get every single node in a parents subtree
+   Example
+        3
+       / \
+      4   6
+     / \
+    5   7
+If parent is 3, function will return [4, 6, 5, 7]
+If parent is 4, function will return [5, 7]
+**/
+const getAllChildNodes = (parentNode: TableRow, childNodes: any[]): any => {
+  const _children = childNodes.filter((child) => child.parentId === parentNode.id);
+
+  if (_children.length === 0) {
+    return _children;
+  } else {
+
+    return [..._children, ...[].concat(..._children.map((child) => {
+      return getAllChildNodes(child, childNodes);
+    }))];
+  };
 };
