@@ -10,11 +10,10 @@ import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 const Header: React.FC<IHeaderProps> = (props) => {
   const {
     presetName,
-    isShowSettings,
     isShowPresets,
     onTogglePresets,
-    toggleSettings,
     togglePlugin,
+    downloadPdfRef
   } = props;
   const [orgChartContent, setOrgChartContent] = useState<string | null>(null);
 
@@ -33,19 +32,9 @@ const Header: React.FC<IHeaderProps> = (props) => {
   };
 
   const downloadPdfDocument = () => {
-    const input = document.getElementById(PLUGIN_ID);
-    if (input) {
-      html2canvas(input, {
-        logging: true,
-        allowTaint: false,
-        useCORS: true,
-      }).then((canvas: HTMLCanvasElement) => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('l', 'mm', 'a4', true);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 230, 200);
-        pdf.save(`${PLUGIN_ID} .pdf`);
-      });
-    }
+    if (downloadPdfRef.current) {
+      downloadPdfRef.current.click();
+    };
   };
 
   return (

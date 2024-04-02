@@ -4,18 +4,26 @@ import * as d3 from 'd3';
 import { OrgChart } from 'd3-org-chart';
 import styles from '../../styles/OrgChartCard.module.scss';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
+import jsPDF from 'jspdf';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
   appActiveState,
   cardData,
-  shownColumns
+  shownColumns,
+  downloadPdfRef,
 }) => {
   const d3Container = useRef(null);
   let chart: OrgChart<unknown> | null = null;
   let showFieldNames = pluginPresets[appActiveState.activePresetIdx].settings?.show_field_names;
   let _shownColumns = shownColumns;
   let colIDs = _shownColumns?.map((s) => s.key);
+
+  const downloadPdf = () => {
+    if (chart) {
+      chart.exportImg({full:true});
+    };
+  };
 
   useLayoutEffect(() => {
     if (cardData && d3Container.current) {
@@ -39,8 +47,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             }
             return true;
           });
-        }).onExpandOrCollapse((d) => {
         })
+        .onExpandOrCollapse((d) => {})
         .nodeWidth((d: d3.HierarchyNode<unknown>) => 150)
         .nodeHeight((d: d3.HierarchyNode<unknown>) => 300)
         .nodeContent((d: any, i: number, arr, state) => {
@@ -92,8 +100,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                 </div></div>
               </div></div>`.replaceAll(',', '');
         })
-        .nodeUpdate((d) => {
-        })
+        .nodeUpdate((d) => {})
         .render();
     }
 
@@ -101,14 +108,17 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     return () => {
       if (chart) {
         chart.clear();
-      };
+      }
     };
   }, [cardData, d3Container.current, shownColumns]);
 
   return (
     // Add your JSX code here
     <div className="w-100 h-100">
-      <div  ref={d3Container} />
+      <button onClick={downloadPdf} ref={downloadPdfRef} style={{ display: 'none' }}>
+        Download PDF
+      </button>
+      <div ref={d3Container} />
     </div>
   );
 };
