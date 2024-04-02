@@ -7,12 +7,9 @@ export interface ICustomPluginProps {
   appActiveState: AppActiveState;
   activeViewRows?: TableRow[];
   shownColumns?: TableColumn[];
+  downloadPdfRef: React.MutableRefObject<null>;
 }
 
-export interface OrgChartComponentProps {
-  // Add any props you need for your component here
-  pluginPresets: PresetsArray;
-  appActiveState: AppActiveState;
-  shownColumns: TableColumn[] | undefined;
+export interface OrgChartComponentProps extends ICustomPluginProps{
   cardData: any[] | undefined;
 }

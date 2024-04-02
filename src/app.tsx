@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
 // Import of Component
 import Header from './components/Header';
@@ -70,6 +70,7 @@ const App: React.FC<IAppProps> = (props) => {
   // Destructure properties from the app's active state for easier access
   const { activeTable, activePresetId, activePresetIdx, activeViewRows } = appActiveState;
   const { collaborators } = window.app.state;
+  const downloadPdfRef = useRef(null);
 
   useEffect(() => {
     initPluginDTableData();
@@ -483,6 +484,7 @@ const App: React.FC<IAppProps> = (props) => {
           onTogglePresets={togglePresets}
           toggleSettings={toggleSettings}
           togglePlugin={onPluginToggle}
+          downloadPdfRef={downloadPdfRef}
         />
         {/* main body  */}
         <div
@@ -491,6 +493,7 @@ const App: React.FC<IAppProps> = (props) => {
           {/* content  */}
           <div id={PLUGIN_ID} className={styles.body} style={{ padding: '10px' }}>
             <CustomPlugin
+            downloadPdfRef={downloadPdfRef}
               pluginPresets={pluginPresets}
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}
