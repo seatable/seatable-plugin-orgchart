@@ -1,40 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/Modal.module.scss';
 import styles2 from '../../styles/Presets.module.scss';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 import { IHeaderProps } from '../../utils/Interfaces/Header.interface';
 import { PLUGIN_ID } from '../../utils/constants';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 
 const Header: React.FC<IHeaderProps> = (props) => {
-  const {
-    presetName,
-    isShowPresets,
-    onTogglePresets,
-    togglePlugin,
-    downloadPdfRef
-  } = props;
-  const [orgChartContent, setOrgChartContent] = useState<string | null>(null);
-
-  useEffect(() => {
-    const input = document.getElementById('org_chart');
-    if (input) {
-      setOrgChartContent(input.innerHTML);
-    }
-  }, []);
+  const { presetName, isShowPresets, onTogglePresets, togglePlugin, downloadPdfRef } = props;
 
   const printPdfDocument = () => {
-    const originalContents = document.body.innerHTML;
-    // document.body.innerHTML = orgChartContent || '';
-    window.print();
-    // document.body.innerHTML = originalContents;
+    const input = document.getElementById(PLUGIN_ID);
+
+    if (input) {
+      document.body.innerHTML = input.innerHTML;
+      window.print();
+      window.location.reload();
+    }
   };
 
   const downloadPdfDocument = () => {
     if (downloadPdfRef.current) {
       downloadPdfRef.current.click();
-    };
+    }
   };
 
   return (
