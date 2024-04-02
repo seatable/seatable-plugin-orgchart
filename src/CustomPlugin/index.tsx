@@ -8,8 +8,8 @@ import OrgChartComponent from './OrgChartComponent';
 const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginPresets,
   appActiveState,
-  activeViewRows,
   shownColumns,
+  downloadPdfRef
 }) => {
   const [cardData, setCardData] = useState<any[]>();
 
@@ -29,6 +29,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
       pluginPresets={pluginPresets}
       shownColumns={shownColumns}
       appActiveState={appActiveState}
+      downloadPdfRef={downloadPdfRef}
     />
   );
 };
