@@ -9,7 +9,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
   appActiveState,
   cardData,
-  shownColumns
+  shownColumns,
 }) => {
   const d3Container = useRef(null);
   let chart: OrgChart<unknown> | null = null;
@@ -31,36 +31,34 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .compactMarginPair((d) => 100)
         .neighbourMargin((a, b) => 50)
         .siblingsMargin((d) => 100)
-        .createZoom(() => {
-          return d3.zoom().filter((e) => {
-            // Do not zoom on these elements, this is done to enable scrolling
-            if (['DIV', 'FIGURE', 'H5', 'SPAN'].includes(e.srcElement.tagName)) {
-              return false;
-            }
-            return true;
-          });
-        }).onExpandOrCollapse((d) => {
-        })
         .nodeWidth((d: d3.HierarchyNode<unknown>) => 150)
-        .nodeHeight((d: d3.HierarchyNode<unknown>) => 300)
+        .nodeHeight((d: d3.HierarchyNode<any>) => {
+          let image =
+            appActiveState.activeCoverImg &&
+            colIDs?.includes(appActiveState.activeCoverImg.key) &&
+            d.data[appActiveState.activeCoverImg.key];
+          let height = shownColumns?.length! * 43;
+          let imgShown = shownColumns?.map((c) => c.type).includes('image');
+
+          if (!imgShown) {
+            height += 40;
+          }
+          return image ? height + 110 : height || 50;
+        })
         .nodeContent((d: any, i: number, arr, state) => {
           let image =
             appActiveState.activeCoverImg &&
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key];
-          const imageDiffVert = 25 + 2;
 
-          return `<div style='width:${d.width}px;height:${d.height}px;padding-top:${
-            imageDiffVert - 2
-          }px;'> <div
-                class="${styles.card}" style="width:${d.width - 2}px;height:${
-                  d.height - imageDiffVert
-                }px;">
-                <div  style='overflow:scroll;height:100%'>
-                <figure class="${styles.card_figure}" style="background-image: url(${
-                  image || 'https://cdn-icons-png.flaticon.com/512/6596/6596121.png'
-                })">
-                </figure>
+          return `<div style='width:${d.width}px;height:${d.height}px;'> <div
+                class="${styles.card} ${!image ? 'py-4' : 'py-0'}">
+                <div style='height:100%'>
+                ${
+                  image
+                    ? `<figure class="${styles.card_figure}" style="background-image: url(${image})"></figure>`
+                    : ''
+                }
                 <h5 class="${styles.card_title}">${
                   d.data[appActiveState.activeCardTitle?.key!]
                 }</h5>
@@ -92,8 +90,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                 </div></div>
               </div></div>`.replaceAll(',', '');
         })
-        .nodeUpdate((d) => {
-        })
         .render();
     }
 
@@ -108,7 +104,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   return (
     // Add your JSX code here
     <div className="w-100 h-100">
-      <div  ref={d3Container} />
+      <div ref={d3Container} />
     </div>
   );
 };
