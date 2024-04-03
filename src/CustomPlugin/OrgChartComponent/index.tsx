@@ -61,71 +61,61 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             appActiveState.activeCoverImg &&
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key];
-          return `<div
-             style="border-radius: 5px;
-                position: relative;
-                background: #fff;
-                margin: 0;
-                width:${d.width}px;height:${d.height}px;">
-                <div style='position:relative; margin: 0;'>
-                ${
-                  image
-                    ? `<img class="card-img" src="${image}" style="width: 100%;
-                    height: 120px;
-                    margin-bottom: 10px;
-                    object-fit: cover;
-                    position:relative;
-                    top: 0;
-                    left: 0;
-                    " />`
-                    : ''
-                }
-                <h5 style="padding: ${!image ? '15px' : '0'} 15px 0;
-                font-size: 11px;
-                margin: 0 0 10px;
-                font-weight: 600;">${d.data[appActiveState.activeCardTitle?.key!]}</h5>
-                <div style="padding: 0 15px 10px;
-                display: flex;
-                flex-direction: column; 
-                margin: 0;
-                gap: 10px;">
-                  ${
-                    _shownColumns
-                      ? _shownColumns?.map((c: any, i) =>
-                          c.type === 'image'
-                            ? ''
-                            : c.type === 'multiple-select' && d.data[c.key]
-                              ? `<div key=${c.key}>
-                            ${
-                              showFieldNames
-                                ? `<h6 style="text-transform: uppercase;color: #9ba4b5;font-size: 10px;font-weight: 600;" margin: 0;>${c.name}</h6>`
-                                : ''
-                            }
-                            <div style="display: flex;
-                            flex-direction: row;
-                            gap: 8px;">
-                            ${_shownColumns![i].data.options.map((select: any) =>
-                              d.data[c.key]?.includes(select.id)
-                                ? `<span key='${select.id}' style='color: ${select.textColor}; background: ${select.color}'>${select.name}</span>`
-                                : ''
-                            )}
-                            </div>
-                          </div>`
-                              : d.data[c.key] &&
-                                `<div key=${c.key}>
-                          ${
-                            showFieldNames
-                              ? `<h6 style=" text-transform: uppercase;
-                          color: #9ba4b5;
-                          font-size: 10px;
-                          font-weight: 600; margin: 0 0 5px;">${c.name}</h6>`
-                              : ''
-                          }
-                            <p style="margin: 0;">${d.data[c.key]}</p>
-                          </div>`
-                        )
-                      : ''
-                  }
+
+          return `<div style="border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
+            d.width
+          }px;height:${d.height}px;">
+                    <div style='position:relative; margin: 0;'>
+                      ${
+                        image
+                          ? `<img class="card-img" src="${image}" style="width: 100%;
+                          height: 120px;
+                          margin-bottom: 10px;
+                          object-fit: cover;
+                          position:relative;
+                          top: 0;
+                          left: 0;
+                          " />`
+                          : ''
+                      }
+                      <h5 style="padding: ${
+                        !image ? '15px' : '0'
+                      } 15px 0;font-size: 11px;margin: 0 0 10px;font-weight: 600;">${
+                        d.data[appActiveState.activeCardTitle?.key!]
+                      }</h5>
+                      <div style="padding: 0 15px 10px;display: flex;flex-direction: column;margin: 0;gap: 10px;">
+                        ${
+                          _shownColumns
+                            ? _shownColumns?.map((c: any, i) =>
+                                c.type === 'image'
+                                  ? ''
+                                  : c.type === 'multiple-select' && d.data[c.key]
+                                    ? `<div key=${c.key}>
+                                        ${
+                                          showFieldNames
+                                            ? `<h6 style="text-transform: uppercase;color: #9ba4b5;font-size: 10px;font-weight: 600;" margin: 0;>${c.name}</h6>`
+                                            : ''
+                                        }
+                                        <div style="display: flex;flex-direction: row;gap: 8px;">
+                                          ${_shownColumns![i].data.options.map((select: any) =>
+                                            d.data[c.key]?.includes(select.id)
+                                              ? `<span key='${select.id}' style='color: ${select.textColor}; padding: 2px 10px; border-radius: 8px; background: ${select.color}'>${select.name}</span>`
+                                              : ''
+                                          )}
+                                        </div>
+                                      </div>`
+                                    : d.data[c.key] &&
+                                      `<div key=${c.key}>
+                                        ${
+                                          showFieldNames
+                                            ? `<h6 style="text-transform: uppercase;color: #9ba4b5;font-size: 10px;font-weight: 600; margin: 0 0 5px;">${c.name}</h6>`
+                                            : ''
+                                        }
+                                        <p style="margin: 0;">${d.data[c.key]}</p>
+                                     </div>`
+                              )
+                            : ''
+                        }
                 </div></div>
               </div>`.replaceAll(',', '');
         })
