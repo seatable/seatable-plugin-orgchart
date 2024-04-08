@@ -477,7 +477,6 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
     });
   }
 
-
   return filterMultipleParentNodes(_rows);
 };
 
@@ -490,6 +489,10 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
   // if no parents and no child, return an empty array
   if ((parentNodes.length === 0 && childNodes.length === 0) || parentNodes.length === 0) {
     return [];
+  }
+
+  if (childNodes.length === 0) {
+    return [parentNodes[0]];
   }
 
   // get all parent nodes
@@ -536,4 +539,15 @@ const getAllChildNodes = (parentNode: TableRow, childNodes: any[]): any => {
       return getAllChildNodes(child, childNodes);
     }))];
   };
+};
+
+export const checkIfLinkToDifferentTable = (link: TableColumn, table: Table) => {
+  const links = window.dtableSDK.getLinks();
+  const _link = links.find((l: any) => l._id === link.data.link_id);
+
+  if (_link?.table1_table2_map || (_link?.table1_table2_map && Object.keys(_link?.table1_table2_map).length > 0)) {
+    return true;
+  } else {
+    return false;
+  }
 };
