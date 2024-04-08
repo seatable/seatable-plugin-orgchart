@@ -463,15 +463,20 @@ export const showFieldNames = (settings: PresetSettings) => {
 export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
   let parentId: any;
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
-  let _rows = rows.map((r: any) => {
-    parentId = linkedRows[r._id][relationship?.key!][0];
+  let _rows = [];
 
-    return {
-      ...r,
-      id: r._id,
-      parentId,
-    };
-  });
+  if (Object.keys(linkedRows).length > 0) {
+    _rows = rows.map((r: any) => {
+      parentId = linkedRows[r._id][relationship?.key!][0];
+
+      return {
+        ...r,
+        id: r._id,
+        parentId,
+      };
+    });
+  }
+
 
   return filterMultipleParentNodes(_rows);
 };
@@ -483,7 +488,7 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
   let childNodes = rows.filter((row) => row.parentId);
 
   // if no parents and no child, return an empty array
-  if (parentNodes.length === 0 && childNodes.length === 0) {
+  if ((parentNodes.length === 0 && childNodes.length === 0) || parentNodes.length === 0) {
     return [];
   }
 
@@ -502,12 +507,12 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
   childNodes = parentNode?.children as TableRow[];
 
   // delete children property (not needed anymore)
-  delete parentNode.children;
+  if (parentNode) delete parentNode.children;
 
   // create new array that includes one parentNode and all its children
   const _rows = [parentNode, ...childNodes];
 
-  return _rows;
+  return parentNode ? _rows : [];
 };
 
 /**  Function to get every single node in a parents subtree
