@@ -14,6 +14,7 @@ import {
   truncateTableName,
   isAllColumnsShown,
   showFieldNames,
+  checkIfLinkToDifferentTable,
 } from '../../utils/utils';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import { SettingsOption } from '../../utils/types';
@@ -78,6 +79,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     // Create options for relationship dropdown
     let relationshipOptions = activeTable?.columns
       .filter((item) => item.type === 'link')
+      .filter((item) => !checkIfLinkToDifferentTable(item, appActiveState.activeTable!))
       .map((item) => {
         let value = item.key;
         let label = truncateTableName(item.name);
