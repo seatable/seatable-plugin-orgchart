@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { OrgChart } from 'd3-org-chart';
 import styles from '../../styles/OrgChartCard.module.scss';
+import modalStyles from '../../styles/Modal.module.scss';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
 import jsPDF from 'jspdf';
 import { PLUGIN_ID } from '../../utils/constants';
@@ -19,6 +20,10 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   let showFieldNames = pluginPresets[appActiveState.activePresetIdx].settings?.show_field_names;
   let _shownColumns = shownColumns;
   let colIDs = _shownColumns?.map((s) => s.key);
+
+  const fitToScreen = () => {
+    chart?.fit();
+  };
 
   const downloadPdf = () => {
     if (chart) {
@@ -136,6 +141,9 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   return (
     // Add your JSX code here
     <div className="w-100 h-100" id={PLUGIN_ID}>
+      <button onClick={fitToScreen} className={modalStyles.main_fit_to_screen}>
+        Fit to screen
+      </button>
       <button onClick={downloadPdf} ref={downloadPdfRef} style={{ display: 'none' }}>
         Download PDF
       </button>
