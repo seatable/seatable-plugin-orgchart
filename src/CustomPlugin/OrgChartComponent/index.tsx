@@ -41,7 +41,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .neighbourMargin((a, b) => 50)
         .siblingsMargin((d) => 100)
         .duration(0)
-        .nodeWidth((d: d3.HierarchyNode<unknown>) => 150)
+        .nodeWidth((d: d3.HierarchyNode<unknown>) => 250)
         .nodeHeight((d: d3.HierarchyNode<any>) => {
           let image =
             appActiveState.activeCoverImg &&
@@ -62,7 +62,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key];
 
-          return `<div style="border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
+          return `<div style="border:1px solid #dedede; border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
             d.width
           }px;height:${d.height}px;">
                     <div style='position:relative; margin: 0;'>
@@ -80,7 +80,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                       }
                       <h5 style="padding: ${
                         !image ? '15px' : '0'
-                      } 15px 0;font-size: 11px;margin: 0 0 10px;font-weight: 600;">${
+                      } 15px 0;font-size: 14px;margin: 0 0 10px;font-weight: 600;">${
                         d.data[appActiveState.activeCardTitle?.key!]
                       }</h5>
                       <div style="padding: 0 15px 10px;display: flex;flex-direction: column;margin: 0;gap: 10px;">
