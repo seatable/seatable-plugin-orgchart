@@ -47,7 +47,6 @@ MenuList.propTypes = {
 };
 
 const Option = (props) => {
-  console.log(props);
   return (
     <div style={props.data.style}>
       <components.Option {...props} />

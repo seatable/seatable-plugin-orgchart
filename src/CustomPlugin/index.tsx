@@ -24,14 +24,14 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
 
 
   return (
-    // <OrgChartComponent
-    //   cardData={cardData}
-    //   pluginPresets={pluginPresets}
-    //   shownColumns={shownColumns}
-    //   appActiveState={appActiveState}
-    //   downloadPdfRef={downloadPdfRef}
-    // />
-    <div></div>
+    <OrgChartComponent
+      cardData={cardData}
+      pluginPresets={pluginPresets}
+      shownColumns={shownColumns}
+      appActiveState={appActiveState}
+      downloadPdfRef={downloadPdfRef}
+    />
+
   );
 };
 
