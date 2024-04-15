@@ -43,6 +43,7 @@ export interface PresetSettings {
   coverImg?: TableColumn;
   shown_columns?: TableColumn[];
   show_field_names?: boolean;
+  columns?: TableColumn[];
 }
 
 export type PresetsArray = IPresetInfo[];

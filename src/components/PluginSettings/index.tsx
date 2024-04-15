@@ -47,9 +47,12 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   const [relationshipSelectedOption, setRelationshipSelectedOption] = useState<SelectOption>();
   const [coverImgOptions, setCoverImgOptions] = useState<SelectOption[]>();
   const [coverImgSelectedOption, setCoverImgSelectedOption] = useState<SelectOption>();
+  const [dragItemIndex, setDragItemIndex] = useState<number | null>(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
   const { activeTable } = appActiveState;
   let shownColumns = pluginPresets[activePresetIdx].settings?.shown_columns?.map((c) => c.key);
   let isAllShown = isAllColumnsShown(shownColumns, activeTable?.columns);
+  let fields = pluginPresets[activePresetIdx].settings?.columns || activeTable?.columns;
 
   // Change options when active table or view changes
   useEffect(() => {
@@ -196,6 +199,46 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     updatePresets(activePresetIdx, newPluginPresets, pluginDataStore, oldPreset._id);
   };
 
+  // drag and drop logic
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.stopPropagation();
+    setDragItemIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.stopPropagation();
+    setDragOverItemIndex(index);
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    let __otherFields = [...fields!];
+    if (dragItemIndex !== null && dragOverItemIndex !== null) {
+      const dragItem = __otherFields.splice(dragItemIndex, 1)[0];
+      __otherFields.splice(dragOverItemIndex, 0, dragItem);
+      setDragItemIndex(null);
+      setDragOverItemIndex(null);
+
+      let _pluginPresets = [...pluginPresets];
+      _pluginPresets[activePresetIdx].settings!.columns = __otherFields;
+      let _pluginDataStore = { ...pluginDataStore, presets: _pluginPresets };
+
+      updatePresets(
+        appActiveState.activePresetIdx,
+        _pluginPresets,
+        _pluginDataStore,
+        appActiveState.activePresetId
+      );
+    }
+  };
+
   return (
     <div className={`bg-white ${isShowSettings ? styles.settings : styles.settings_hide}`}>
       <div>
@@ -278,8 +321,15 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
                     {isAllShown ? 'Hide all' : 'Show all'}
                   </button>
                 </div>
-                {activeTable?.columns.map((c) => (
-                  <div key={c.key} className={styles.settings_fields_columns} draggable="true">
+                {fields?.map((c, i) => (
+                  <div
+                    key={c.key}
+                    className={styles.settings_fields_columns}
+                    draggable="true"
+                    onDragStart={(e) => handleDragStart(e, i)}
+                    onDragEnter={(e) => handleDragEnter(e, i)}
+                    onDragEnd={(e) => handleDragEnd(e)}
+                    onDragOver={handleDragOver}>
                     <div className="d-flex align-items-center">
                       <div className={`field-dragbar ${styles.settings_fields_dragbar}`}>
                         <i className="dtable-font dtable-icon-drag pr-2" />
