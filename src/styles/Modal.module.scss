@@ -201,11 +201,12 @@
     color: $preset-text1;
     background-color: $preset-bgColor;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
     position: absolute;
     z-index: 10;
-    top: 10px;
-    left: 10px;
+    top: 85%;
+    left: 30px;
   };
 }
 

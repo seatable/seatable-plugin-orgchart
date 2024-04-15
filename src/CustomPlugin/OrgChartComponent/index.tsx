@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { OrgChart } from 'd3-org-chart';
-import styles from '../../styles/OrgChartCard.module.scss';
 import modalStyles from '../../styles/Modal.module.scss';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
-import jsPDF from 'jspdf';
 import { PLUGIN_ID } from '../../utils/constants';
+import { BiExpandAlt } from 'react-icons/bi';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
@@ -18,8 +17,14 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const d3Container = useRef(null);
   let chart: OrgChart<unknown> | null = null;
   let showFieldNames = pluginPresets[appActiveState.activePresetIdx].settings?.show_field_names;
-  let _shownColumns = shownColumns;
-  let colIDs = _shownColumns?.map((s) => s.key);
+  let colIDs = shownColumns?.map((s) => s.key);
+  let fields =
+    pluginPresets[appActiveState.activePresetIdx].settings?.columns ||
+    appActiveState.activeTable?.columns;
+  let fieldsIDs = fields?.map((f) => f.key);
+  let _shownColumns = fieldsIDs
+    ?.map((id) => shownColumns?.find((c) => c.key === id))
+    .filter((c) => c !== undefined);
 
   const fitToScreen = () => {
     chart?.fit();
@@ -102,7 +107,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                                             : ''
                                         }
                                         <div style="display: flex;flex-direction: row;gap: 8px;">
-                                          ${_shownColumns![i].data.options.map((select: any) =>
+                                          ${_shownColumns![i]?.data.options.map((select: any) =>
                                             d.data[c.key]?.includes(select.id)
                                               ? `<span key='${select.id}' style='color: ${select.textColor}; padding: 2px 10px; border-radius: 8px; background: ${select.color}'>${select.name}</span>`
                                               : ''
@@ -142,7 +147,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     // Add your JSX code here
     <div className="w-100 h-100" id={PLUGIN_ID}>
       <button onClick={fitToScreen} className={modalStyles.main_fit_to_screen}>
-        Fit to screen
+        <BiExpandAlt color="#fff" />
       </button>
       <button onClick={downloadPdf} ref={downloadPdfRef} style={{ display: 'none' }}>
         Download PDF
