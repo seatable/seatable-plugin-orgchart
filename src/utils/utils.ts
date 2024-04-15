@@ -472,8 +472,6 @@ export function convertToCSV(arr: any[]) {
 export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
   let parentId: any;
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
-  // console.log('relationship', relationship);
-  // console.log('linkedRows', linkedRows);
   let _rows = rows.map((r: any) => {
     parentId = linkedRows[r._id][relationship?.key!][0];
 
