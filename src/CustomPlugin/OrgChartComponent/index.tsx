@@ -6,6 +6,7 @@ import modalStyles from '../../styles/Modal.module.scss';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
 import { PLUGIN_ID } from '../../utils/constants';
 import { BiExpandAlt } from 'react-icons/bi';
+import pluginContext from '../../plugin-context';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
@@ -34,6 +35,11 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     if (chart) {
       chart.exportImg({ full: true });
     }
+  };
+
+  const onRowExpand = (r_id: string) => {
+    let row = appActiveState.activeTable?.rows.find((row) => r_id === row._id);
+    pluginContext.expandRow(row, appActiveState.activeTable);
   };
 
   useLayoutEffect(() => {
@@ -70,6 +76,9 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           }
 
           return image ? height + 110 : height || 50;
+        })
+        .onNodeClick((d: any) => {
+          onRowExpand(d.id);
         })
         .nodeContent((d: any, i: number, arr, state) => {
           let image =
