@@ -84,6 +84,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           let image =
             appActiveState.activeCoverImg &&
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
+            d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
 
           return `<div style="border:1px solid #dedede; border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
