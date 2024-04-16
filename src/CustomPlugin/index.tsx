@@ -9,9 +9,13 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginPresets,
   appActiveState,
   shownColumns,
-  downloadPdfRef
+  downloadPdfRef,
 }) => {
   const [cardData, setCardData] = useState<any[]>();
+  let multiFields = appActiveState.activeTable?.columns.filter((c) => c.type === 'multiple-select');
+  let __shownColumns = shownColumns?.map((s) =>
+    s?.type === 'multiple-select' ? multiFields?.find((_s) => s.key === _s.key) : s
+  );
 
   useEffect(() => {
     let data = parseRowsData(
@@ -22,16 +26,14 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
     setCardData(data);
   }, [appActiveState]);
 
-
   return (
     <OrgChartComponent
       cardData={cardData}
       pluginPresets={pluginPresets}
-      shownColumns={shownColumns}
+      shownColumns={__shownColumns}
       appActiveState={appActiveState}
       downloadPdfRef={downloadPdfRef}
     />
-
   );
 };
 

@@ -17,13 +17,13 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const d3Container = useRef(null);
   let chart: OrgChart<unknown> | null = null;
   let showFieldNames = pluginPresets[appActiveState.activePresetIdx].settings?.show_field_names;
-  let colIDs = shownColumns?.map((s) => s.key);
+  let colIDs = shownColumns?.map((s) => s?.key);
   let fields =
     pluginPresets[appActiveState.activePresetIdx].settings?.columns ||
     appActiveState.activeTable?.columns;
   let fieldsIDs = fields?.map((f) => f.key);
   let _shownColumns = fieldsIDs
-    ?.map((id) => shownColumns?.find((c) => c.key === id))
+    ?.map((id) => shownColumns?.find((c) => c?.key === id))
     .filter((c) => c !== undefined);
 
   const fitToScreen = () => {
@@ -53,12 +53,17 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .duration(0)
         .nodeWidth((d: d3.HierarchyNode<unknown>) => 250)
         .nodeHeight((d: d3.HierarchyNode<any>) => {
+          let multiFieldKey = appActiveState.activeTable?.columns.find(
+            (c) => c.type === 'multiple-select'
+          )?.key;
+          let multiNo = d.data[multiFieldKey!]?.length;
+
           let image =
             appActiveState.activeCoverImg &&
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key];
-          let height = shownColumns?.length! * 43;
-          let imgShown = shownColumns?.map((c) => c.type).includes('image');
+          let height = shownColumns?.length! * (43 + multiNo + 1);
+          let imgShown = shownColumns?.map((c) => c?.type).includes('image');
 
           if (!imgShown) {
             height += 40;
@@ -106,7 +111,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                                             ? `<h6 style="text-transform: uppercase;color: #9ba4b5;font-size: 10px;font-weight: 600;" margin: 0;>${c.name}</h6>`
                                             : ''
                                         }
-                                        <div style="display: flex;flex-direction: row;gap: 8px;">
+                                        <div style="display: flex;flex-direction: row;gap: 8px;flex-wrap: wrap;">
                                           ${_shownColumns![i]?.data.options.map((select: any) =>
                                             d.data[c.key]?.includes(select.id)
                                               ? `<span key='${select.id}' style='color: ${select.textColor}; padding: 2px 10px; border-radius: 8px; background: ${select.color}'>${select.name}</span>`
