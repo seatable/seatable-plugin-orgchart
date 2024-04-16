@@ -6,7 +6,7 @@ export interface ICustomPluginProps {
   pluginPresets: PresetsArray;
   appActiveState: AppActiveState;
   activeViewRows?: TableRow[];
-  shownColumns?: TableColumn[];
+  shownColumns?:  (TableColumn | undefined)[];
   downloadPdfRef: React.MutableRefObject<null>;
 }
 
