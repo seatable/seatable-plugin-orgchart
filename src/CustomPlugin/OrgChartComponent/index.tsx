@@ -62,13 +62,13 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           let multiFieldKey = appActiveState.activeTable?.columns.find(
             (c) => c.type === 'multiple-select'
           )?.key;
-          let multiNo = d.data[multiFieldKey!]?.length;
+          let multiNo = d.data[multiFieldKey!]?.length + 1 || 0;
 
           let image =
             appActiveState.activeCoverImg &&
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key];
-          let height = shownColumns?.length! * (43 + multiNo + 1);
+          let height = shownColumns?.length! * (43 + multiNo);
           let imgShown = shownColumns?.map((c) => c?.type).includes('image');
 
           if (!imgShown) {
