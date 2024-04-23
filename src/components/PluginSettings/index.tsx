@@ -16,6 +16,7 @@ import {
   isAllColumnsShown,
   showFieldNames,
   checkIfLinkToDifferentTable,
+  removeDeletedFields,
 } from '../../utils/utils';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import { SettingsOption } from '../../utils/types';
@@ -68,6 +69,10 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
   let shownColumns = pluginPresets[activePresetIdx].settings?.shown_columns?.map((c) => c.key);
   let isAllShown = isAllColumnsShown(shownColumns, activeTable?.columns);
   let fields = pluginPresets[activePresetIdx].settings?.columns || activeTable?.columns;
+  let extraFields = activeTable?.columns.filter(
+    (c) => !fields?.map((f) => f?.key)?.includes(c?.key)
+  );
+  fields = removeDeletedFields([...fields, ...extraFields], appActiveState.activeTable!);
 
   // Change options when active table or view changes
   useEffect(() => {
@@ -360,35 +365,37 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
                     {isAllShown ? 'Hide all' : 'Show all'}
                   </button>
                 </div>
-                {fields?.map((c, i) => (
-                  <div
-                    key={c.key}
-                    className={styles.settings_fields_columns}
-                    draggable="true"
-                    onDragStart={(e) => handleDragStart(e, i)}
-                    onDragEnter={(e) => handleDragEnter(e, i)}
-                    onDragEnd={(e) => handleDragEnd(e)}
-                    onDragOver={handleDragOver}>
-                    <div className="d-flex align-items-center">
-                      <div className={`field-dragbar ${styles.settings_fields_dragbar}`}>
-                        <i className="dtable-font dtable-icon-drag pr-2" />
+                {fields
+                  .filter((c) => c !== null)
+                  ?.map((c, i) => (
+                    <div
+                      key={c?.key}
+                      className={styles.settings_fields_columns}
+                      draggable="true"
+                      onDragStart={(e) => handleDragStart(e, i)}
+                      onDragEnter={(e) => handleDragEnter(e, i)}
+                      onDragEnd={(e) => handleDragEnd(e)}
+                      onDragOver={handleDragOver}>
+                      <div className="d-flex align-items-center">
+                        <div className={`field-dragbar ${styles.settings_fields_dragbar}`}>
+                          <i className="dtable-font dtable-icon-drag pr-2" />
+                        </div>
+                        <i
+                          className={`dtable-font ${COLUMNS_ICON_CONFIG[c?.type]} ${
+                            styles.settings_fields_icons
+                          }`}
+                        />
+                        <p className="ml-2 mb-0">{c?.name}</p>
                       </div>
-                      <i
-                        className={`dtable-font ${COLUMNS_ICON_CONFIG[c.type]} ${
-                          styles.settings_fields_icons
-                        }`}
-                      />
-                      <p className="ml-2 mb-0">{c.name}</p>
+                      <button
+                        onClick={() => handleShownColumn(c, shownColumns?.includes(c?.key)!)}
+                        className={`${
+                          shownColumns?.includes(c?.key)
+                            ? styles.settings_fields_toggle_btns_active
+                            : styles.settings_fields_toggle_btns
+                        } `}></button>
                     </div>
-                    <button
-                      onClick={() => handleShownColumn(c, shownColumns?.includes(c.key)!)}
-                      className={`${
-                        shownColumns?.includes(c.key)
-                          ? styles.settings_fields_toggle_btns_active
-                          : styles.settings_fields_toggle_btns
-                      } `}></button>
-                  </div>
-                ))}
+                  ))}
               </div>
               <div className={`mt-5 ${styles.settings_fields}`}>
                 <div className="mb-2 d-flex align-items-center justify-content-between">

@@ -551,3 +551,7 @@ export const checkIfLinkToDifferentTable = (link: TableColumn, table: Table) => 
     return false;
   }
 };
+
+export const removeDeletedFields = (fields: TableColumn[], table: Table) => {
+  return fields.filter((field: TableColumn) => table.columns.map((column) => column.key).includes(field.key));
+};
