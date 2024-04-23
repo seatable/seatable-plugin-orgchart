@@ -28,6 +28,7 @@ import { SelectOption } from './utils/Interfaces/PluginSettings.interface';
 // Import of CSS
 import styles from './styles/Modal.module.scss';
 import './assets/css/plugin-layout.css';
+import './styles/main.scss';
 // Import of Constants
 import {
   INITIAL_IS_SHOW_STATE,
