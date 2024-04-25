@@ -101,7 +101,16 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .siblingsMargin((d) => 100)
         .duration(0)
         .nodeWidth((d: d3.HierarchyNode<unknown>) => 250)
-        .nodeHeight((d: d3.HierarchyNode<any>) => cardHeight)
+        .nodeHeight((d: d3.HierarchyNode<any>) => (cardHeight > 50 ? cardHeight + 10 : cardHeight))
+        .createZoom(() => {
+          return d3.zoom().filter((e) => {
+            // Do not zoom on these elements, this is done to enable scrolling
+            if (['DIV', 'FIGURE', 'H5', 'SPAN'].includes(e.srcElement.tagName)) {
+              return false;
+            }
+            return true;
+          });
+        })
         .onNodeClick((d: any) => {
           onRowExpand(d.id);
         })
@@ -111,7 +120,9 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
-
+          let titleCol = appActiveState.activeTable?.columns.find(
+            (c) => c.key === appActiveState.activeCardTitle?.key
+          );
           return `<div style="border:1px solid #dedede; border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
             d.width
           }px;height:${d.height}px;">
@@ -128,31 +139,52 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                           " />`
                           : ''
                       }
-                      <h5 style="padding: ${
+                      <div style="padding: ${
                         !image ? '15px' : '0'
-                      } 15px 0;font-size: 14px;margin: 0 0 10px;font-weight: 600;">${
-                        d.data[appActiveState.activeCardTitle?.key!]
-                      }</h5>
-                      <div style="padding: 0 15px 10px;margin-top: 10px;" class="org-card-formatter">
+                      } 15px 0;font-size: 14px;margin: 0 0 15px;font-weight: 600;">
+                      ${ReactDOMServer.renderToString(
+                        <EditorFormatter
+                          column={titleCol}
+                          row={d.data}
+                          table={appActiveState.activeTable}
+                          displayColumnName={false}
+                          getLinkCellValue={_getLinkCellValue}
+                          getTableById={_getTableById}
+                          getRowsByID={getRowsByID}
+                          selectedView={appActiveState.activeTableView}
+                          collaborators={collaborators}
+                          getUserCommonInfo={getUserCommonInfo}
+                          getMediaUrl={getMediaUrl}
+                          formulaRows={formulaRows}
+                        />
+                      )}
+                      </div>
+                      <div style="padding: 0 15px 10px;margin-top: 10px;max-height: 195px;
+                      overflow: auto; gap: 15px;
+                      display: flex;
+                      flex-direction: column;" class="org-card-formatter">
                         ${
                           _shownColumns
-                            ? _shownColumns?.map((c: any, i) =>
-                                ReactDOMServer.renderToString(
-                                  <EditorFormatter
-                                    column={c}
-                                    row={d.data}
-                                    table={appActiveState.activeTable}
-                                    displayColumnName={showFieldNames || false}
-                                    getLinkCellValue={_getLinkCellValue}
-                                    getTableById={_getTableById}
-                                    getRowsByID={getRowsByID}
-                                    selectedView={appActiveState.activeTableView}
-                                    collaborators={collaborators}
-                                    getUserCommonInfo={getUserCommonInfo}
-                                    getMediaUrl={getMediaUrl}
-                                    formulaRows={formulaRows}
-                                  />
-                                )
+                            ? _shownColumns?.map(
+                                (c: any, i) =>
+                                  `<div>
+                            ${ReactDOMServer.renderToString(
+                              <EditorFormatter
+                                column={c}
+                                row={d.data}
+                                table={appActiveState.activeTable}
+                                displayColumnName={showFieldNames || false}
+                                getLinkCellValue={_getLinkCellValue}
+                                getTableById={_getTableById}
+                                getRowsByID={getRowsByID}
+                                selectedView={appActiveState.activeTableView}
+                                collaborators={collaborators}
+                                getUserCommonInfo={getUserCommonInfo}
+                                getMediaUrl={getMediaUrl}
+                                formulaRows={formulaRows}
+                              />
+                            )}
+                            </div>`
                               )
                             : ''
                         }
