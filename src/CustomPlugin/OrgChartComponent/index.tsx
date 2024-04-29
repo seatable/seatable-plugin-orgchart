@@ -123,26 +123,40 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           let titleCol = appActiveState.activeTable?.columns.find(
             (c) => c.key === appActiveState.activeCardTitle?.key
           );
-          return `<div style="border:1px solid #dedede; border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
-            d.width
-          }px;height:${d.height}px;">
-                    <div style='position:relative; margin: 0;' class="org-card" >
-                      ${
-                        image
-                          ? `<img class="card-img" src="${image}" style="width: 100%;
-                          height: 180px;
-                          margin-bottom: 10px;
-                          object-fit: cover;
-                          position:relative;
-                          border-bottom: 1px solid #dedede;
-                          top: 0;
-                          left: 0;
-                          " />`
-                          : ''
-                      }
-                      <div style="padding: ${
-                        !image ? '15px' : '0'
-                      } 15px 0;font-size: 14px;margin: 5px 0 15px;">
+          return `
+            <div style="
+              border:1px solid #dedede;
+              border-radius: 5px;
+              position: relative;
+              background: #fff;
+              margin: 0;
+              width:${d.width}px; 
+              height:${d.height}px;
+            ">
+            <div class="org-card" style="
+              position:relative;
+              margin: 0;
+            ">
+                ${
+                  image
+                    ? `<img class="card-img" src="${image}" style="width: 100%;
+                    height: 180px;
+                    margin-bottom: 10px;
+                    object-fit: cover;
+                    position:relative;
+                    border-bottom: 1px solid #dedede;
+                    top: 0;
+                    left: 0;
+                    " />`
+                    : ''
+                }
+                      
+                <div style="
+                  padding: ${!image ? '15px' : '0'} 15px 0;
+                  font-size: 14px;
+                  font-weight: 600;
+                  margin: 5px 0 15px;
+                ">
                       ${ReactDOMServer.renderToString(
                         <EditorFormatter
                           column={titleCol}
@@ -159,11 +173,16 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                           formulaRows={formulaRows}
                         />
                       )}
-                      </div>
-                      <div style="padding: 0 15px 10px;margin-top: 10px;max-height: 195px;font-size:14px;
-                      overflow: auto; gap: 15px;
-                      display: flex;
-                      flex-direction: column;" class="org-card-formatter">
+                </div>
+
+                <div class="org-card-formatter" style="
+                  padding: 0 15px 10px;
+                  margin-top: 10px;
+                  max-height: 195px;
+                  font-size:14px;
+                  overflow: auto; gap: 15px;
+                  display: flex;
+                  flex-direction: column;" >
                         ${
                           _shownColumns
                             ? _shownColumns?.map(
