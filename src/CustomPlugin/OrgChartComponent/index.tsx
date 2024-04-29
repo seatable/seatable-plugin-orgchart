@@ -130,10 +130,11 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                       ${
                         image
                           ? `<img class="card-img" src="${image}" style="width: 100%;
-                          height: 120px;
+                          height: 180px;
                           margin-bottom: 10px;
                           object-fit: cover;
                           position:relative;
+                          border-bottom: 1px solid #dedede;
                           top: 0;
                           left: 0;
                           " />`
