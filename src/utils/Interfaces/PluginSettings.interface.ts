@@ -9,7 +9,7 @@ interface IPluginSettingsProps {
   activeTableViews: TableViewArray;
   pluginPresets: PresetsArray;
   onTableOrViewChange: (type: SettingsOption, option: SelectOption) => void;
-  onToggleSettings: () => void;
+  onToggleSettings: (e: any) => void;
   isShowSettings: boolean;
   activePresetIdx: number;
   pluginDataStore: IPluginDataStore;

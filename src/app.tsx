@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
+import deepCopy from 'deep-copy';
 // Import of Component
 import Header from './components/Header';
 import PluginSettings from './components/PluginSettings';
@@ -304,19 +305,20 @@ const App: React.FC<IAppProps> = (props) => {
     setAppActiveState(newPresetActiveState);
   };
 
-  const toggleSettings = () => {
+  const toggleSettings = (e: any) => {
+    e.stopPropagation();
     if (isMobile() && isShowState.isShowPresets) {
       // Collapse presets if open
-      togglePresets();
+      togglePresets(e);
     }
 
     setIsShowState((prevState) => ({ ...prevState, isShowSettings: !prevState.isShowSettings }));
   };
 
-  const togglePresets = () => {
+  const togglePresets = (e: any) => {
     if (isMobile() && isShowState.isShowSettings) {
       // Collapse settings if open
-      toggleSettings();
+      toggleSettings(e);
     }
 
     setIsShowState((prevState) => ({ ...prevState, isShowPresets: !prevState.isShowPresets }));
@@ -499,6 +501,8 @@ const App: React.FC<IAppProps> = (props) => {
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}
               shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
+              pluginDataStore={pluginDataStore}
+              updatePresets={updatePresets}
             />
 
             <button className={styles.add_row} onClick={addRowItem}>

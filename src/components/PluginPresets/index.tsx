@@ -173,6 +173,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
       option
     );
 
+
     // Update active state info
     const newPresetActiveState: AppActiveState = {
       activePresetId: _id,
