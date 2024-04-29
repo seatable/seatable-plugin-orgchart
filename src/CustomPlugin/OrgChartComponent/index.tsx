@@ -130,6 +130,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
               width:${d.width}px; 
               height:${d.height}px;
             ">
+
+            <!-- Card: Cover Image -->
             <div class="org-card" style="
               position:relative;
               margin: 0;
@@ -146,7 +148,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                     " />`
                     : ''
                 }
-                      
+                
+                <!-- Card: Title -->
                 <div style="
                   padding: 15px;
                   font-size: 14px;
@@ -170,6 +173,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                       )}
                 </div>
 
+                <!-- Card: other content -->
                 <div class="org-card-formatter" style="
                   padding: 0 15px 10px;
                   font-size:14px;

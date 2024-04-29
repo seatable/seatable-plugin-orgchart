@@ -381,7 +381,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
                           <i className="dtable-font dtable-icon-drag pr-2" />
                         </div>
                         <i
-                          className={`dtable-font ${COLUMNS_ICON_CONFIG[c?.type]} ${
+                          className={`${COLUMNS_ICON_CONFIG[c?.type]} ${
                             styles.settings_fields_icons
                           }`}
                         />
