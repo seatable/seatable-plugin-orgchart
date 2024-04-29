@@ -114,8 +114,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
           // fallback image
           if (!image && appActiveState.activeCoverImg) {
-            image =
-              'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg';
+            image = '/media/placeholder.png';
           }
 
           let titleCol = appActiveState.activeTable?.columns.find(
