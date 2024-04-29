@@ -101,16 +101,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .siblingsMargin((d) => 100)
         .duration(0)
         .nodeWidth((d: d3.HierarchyNode<unknown>) => 250)
-        .nodeHeight((d: d3.HierarchyNode<any>) => (cardHeight > 50 ? cardHeight + 10 : cardHeight))
-        .createZoom(() => {
-          return d3.zoom().filter((e) => {
-            // Do not zoom on these elements, this is done to enable scrolling
-            if (['DIV', 'FIGURE', 'H5', 'SPAN'].includes(e.srcElement.tagName)) {
-              return false;
-            }
-            return true;
-          });
-        })
+        .nodeHeight((d: d3.HierarchyNode<any>) => cardHeight)
         .onNodeClick((d: any) => {
           onRowExpand(d.id);
         })
@@ -119,6 +110,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             appActiveState.activeCoverImg &&
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
+
           let titleCol = appActiveState.activeTable?.columns.find(
             (c) => c.key === appActiveState.activeCardTitle?.key
           );
@@ -140,7 +132,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                   image
                     ? `<img class="card-img" src="${image}" style="width: 100%;
                     height: 180px;
-                    margin-bottom: 10px;
                     object-fit: cover;
                     position:relative;
                     border-bottom: 1px solid #dedede;
@@ -151,10 +142,9 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                 }
                       
                 <div style="
-                  padding: ${!image ? '15px' : '0'} 15px 0;
+                  padding: 15px;
                   font-size: 14px;
                   font-weight: 600;
-                  margin: 5px 0 15px;
                 ">
                       ${ReactDOMServer.renderToString(
                         <EditorFormatter
@@ -176,10 +166,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
                 <div class="org-card-formatter" style="
                   padding: 0 15px 10px;
-                  margin-top: 10px;
-                  max-height: 195px;
                   font-size:14px;
-                  overflow: auto; gap: 15px;
+                  gap: 15px;
                   display: flex;
                   flex-direction: column;" >
                         ${
