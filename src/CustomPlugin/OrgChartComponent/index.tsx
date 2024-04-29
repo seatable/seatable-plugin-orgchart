@@ -117,7 +117,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .nodeContent((d: any, i: number, arr, state) => {
           let image =
             appActiveState.activeCoverImg &&
-            colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
           let titleCol = appActiveState.activeTable?.columns.find(
