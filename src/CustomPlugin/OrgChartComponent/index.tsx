@@ -142,7 +142,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                       }
                       <div style="padding: ${
                         !image ? '15px' : '0'
-                      } 15px 0;font-size: 14px;margin: 5px 0 15px;font-weight: 600;">
+                      } 15px 0;font-size: 14px;margin: 5px 0 15px;">
                       ${ReactDOMServer.renderToString(
                         <EditorFormatter
                           column={titleCol}
