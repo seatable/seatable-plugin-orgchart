@@ -3,6 +3,7 @@ export interface IHeaderProps {
   isShowSettings: boolean;
   isShowPresets: boolean;
   downloadPdfRef: React.MutableRefObject<any>;
+  fitToScreenRef: React.MutableRefObject<any>;
   toggleSettings: () => void;
   togglePlugin: () => void;
   onTogglePresets: () => void;

@@ -72,6 +72,7 @@ const App: React.FC<IAppProps> = (props) => {
   const { activeTable, activePresetId, activePresetIdx, activeViewRows } = appActiveState;
   const { collaborators } = window.app.state;
   const downloadPdfRef = useRef(null);
+  const fitToScreenRef = useRef(null);
 
   useEffect(() => {
     initPluginDTableData();
@@ -124,7 +125,7 @@ const App: React.FC<IAppProps> = (props) => {
     let activeTableViews: TableViewArray = activeTable.views; // All the Views of the specific Active Table
     let pluginDataStore: IPluginDataStore = getPluginDataStore(activeTable, PLUGIN_NAME);
     let pluginPresets: PresetsArray = pluginDataStore.presets; // An array with all the Presets
-    
+
     setPluginDataStore(pluginDataStore);
     setAllTables(allTables);
     setPluginPresets(pluginPresets);
@@ -486,6 +487,7 @@ const App: React.FC<IAppProps> = (props) => {
           toggleSettings={toggleSettings}
           togglePlugin={onPluginToggle}
           downloadPdfRef={downloadPdfRef}
+          fitToScreenRef={fitToScreenRef}
         />
         {/* main body  */}
         <div
@@ -494,7 +496,8 @@ const App: React.FC<IAppProps> = (props) => {
           {/* content  */}
           <div id={PLUGIN_ID} className={styles.body} style={{ padding: '10px' }}>
             <CustomPlugin
-            downloadPdfRef={downloadPdfRef}
+              downloadPdfRef={downloadPdfRef}
+              fitToScreenRef={fitToScreenRef}
               pluginPresets={pluginPresets}
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}

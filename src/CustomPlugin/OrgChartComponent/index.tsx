@@ -19,6 +19,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   cardData,
   shownColumns,
   downloadPdfRef,
+  fitToScreenRef,
 }) => {
   const [cardHeight, setCardHeight] = useState<number>(0);
   const d3Container = useRef(null);
@@ -231,8 +232,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   return (
     // Add your JSX code here
     <div className="w-100 h-100" id={PLUGIN_ID}>
-      <button onClick={fitToScreen} className={modalStyles.main_fit_to_screen}>
-        <BiExpandAlt color="#fff" />
+      <button onClick={fitToScreen} ref={fitToScreenRef} style={{ display: 'none' }}>
+        Fit to screen
       </button>
       <button onClick={downloadPdf} ref={downloadPdfRef} style={{ display: 'none' }}>
         Download PDF
