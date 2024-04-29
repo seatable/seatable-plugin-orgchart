@@ -16,8 +16,8 @@ export interface IPresetsProps {
   pluginDataStore: IPluginDataStore;
   isShowPresets: boolean;
   allTables: TableArray;
-  onTogglePresets: () => void;
-  onToggleSettings: () => void;
+  onTogglePresets: (e: any) => void;
+  onToggleSettings: (e: any) => void;
   updateActiveData: () => void;
 }
 
@@ -44,6 +44,7 @@ export interface PresetSettings {
   shown_columns?: TableColumn[];
   show_field_names?: boolean;
   columns?: TableColumn[];
+  tree_leaves?: any[];
 }
 
 export type PresetsArray = IPresetInfo[];

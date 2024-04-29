@@ -59,7 +59,8 @@ const PresetItem: React.FC<IPresetItemProps> = ({
   });
 
   // toggle Preset dropdown(edit/delete)
-  const togglePresetDropdown = () => {
+  const togglePresetDropdown = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     setShowPresetDropdown((prev) => !prev);
   };
 
@@ -69,12 +70,12 @@ const PresetItem: React.FC<IPresetItemProps> = ({
     switch (action) {
       case PresetHandleAction.delete:
         deletePreset();
-        togglePresetDropdown();
+        togglePresetDropdown(e);
         break;
       case PresetHandleAction.rename:
         setIsEditing((prev) => !prev);
         togglePresetsUpdate(e, PresetHandleAction.edit);
-        togglePresetDropdown();
+        togglePresetDropdown(e);
         setShowPresetDropdown(false);
         break;
       case PresetHandleAction.duplicate:
@@ -87,7 +88,7 @@ const PresetItem: React.FC<IPresetItemProps> = ({
 
   const onClickPreset = (e: React.MouseEvent<HTMLElement>) => {
     if (e.detail === 2) {
-      onToggleSettings();
+      onToggleSettings(e);
     } else {
       onSelectPreset(p?._id);
     }
@@ -130,10 +131,9 @@ const PresetItem: React.FC<IPresetItemProps> = ({
             <span
               className={`dtable-font dtable-icon-set-up ${styles.modal_header_viewBtn_settings}`}
               onClick={onToggleSettings}></span>
-            <BsThreeDots
-              className={`ml-1 ${styles.modal_header_viewBtn_icons}`}
-              onClick={togglePresetDropdown}
-            />
+            <div onClick={togglePresetDropdown}>
+              <BsThreeDots className={`ml-1 ${styles.modal_header_viewBtn_icons}`} />
+            </div>
           </span>
         </div>
         {showPresetDropdown && (
