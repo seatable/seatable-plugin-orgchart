@@ -100,8 +100,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .neighbourMargin((a, b) => 50)
         .siblingsMargin((d) => 100)
         .duration(0)
-        .nodeWidth((d: d3.HierarchyNode<unknown>) => 250)
-        .nodeHeight((d: d3.HierarchyNode<any>) => cardHeight)
+        .nodeWidth((d: d3.HierarchyNode<unknown>) => 280)
+        .nodeHeight((d: d3.HierarchyNode<any>) => cardHeight + 10)
         .onNodeClick((d: any) => {
           onRowExpand(d.id);
         })
