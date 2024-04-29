@@ -139,7 +139,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                 ${
                   image
                     ? `<img class="card-img" src="${image}" style="width: 100%;
-                    height: 180px;
+                    height: 220px;
                     object-fit: cover;
                     position:relative;
                     border-bottom: 1px solid #dedede;
@@ -152,7 +152,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                 <!-- Card: Title -->
                 <div style="
                   padding: 15px;
-                  font-size: 14px;
+                  font-size: 16px;
                   font-weight: 600;
                 ">
                       ${ReactDOMServer.renderToString(
