@@ -111,6 +111,12 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
 
+          // fallback image
+          if (!image && appActiveState.activeCoverImg) {
+            image =
+              'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg';
+          }
+
           let titleCol = appActiveState.activeTable?.columns.find(
             (c) => c.key === appActiveState.activeCardTitle?.key
           );
