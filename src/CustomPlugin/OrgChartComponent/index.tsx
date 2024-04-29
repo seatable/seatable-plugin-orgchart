@@ -160,7 +160,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                         />
                       )}
                       </div>
-                      <div style="padding: 0 15px 10px;margin-top: 10px;max-height: 195px;
+                      <div style="padding: 0 15px 10px;margin-top: 10px;max-height: 195px;font-size:14px;
                       overflow: auto; gap: 15px;
                       display: flex;
                       flex-direction: column;" class="org-card-formatter">
