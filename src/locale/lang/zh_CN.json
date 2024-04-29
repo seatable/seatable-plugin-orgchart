@@ -9,5 +9,9 @@
   "preset_warn_exist": "请输入唯一的预设名称",
   "title": "標題",
   "relationship": "關係",
-  "coverImg": "封面圖片"
+  "cover_img": "封面圖片",
+  "other_fields": "组织结构图中显示的其他字段",
+  "show_field_names": "显示字段名称",
+  "hide_all": "显示全部",
+  "show_all": "隐藏全部"
 }

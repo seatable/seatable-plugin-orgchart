@@ -9,5 +9,9 @@
   "preset_warn_exist": "Пожалуйста, введите уникальное имя предустановки",
   "title": "Заголовок",
   "relationship": "Отношение",
-  "coverImg": "Обложка"
+  "cover_img": "Обложка",
+  "other_fields": "Other fields shown in Org chart",
+  "show_field_names": "Show field names",
+  "hide_all": "Hide all",
+  "show_all": "Show all"
 }
