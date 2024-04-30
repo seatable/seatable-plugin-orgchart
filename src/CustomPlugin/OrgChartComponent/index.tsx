@@ -92,6 +92,15 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         chart = new OrgChart();
       }
 
+      // error handling:
+      // - ignore records with invalid relationship value
+      // - show error message if rendering is not possible
+      if (cardData.length === 0) {
+        console.log(
+          'The org chart could not be rendered. Please avoid multiple root elements and faulty links in your selected view.'
+        );
+      }
+
       chart
         .container(d3Container.current)
         .data(cardData)
