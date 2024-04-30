@@ -11,3 +11,12 @@
   max-height: 700px;
   overflow: auto;
 }
+
+/* bigger arrows for collapsing */
+.node-button-div svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+.node-button-div span {
+  font-size: 14px;
+}

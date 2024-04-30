@@ -9,5 +9,9 @@
   "preset_warn_exist": "Introduza um nome de predefinição único",
   "title": "Título",
   "relationship": "Relação",
-  "coverImg": "Imagem de capa"
+  "cover_img": "Imagem de capa",
+  "other_fields": "Otros campos del organigrama",
+  "show_field_names": "Mostrar nombres de campos",
+  "hide_all": "Ocultar todo",
+  "show_all": "Mostrar todo"
 }

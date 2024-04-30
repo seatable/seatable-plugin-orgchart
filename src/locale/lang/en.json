@@ -9,5 +9,9 @@
   "preset_warn_exist": "Please enter a unique preset name",
   "title": "Title",
   "relationship": "Relationship",
-  "coverImg": "Cover Image"
+  "cover_img": "Cover Image",
+  "other_fields": "Other fields shown in Org chart",
+  "show_field_names": "Show field names",
+  "hide_all": "Hide all",
+  "show_all": "Show all"
 }

@@ -6,7 +6,7 @@ export interface ICustomPluginProps {
   pluginPresets: PresetsArray;
   appActiveState: AppActiveState;
   activeViewRows?: TableRow[];
-  shownColumns?:  (TableColumn | undefined)[];
+  shownColumns?: (TableColumn | undefined)[];
   downloadPdfRef: React.MutableRefObject<null>;
   pluginDataStore: IPluginDataStore;
   updatePresets: (
@@ -16,8 +16,9 @@ export interface ICustomPluginProps {
     activePresetId: string,
     callBack?: any
   ) => void;
+  fitToScreenRef: React.MutableRefObject<null>;
 }
 
-export interface OrgChartComponentProps extends ICustomPluginProps{
+export interface OrgChartComponentProps extends ICustomPluginProps {
   cardData: any[] | undefined;
 }

@@ -9,5 +9,9 @@
   "preset_warn_exist": "Veuillez saisir un nom de préréglage unique",
   "title": "Titre",
   "relationship": "Relation",
-  "coverImg": "Image de couverture"
+  "cover_img": "Image de couverture",
+  "other_fields": "Autres champs figurant dans l'organigramme",
+  "show_field_names": "Afficher nom de colonne",
+  "hide_all": "Masquer toutes",
+  "show_all": "Afficher tout"
 }

@@ -23,6 +23,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   downloadPdfRef,
   pluginDataStore,
   updatePresets,
+  fitToScreenRef
 }) => {
   // Set the initial height of the card
   const [cardHeight, setCardHeight] = useState<number>(0);
@@ -179,52 +180,64 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .svgHeight(window.innerHeight - 10)
         .compactMarginBetween((d) => 65)
         .compactMarginPair((d) => 100)
+        .compact(false)
         .neighbourMargin((a, b) => 50)
-        .siblingsMargin((d) => 100)
+        .siblingsMargin((d) => 20)
         .duration(0)
-        .nodeWidth((d: d3.HierarchyNode<unknown>) => 250)
-        .nodeHeight((d: d3.HierarchyNode<any>) => (cardHeight > 50 ? cardHeight + 10 : cardHeight))
-        .createZoom(() => {
-          return d3.zoom().filter((e) => {
-            // Do not zoom on these elements, this is done to enable scrolling
-            if (['DIV', 'FIGURE', 'H5', 'SPAN'].includes(e.srcElement.tagName)) {
-              return false;
-            }
-            return true;
-          });
-        })
+        .nodeWidth((d: d3.HierarchyNode<unknown>) => 280)
+        .nodeHeight((d: d3.HierarchyNode<any>) => cardHeight + 10)
         .onNodeClick((d: any) => {
           onRowExpand(d.id);
         })
         .nodeContent((d: any, i: number, arr, state) => {
           let image =
             appActiveState.activeCoverImg &&
-            colIDs?.includes(appActiveState.activeCoverImg.key) &&
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
+
+          // fallback image
+          if (!image && appActiveState.activeCoverImg) {
+            image = '/media/placeholder.png';
+          }
+
           let titleCol = appActiveState.activeTable?.columns.find(
             (c) => c.key === appActiveState.activeCardTitle?.key
           );
+          return `
+            <div style="
+              border:1px solid #dedede;
+              border-radius: 5px;
+              position: relative;
+              background: #fff;
+              margin: 0;
+              width:${d.width}px; 
+              height:${d.height}px;
+            ">
 
-          return `<div style="border:1px solid #dedede; border-radius: 5px;position: relative;background: #fff;margin: 0;width:${
-            d.width
-          }px;height:${d.height}px;">
-                    <div style='position:relative; margin: 0;' class="org-card" >
-                      ${
-                        image
-                          ? `<img class="card-img" src="${image}" style="width: 100%;
-                          height: 120px;
-                          margin-bottom: 10px;
-                          object-fit: cover;
-                          position:relative;
-                          top: 0;
-                          left: 0;
-                          " />`
-                          : ''
-                      }
-                      <div style="padding: ${
-                        !image ? '15px' : '0'
-                      } 15px 0;font-size: 14px;margin: 0 0 15px;font-weight: 600;">
+            <!-- Card: Cover Image -->
+            <div class="org-card" style="
+              position:relative;
+              margin: 0;
+            ">
+                ${
+                  image
+                    ? `<img class="card-img" src="${image}" style="width: 100%;
+                    height: 180px;
+                    object-fit: cover;
+                    position:relative;
+                    border-bottom: 1px solid #dedede;
+                    top: 0;
+                    left: 0;
+                    " />`
+                    : ''
+                }
+                
+                <!-- Card: Title -->
+                <div style="
+                  padding: 15px;
+                  font-size: 16px;
+                  font-weight: 600;
+                ">
                       ${ReactDOMServer.renderToString(
                         <EditorFormatter
                           column={titleCol}
@@ -241,11 +254,15 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                           formulaRows={formulaRows}
                         />
                       )}
-                      </div>
-                      <div style="padding: 0 15px 10px;margin-top: 10px;max-height: 195px;
-                      overflow: auto; gap: 15px;
-                      display: flex;
-                      flex-direction: column;" class="org-card-formatter">
+                </div>
+
+                <!-- Card: other content -->
+                <div class="org-card-formatter" style="
+                  padding: 0 15px 10px;
+                  font-size:14px;
+                  gap: 15px;
+                  display: flex;
+                  flex-direction: column;" >
                         ${
                           _shownColumns
                             ? _shownColumns?.map(
@@ -327,8 +344,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   return (
     // Add your JSX code here
     <div className="w-100 h-100" id={PLUGIN_ID}>
-      <button onClick={fitToScreen} className={modalStyles.main_fit_to_screen}>
-        <BiExpandAlt color="#fff" />
+      <button onClick={fitToScreen} ref={fitToScreenRef} style={{ display: 'none' }}>
+        Fit to screen
       </button>
       <button onClick={downloadPdf} ref={downloadPdfRef} style={{ display: 'none' }}>
         Download PDF

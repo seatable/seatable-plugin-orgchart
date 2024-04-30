@@ -9,5 +9,9 @@
   "preset_warn_exist": "Introduzca un nombre único para la preajuste",
   "title": "Título",
   "relationship": "relación",
-  "coverImg": "Imagen de portada"
+  "cover_img": "Imagen de portada",
+  "other_fields": "Otros campos del organigrama",
+  "show_field_names": "Mostrar nombres de campos",
+  "hide_all": "Ocultar todo",
+  "show_all": "Mostrar todo"
 }

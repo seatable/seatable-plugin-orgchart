@@ -1,6 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { CellType, SELECT_OPTION_COLORS } from 'dtable-utils';
+
+// icons
+import styles from '../../styles/PluginSettings.module.scss';
+import { COLUMNS_ICON_CONFIG } from 'dtable-utils';
+
 import {
   TextFormatter,
   NumberFormatter,
@@ -128,9 +133,15 @@ class EditorFormatter extends React.Component {
   renderColumnFormatter = (formatter) => {
     const { column } = this.props;
     const { name: columnName } = column;
+    
     return (
       <>
         <div className="orgchart-editor-title">
+          <i
+            className={`dtable-font ${COLUMNS_ICON_CONFIG[column.type]} ${
+              styles.settings_fields_icons
+            }`}
+          />
           <span className="orgchart-editor-title-text">{columnName}</span>
         </div>
         <div style={{ minHeight: 28 }}>{formatter}</div>
