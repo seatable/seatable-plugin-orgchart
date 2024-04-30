@@ -134,8 +134,13 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const setInitialTreeLayout = (leaves: any[], cardData?: any[]) => {
     if (leaves.length === 0) return;
 
-    if (leaves.length === 1 && !cardData?.find((d) => d.id === leaves[0])?.parentId) {
-      chart?.collapseAll(); // If leave is root, collapse all
+    if (leaves.length === 1 && !cardData?.find((d) => d._id === leaves[0])?.parentId) {
+      chart?.collapseAll().nodeUpdate((d, i, arr) => {
+        chart?.duration(500);
+        let _leaves = getTreeLeaves(arr).map((l) => l?.__data__?.id);
+        setLeaves(_leaves);
+      })
+      .render(); // If leave is root, collapse all
     } else {
       leaves.map((leaf, i) => {
         if (i !== leaves.length - 1) {
