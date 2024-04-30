@@ -6,7 +6,6 @@ import deepCopy from 'deep-copy';
 import modalStyles from '../../styles/Modal.module.scss';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
 import { PLUGIN_ID } from '../../utils/constants';
-import { BiExpandAlt } from 'react-icons/bi';
 import pluginContext from '../../plugin-context';
 import EditorFormatter from '../../components/Elements/formatter';
 import { Table, TableView } from '../../utils/Interfaces/Table.interface';
@@ -23,7 +22,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   downloadPdfRef,
   pluginDataStore,
   updatePresets,
-  fitToScreenRef
+  fitToScreenRef,
+  isDevelopment
 }) => {
   // Set the initial height of the card
   const [cardHeight, setCardHeight] = useState<number>(0);
@@ -71,6 +71,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   // Function to expand the row in the table
   const onRowExpand = (r_id: string) => {
     let row = appActiveState.activeTable?.rows.find((row) => r_id === row._id);
+    if(isDevelopment) return;
     pluginContext.expandRow(row, appActiveState.activeTable);
   };
 
@@ -116,7 +117,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     let newPluginPresets = deepCopy(pluginPresets);
     let oldPreset = pluginPresets.find((p) => p._id === _id)!;
     let _idx = pluginPresets.findIndex((p) => p._id === _id);
-    let settings = { ...oldPreset.settings, tree_leaves: leavess || leaves };
+    let settings = { ...oldPreset?.settings, tree_leaves: leavess || leaves };
     let updatedPreset = { ...oldPreset, settings, _id: _id };
 
     newPluginPresets.splice(_idx, 1, updatedPreset);
@@ -143,6 +144,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           return chart
             ?.duration(0)
             .nodeUpdate((d, i, arr) => {
+              chart?.duration(500);
               let _leaves = getTreeLeaves(arr).map((l) => l?.__data__?.id);
               setLeaves(_leaves);
             })
@@ -154,17 +156,17 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   };
 
   useEffect(() => {
-    let _leaves = pluginPresets[appActiveState.activePresetIdx].settings?.tree_leaves || [];
-
     // Save tree leaves to the active preset when the user changes the preset
     if (_presetChanged !== appActiveState.activePresetId) {
+      let _leaves = pluginPresets.find((p) => p._id === _presetChanged)?.settings?.tree_leaves || [];
+
       if (!arraysEqual(_leaves, leaves) && leaves.length > 0) {
         addTreeLeavesToPresets(_presetChanged);
       }
-    }
 
-    setPresetChanged(appActiveState.activePresetId);
-    setLeaves([]);
+      setPresetChanged(appActiveState.activePresetId);
+      setLeaves([]);
+    }
   }, [_presetChanged, appActiveState.activePresetId]);
 
   // Render the chart
@@ -292,7 +294,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
               </div>`.replaceAll(',', '');
         })
         .nodeUpdate((d: any, i, arr) => {
-          chart?.duration(500);
           // Update card height
           let org_cards = Array.from(document.querySelectorAll('.org-card'));
           let org_card_height = org_cards

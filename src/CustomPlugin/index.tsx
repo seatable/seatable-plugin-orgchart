@@ -13,6 +13,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginDataStore,
   updatePresets,
   fitToScreenRef,
+  isDevelopment
 }) => {
   const [cardData, setCardData] = useState<any[]>();
   let multiFields = appActiveState.activeTable?.columns.filter((c) => c.type === 'multiple-select');
@@ -39,6 +40,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
       pluginDataStore={pluginDataStore}
       updatePresets={updatePresets}
       fitToScreenRef={fitToScreenRef}
+      isDevelopment={isDevelopment}
     />
   );
 };

@@ -505,6 +505,7 @@ const App: React.FC<IAppProps> = (props) => {
               activeViewRows={activeViewRows}
               shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
               pluginDataStore={pluginDataStore}
+              isDevelopment={isDevelopment}
               updatePresets={updatePresets}
             />
 

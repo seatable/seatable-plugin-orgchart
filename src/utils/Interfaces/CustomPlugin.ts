@@ -17,6 +17,7 @@ export interface ICustomPluginProps {
     callBack?: any
   ) => void;
   fitToScreenRef: React.MutableRefObject<null>;
+  isDevelopment?: boolean;
 }
 
 export interface OrgChartComponentProps extends ICustomPluginProps {
