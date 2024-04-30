@@ -133,7 +133,7 @@ class EditorFormatter extends React.Component {
   renderColumnFormatter = (formatter) => {
     const { column } = this.props;
     const { name: columnName } = column;
-    console.log(column);
+    
     return (
       <>
         <div className="orgchart-editor-title">
