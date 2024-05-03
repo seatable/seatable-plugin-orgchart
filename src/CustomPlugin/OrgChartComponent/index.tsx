@@ -190,6 +190,10 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           onRowExpand(d.id);
         })
         .onZoom(() => {
+          let _transform = chart?.getChartState().lastTransform;
+          if (_transform.x === 0 && _transform.y === 0 && _transform.k === 1) {
+            _setPositioningAndZoomLevel(true);
+          }
           setPositioningAndZoomLevel(chart?.getChartState().lastTransform || {});
         })
         .nodeContent((d: any, i: number, arr, state) => {
@@ -310,7 +314,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .render();
     }
 
-    _setPositioningAndZoomLevel();
+    _setPositioningAndZoomLevel(true);
 
     return () => {
       if (chart) {
@@ -337,7 +341,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     };
   }, [__data, positioningAndZoomLevel]);
 
-  const _setPositioningAndZoomLevel = () => {
+  const _setPositioningAndZoomLevel = (def: boolean) => {
     // logic to render updated data
     let DATA = __data?.map((d) => {
       let p_d = cardData?.find((p) => p.id === d.id);
@@ -350,7 +354,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
     if (
       Object.keys(positioningAndZoomLevel).length === 0 &&
-      Object.keys(preset_tree_position).length !== 0
+      Object.keys(preset_tree_position).length !== 0 &&
+      def
     ) {
       _gElement?.setAttribute(
         'transform',
