@@ -33,6 +33,12 @@ export interface IPresetInfo {
   settings?: PresetSettings;
 }
 
+export interface OrgChartTreePosition {
+  x: number;
+  y: number;
+  k: number
+}
+
 export interface PresetSettings {
   shown_image_name?: string | undefined;
   shown_title_name?: string | undefined;
@@ -44,7 +50,8 @@ export interface PresetSettings {
   shown_columns?: TableColumn[];
   show_field_names?: boolean;
   columns?: TableColumn[];
-  tree_leaves?: any[];
+  tree_data?: any[];
+  tree_position?: OrgChartTreePosition | {};
 }
 
 export type PresetsArray = IPresetInfo[];

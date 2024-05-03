@@ -571,6 +571,6 @@ export const getTreeLeaves = (nodes: any[]) => {
   return leaves;
 };
 
-export const arraysEqual = (arr1: any[], arr2: any[]) => {
+export const arraysEqual = (arr1: any, arr2: any) => {
   return JSON.stringify(arr1) === JSON.stringify(arr2);
 };

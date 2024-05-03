@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// @ts-nocheck
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { OrgChart } from 'd3-org-chart';
 import deepCopy from 'deep-copy';
-import modalStyles from '../../styles/Modal.module.scss';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
 import { PLUGIN_ID } from '../../utils/constants';
 import pluginContext from '../../plugin-context';
@@ -12,7 +12,8 @@ import { Table, TableView } from '../../utils/Interfaces/Table.interface';
 import ReactDOMServer from 'react-dom/server';
 import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
-import { arraysEqual, getTreeLeaves } from '../../utils/utils';
+import { arraysEqual } from '../../utils/utils';
+import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
@@ -23,12 +24,15 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginDataStore,
   updatePresets,
   fitToScreenRef,
-  isDevelopment
+  isDevelopment,
 }) => {
   // Set the initial height of the card
   const [cardHeight, setCardHeight] = useState<number>(0);
-  // Set the initial leaves of the tree (leaves are the nodes that have no children)
-  const [leaves, setLeaves] = useState<any[]>([]);
+  // Set the initial data of the tree
+  const [__data, setData] = useState<any[]>([]);
+  const [positioningAndZoomLevel, setPositioningAndZoomLevel] = useState<OrgChartTreePosition | {}>(
+    {}
+  );
   // Set the initial state of the presetId, to know when the user changes the preset
   const [_presetChanged, setPresetChanged] = useState<string>(appActiveState.activePresetId);
   // Set the ref for the d3 container
@@ -71,7 +75,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   // Function to expand the row in the table
   const onRowExpand = (r_id: string) => {
     let row = appActiveState.activeTable?.rows.find((row) => r_id === row._id);
-    if(isDevelopment) return;
+    if (isDevelopment) return;
     pluginContext.expandRow(row, appActiveState.activeTable);
   };
 
@@ -117,7 +121,11 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     let newPluginPresets = deepCopy(pluginPresets);
     let oldPreset = pluginPresets.find((p) => p._id === _id)!;
     let _idx = pluginPresets.findIndex((p) => p._id === _id);
-    let settings = { ...oldPreset?.settings, tree_leaves: leavess || leaves };
+    let settings = {
+      ...oldPreset?.settings,
+      tree_data: __data,
+      tree_position: positioningAndZoomLevel,
+    };
     let updatedPreset = { ...oldPreset, settings, _id: _id };
 
     newPluginPresets.splice(_idx, 1, updatedPreset);
@@ -131,51 +139,36 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     );
   };
 
-  const setInitialTreeLayout = (leaves: any[], cardData?: any[]) => {
-    if (leaves.length === 0) return;
-
-    if (leaves.length === 1 && !cardData?.find((d) => d._id === leaves[0])?.parentId) {
-      chart?.collapseAll().nodeUpdate((d, i, arr) => {
-        chart?.duration(500);
-        let _leaves = getTreeLeaves(arr).map((l) => l?.__data__?.id);
-        setLeaves(_leaves);
-      })
-      .render(); // If leave is root, collapse all
-    } else {
-      leaves.map((leaf, i) => {
-        if (i !== leaves.length - 1) {
-          return chart?.duration(0).setExpanded(leaf, true).render(); // Expand all leaves
-        } else {
-          return chart
-            ?.duration(0)
-            .nodeUpdate((d, i, arr) => {
-              chart?.duration(500);
-              let _leaves = getTreeLeaves(arr).map((l) => l?.__data__?.id);
-              setLeaves(_leaves);
-            })
-            .setExpanded(leaf, true)
-            .render();
-        }
-      });
-    }
-  };
-
   useEffect(() => {
-    // Save tree leaves to the active preset when the user changes the preset
+    // Save tree data and positioning to the active preset when the user changes the preset
     if (_presetChanged !== appActiveState.activePresetId) {
-      let _leaves = pluginPresets.find((p) => p._id === _presetChanged)?.settings?.tree_leaves || [];
+      let _tree_data =
+        pluginPresets.find((p) => p._id === _presetChanged)?.settings?.tree_data || [];
+      let _tree_position =
+        pluginPresets.find((p) => p._id === _presetChanged)?.settings?.tree_position || {};
 
-      if (!arraysEqual(_leaves, leaves) && leaves.length > 0) {
+      if (
+        !arraysEqual(_tree_data, __data) ||
+        !arraysEqual(positioningAndZoomLevel, _tree_position)
+      ) {
         addTreeLeavesToPresets(_presetChanged);
       }
 
       setPresetChanged(appActiveState.activePresetId);
-      setLeaves([]);
+      setData([]);
+      setPositioningAndZoomLevel({});
     }
   }, [_presetChanged, appActiveState.activePresetId]);
 
   // Render the chart
   useLayoutEffect(() => {
+    let _tree_data = pluginPresets[appActiveState.activePresetIdx]?.settings?.tree_data;
+    // logic to render updated data
+    let DATA = _tree_data?.map((d) => {
+      let p_d = cardData?.find((p) => p.id === d.id);
+      return p_d ? { ...p_d, _expanded: d._expanded } : d;
+    });
+
     if (cardData && d3Container.current) {
       if (!chart) {
         chart = new OrgChart();
@@ -183,7 +176,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
       chart
         .container(d3Container.current)
-        .data(cardData)
+        .data(DATA[0] ? DATA : cardData)
         .svgHeight(window.innerHeight - 10)
         .compactMarginBetween((d) => 65)
         .compactMarginPair((d) => 100)
@@ -195,6 +188,9 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         .nodeHeight((d: d3.HierarchyNode<any>) => cardHeight + 10)
         .onNodeClick((d: any) => {
           onRowExpand(d.id);
+        })
+        .onZoom(() => {
+          setPositioningAndZoomLevel(chart?.getChartState().lastTransform || {});
         })
         .nodeContent((d: any, i: number, arr, state) => {
           let image =
@@ -299,6 +295,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
               </div>`.replaceAll(',', '');
         })
         .nodeUpdate((d: any, i, arr) => {
+          chart?.duration(500);
           // Update card height
           let org_cards = Array.from(document.querySelectorAll('.org-card'));
           let org_card_height = org_cards
@@ -306,23 +303,14 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             .reduce((a: any, b: any) => Math.max(a, b));
           setCardHeight(org_card_height);
 
-          // Update tree leaves
-          let _leaves = getTreeLeaves(arr).map((l) => l?.__data__?.id);
-
-          if (i === arr.length - 1 && !arraysEqual(_leaves, leaves)) {
-            setLeaves(_leaves);
+          if (i === arr.length - 1) {
+            setData(chart?.data() || []);
           }
         })
         .render();
     }
 
-    let __leaves = pluginPresets[appActiveState.activePresetIdx].settings?.tree_leaves || [];
-
-    if (leaves.length === 0 || arraysEqual(__leaves, leaves)) {
-      setInitialTreeLayout(__leaves, cardData);
-    } else {
-      setInitialTreeLayout(leaves, cardData);
-    }
+    _setPositioningAndZoomLevel();
 
     return () => {
       if (chart) {
@@ -332,11 +320,13 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   }, [cardData, d3Container.current, cardHeight]);
 
   useEffect(() => {
-    let __leaves = pluginPresets[appActiveState.activePresetIdx].settings?.tree_leaves || [];
-    // Save tree leaves to the active preset when the user leaves the page
+    let __tree_data = pluginPresets[appActiveState.activePresetIdx].settings?.tree_data || [];
+    let __tree_position =
+      pluginPresets[appActiveState.activePresetIdx].settings?.tree_position || {};
+    // Save tree data to the active preset when the user leaves the page
     const handleBeforeUnload = () => {
-      localStorage.setItem('leaves', JSON.stringify(leaves));
-      if (arraysEqual(leaves, __leaves) || leaves.length === 0) return;
+      if (arraysEqual(__data, __tree_data) && arraysEqual(__tree_position, positioningAndZoomLevel))
+        return;
       addTreeLeavesToPresets(appActiveState.activePresetId);
     };
 
@@ -345,7 +335,37 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [leaves]);
+  }, [__data, positioningAndZoomLevel]);
+
+  const _setPositioningAndZoomLevel = () => {
+    // logic to render updated data
+    let DATA = __data?.map((d) => {
+      let p_d = cardData?.find((p) => p.id === d.id);
+      return p_d ? { ...p_d, _expanded: d._expanded } : d;
+    });
+    let _gElement = document.querySelector('.chart');
+    let preset_tree_position =
+      pluginPresets[appActiveState.activePresetIdx].settings?.tree_position || {};
+    DATA[0] && chart?.data(DATA).duration(0).render();
+
+    if (
+      Object.keys(positioningAndZoomLevel).length === 0 &&
+      Object.keys(preset_tree_position).length !== 0
+    ) {
+      _gElement?.setAttribute(
+        'transform',
+        `translate(${preset_tree_position.x}, ${preset_tree_position.y}) scale(${preset_tree_position.k})`
+      );
+      setPositioningAndZoomLevel(preset_tree_position);
+    } else if (Object.keys(positioningAndZoomLevel).length !== 0) {
+      _gElement?.setAttribute(
+        'transform',
+        `translate(${positioningAndZoomLevel.x}, ${positioningAndZoomLevel.y}) scale(${positioningAndZoomLevel.k})`
+      );
+    } else {
+      return;
+    }
+  };
 
   return (
     // Add your JSX code here
