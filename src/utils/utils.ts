@@ -465,6 +465,7 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
   let _rows = [];
 
+
   if (Object.keys(linkedRows).length > 0) {
     _rows = rows.map((r: any) => {
       parentId = linkedRows[r._id][relationship?.key!][0];
@@ -474,8 +475,9 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
         id: r._id,
         parentId,
       };
-    });
+    })!;
   }
+
 
   return filterMultipleParentNodes(_rows);
 };
@@ -485,22 +487,31 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
   let parentNode;
   let parentNodes = rows.filter((row) => !row.parentId);
   let childNodes = rows.filter((row) => row.parentId);
+  let __rows = [...rows];
+
 
   // if no parents and no child, return an empty array
-  if ((parentNodes.length === 0 && childNodes.length === 0) || parentNodes.length === 0) {
+  if ((parentNodes.length === 0 && childNodes.length === 0)) {
     return [];
   }
 
+  // if no child, return one parent node
   if (childNodes.length === 0) {
     return [parentNodes[0]];
   }
 
-  // get all parent nodes
-  parentNodes = parentNodes.filter((parent) => {
-    return childNodes.some((child) => child.parentId === parent.id);
-  });
+  parentNodes = parentNodes.filter((parent) => childNodes.some((child) => child.parentId === parent.id));
 
-  // get all child nodes of each parent
+  // if no parent has children, remove all parent nodes, leaving only childNodes
+  if (parentNodes.length === 0) {
+    __rows = childNodes;
+  }
+
+  // assign rows to parentNodes if no parent nodes are found
+  if (parentNodes.length === 0 && childNodes.length === __rows.length) {
+    parentNodes = __rows;
+  }
+
   parentNodes = parentNodes.map((parent) => { return ({ ...parent, children: getAllChildNodes(parent, childNodes) }); });
 
   // get parent node with the most children
@@ -513,9 +524,9 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
   if (parentNode) delete parentNode.children;
 
   // create new array that includes one parentNode and all its children
-  const _rows = [parentNode, ...childNodes];
+  const finalData = [{ ...parentNode, parentId: null }, ...childNodes];
 
-  return parentNode ? _rows : [];
+  return parentNode ? finalData : [];
 };
 
 /**  Function to get every single node in a parents subtree
@@ -573,4 +584,13 @@ export const getTreeLeaves = (nodes: any[]) => {
 
 export const arraysEqual = (arr1: any, arr2: any) => {
   return JSON.stringify(arr1) === JSON.stringify(arr2);
+};
+
+export const formatOrgChartTreeData = (persistedData: any[], cardData: any[]) => {
+  let DATA = persistedData?.length === cardData?.length ? persistedData?.map((d) => {
+    let p_d = cardData?.find((p) => p.id === d.id);
+    return p_d ? { ...p_d, _expanded: d._expanded } : d;
+  }) : cardData;
+
+  return DATA;
 };

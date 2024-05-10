@@ -13,7 +13,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginDataStore,
   updatePresets,
   fitToScreenRef,
-  isDevelopment
+  isDevelopment,
 }) => {
   const [cardData, setCardData] = useState<any[]>();
   let multiFields = appActiveState.activeTable?.columns.filter((c) => c.type === 'multiple-select');
@@ -22,13 +22,20 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   );
 
   useEffect(() => {
-    let data = parseRowsData(
-      appActiveState.activeTable,
-      appActiveState.activeViewRows,
+    if (
+      appActiveState.activeTable &&
+      appActiveState.activeViewRows &&
       appActiveState.activeRelationship
-    );
-    setCardData(data);
-  }, [appActiveState]);
+    ) {
+      let data = parseRowsData(
+        appActiveState.activeTable,
+        appActiveState.activeViewRows,
+        appActiveState.activeRelationship
+      );
+
+      setCardData(data);
+    } 
+  }, [JSON.stringify(appActiveState)]);
 
   return (
     <OrgChartComponent

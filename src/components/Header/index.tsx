@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import * as htmlToImage from 'html-to-image';
+import jsPDF from 'jspdf';
 import styles from '../../styles/Modal.module.scss';
 import styles2 from '../../styles/Presets.module.scss';
 import { IHeaderProps } from '../../utils/Interfaces/Header.interface';
-import { PLUGIN_ID } from '../../utils/constants';
+import { PLUGIN_ID, PLUGIN_NAME } from '../../utils/constants';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 
 const Header: React.FC<IHeaderProps> = (props) => {
@@ -11,25 +13,45 @@ const Header: React.FC<IHeaderProps> = (props) => {
     isShowPresets,
     onTogglePresets,
     togglePlugin,
-    downloadPdfRef,
     fitToScreenRef,
   } = props;
 
-  const printPdfDocument = () => {
-    const input = document.getElementById(PLUGIN_ID);
-
-    if (input) {
-      document.body.innerHTML = input.innerHTML;
-      window.print();
-      window.location.reload();
-    }
-  };
-
   const downloadPdfDocument = () => {
-    if (downloadPdfRef.current) {
-      downloadPdfRef.current.click();
-    }
+    const input = document.getElementById(PLUGIN_NAME);
+
+    // Step 1: Capture component as an image
+    htmlToImage
+      .toPng(input as HTMLElement)
+      .then(function (dataUrl) {
+        // Step 2: Convert image to PDF
+        const img = new Image();
+        img.src = dataUrl;
+        img.onload = function () {
+          const pdf = new jsPDF('l', 'mm', [420, 297]);
+
+          // Step 3: Add background color to the entire PDF
+          pdf.setFillColor('#f5f5f5');
+          pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
+
+          // Step 4: Add image to PDF
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+
+          const imgWidth = pdfWidth;
+          const imgHeight = (img.height * imgWidth) / img.width;
+          const yPos = (pdfHeight - imgHeight) / 2;
+
+          pdf.addImage(dataUrl, 'PNG', 0, yPos, imgWidth, imgHeight);
+
+          // Step 5: Download PDF
+          pdf.save(`${presetName}.pdf`);
+        };
+      })
+      .catch(function (error) {
+        console.error('Oops, something went wrong!', error);
+      });
   };
+
 
   const fitToScreen = () => {
     if (fitToScreenRef.current) {
@@ -56,9 +78,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
         </span>
         <span className={styles.modal_header_icon_btn} onClick={downloadPdfDocument}>
           <span className="dtable-font dtable-icon-download"></span>
-        </span>
-        <span className={styles.modal_header_icon_btn} onClick={printPdfDocument}>
-          <span className="dtable-font dtable-icon-print"></span>
         </span>
         <span className={styles.modal_header_icon_btn} onClick={togglePlugin}>
           <span className="dtable-font dtable-icon-x btn-close"></span>

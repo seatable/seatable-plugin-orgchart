@@ -13,7 +13,6 @@ import { KeyDownActions, PresetHandleAction } from '../../../utils/constants';
 import { IPresetItemProps } from '../../../utils/Interfaces/PluginPresets/Item.interface';
 // Styles
 import styles from '../../../styles/Modal.module.scss';
-import '../../../assets/css/plugin-layout.css';
 import intl from 'react-intl-universal';
 import { AVAILABLE_LOCALES, DEFAULT_LOCALE } from '../../../locale';
 const { [DEFAULT_LOCALE]: d } = AVAILABLE_LOCALES;
@@ -36,12 +35,12 @@ const PresetItem: React.FC<IPresetItemProps> = ({
   const [pName, setPName] = useState(p.name);
 
   const onWindowResize = () => {
-    if (window.innerWidth <= 1200 && p.name.length > 15) {
-      setPName(p.name.slice(0, 15) + '...');
-    } else if (window.innerWidth > 1200 && p.name.length > 25) {
-      setPName(p.name.slice(0, 25) + '...');
+    if (window.innerWidth <= 1200 && p?.name?.length > 15) {
+      setPName(p?.name.slice(0, 15) + '...');
+    } else if (window.innerWidth > 1200 && p?.name?.length > 25) {
+      setPName(p?.name.slice(0, 25) + '...');
     } else {
-      setPName(p.name);
+      setPName(p?.name || "");
     }
   };
 
@@ -60,7 +59,6 @@ const PresetItem: React.FC<IPresetItemProps> = ({
 
   // toggle Preset dropdown(edit/delete)
   const togglePresetDropdown = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
     setShowPresetDropdown((prev) => !prev);
   };
 

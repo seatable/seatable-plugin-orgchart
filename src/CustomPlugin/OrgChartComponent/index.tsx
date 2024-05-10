@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-// @ts-nocheck
+/* eslint-disable react-hooks/exhaustive-deps  */
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { OrgChart } from 'd3-org-chart';
@@ -12,7 +11,7 @@ import { Table, TableView } from '../../utils/Interfaces/Table.interface';
 import ReactDOMServer from 'react-dom/server';
 import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
-import { arraysEqual } from '../../utils/utils';
+import { arraysEqual, formatOrgChartTreeData } from '../../utils/utils';
 import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
@@ -20,7 +19,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   appActiveState,
   cardData,
   shownColumns,
-  downloadPdfRef,
   pluginDataStore,
   updatePresets,
   fitToScreenRef,
@@ -30,6 +28,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const [cardHeight, setCardHeight] = useState<number>(0);
   // Set the initial data of the tree
   const [__data, setData] = useState<any[]>([]);
+  const [__chart, setChart] = useState<OrgChart<unknown> | null>(null);
   const [positioningAndZoomLevel, setPositioningAndZoomLevel] = useState<OrgChartTreePosition | {}>(
     {}
   );
@@ -53,18 +52,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   let _shownColumns = fieldsIDs
     ?.map((id) => shownColumns?.find((c) => c?.key === id))
     .filter((c) => c !== undefined);
-
-  // Function to fit the chart to the screen
-  const fitToScreen = () => {
-    chart?.fit();
-  };
-
-  // Function to download the chart as a PDF
-  const downloadPdf = () => {
-    if (chart) {
-      chart.exportImg({ full: true });
-    }
-  };
 
   // Function to get the formula rows of the table
   const getTableFormulaRows = (table: Table, view: TableView) => {
@@ -117,7 +104,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const collaborators = window.app.state.collaborators;
 
   // Function to add tree leaves to the active preset
-  const addTreeLeavesToPresets = (_id: string, leavess?: any) => {
+  const addTreeLeavesToPresets = (_id: string) => {
     let newPluginPresets = deepCopy(pluginPresets);
     let oldPreset = pluginPresets.find((p) => p._id === _id)!;
     let _idx = pluginPresets.findIndex((p) => p._id === _id);
@@ -162,17 +149,35 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
   // Render the chart
   useLayoutEffect(() => {
-    let _tree_data = pluginPresets[appActiveState.activePresetIdx]?.settings?.tree_data;
-    // logic to render updated data
-    let DATA = _tree_data?.map((d) => {
-      let p_d = cardData?.find((p) => p.id === d.id);
-      return p_d ? { ...p_d, _expanded: d._expanded } : d;
-    });
-
     if (cardData && d3Container.current) {
+      // Create the chart
       if (!chart) {
         chart = new OrgChart();
       }
+
+      // error handling:
+      // - ignore records with invalid relationship value
+      // - show error message if rendering is not possible
+      if (cardData.length === 0) {
+        console.log(
+          'The org chart could not be rendered. Please avoid multiple root elements and faulty links in your selected view.'
+        );
+        return;
+      }
+
+      let _tree_data = pluginPresets[appActiveState.activePresetIdx]?.settings?.tree_data || [];
+      // logic to render updated data
+      let DATA = __data.length === 0 ? formatOrgChartTreeData(_tree_data, cardData) : __data;
+      let isCollapsed = DATA.every((d) => d._expanded === false);
+
+      if (
+        __data.find((d) => !d.parentId)?.id !==
+        formatOrgChartTreeData(_tree_data, cardData)?.find((d) => !d.parentId).id
+      ) {
+        DATA = formatOrgChartTreeData(_tree_data, cardData);
+      }
+
+      console.log(formatOrgChartTreeData(_tree_data, cardData));
 
       chart
         .container(d3Container.current)
@@ -190,11 +195,10 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           onRowExpand(d.id);
         })
         .onZoom(() => {
-          let _transform = chart?.getChartState().lastTransform;
-          if (_transform.x === 0 && _transform.y === 0 && _transform.k === 1) {
-            _setPositioningAndZoomLevel(true);
-          }
-          setPositioningAndZoomLevel(chart?.getChartState().lastTransform || {});
+          let _transform = chart?.getChartState().lastTransform!;
+          if (_transform.x === 0) return;
+
+          setPositioningAndZoomLevel({ x: _transform?.x, y: _transform?.y, k: _transform?.k });
         })
         .nodeContent((d: any, i: number, arr, state) => {
           let image =
@@ -299,7 +303,13 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
               </div>`.replaceAll(',', '');
         })
         .nodeUpdate((d: any, i, arr) => {
-          chart?.duration(500);
+          let chartData = chart?.data() || [];
+          let isCollapsed = chartData.every((d: any) => d._expanded === false);
+
+          if (!isCollapsed) {
+            chart?.duration(500);
+          }
+
           // Update card height
           let org_cards = Array.from(document.querySelectorAll('.org-card'));
           let org_card_height = org_cards
@@ -307,21 +317,26 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             .reduce((a: any, b: any) => Math.max(a, b));
           setCardHeight(org_card_height);
 
-          if (i === arr.length - 1) {
-            setData(chart?.data() || []);
+          if (i === 0) {
+            setData(chartData);
+            setChart(chart); // update chart state so it wont be null
           }
         })
         .render();
-    }
 
-    _setPositioningAndZoomLevel(true);
+      if (isCollapsed) {
+        chart?.collapseAll();
+      }
+
+      _setPositioningAndZoomLevel(true);
+    }
 
     return () => {
       if (chart) {
         chart.clear();
       }
     };
-  }, [cardData, d3Container.current, cardHeight]);
+  }, [cardData, d3Container.current, shownColumns, cardHeight]);
 
   useEffect(() => {
     let __tree_data = pluginPresets[appActiveState.activePresetIdx].settings?.tree_data || [];
@@ -342,15 +357,11 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   }, [__data, positioningAndZoomLevel]);
 
   const _setPositioningAndZoomLevel = (def: boolean) => {
-    // logic to render updated data
-    let DATA = __data?.map((d) => {
-      let p_d = cardData?.find((p) => p.id === d.id);
-      return p_d ? { ...p_d, _expanded: d._expanded } : d;
-    });
+    // logic to keep correct positioning
     let _gElement = document.querySelector('.chart');
-    let preset_tree_position =
+    let _gCenterGroup = document.querySelector('.center-group');
+    let preset_tree_position: any =
       pluginPresets[appActiveState.activePresetIdx].settings?.tree_position || {};
-    DATA[0] && chart?.data(DATA).duration(0).render();
 
     if (
       Object.keys(positioningAndZoomLevel).length === 0 &&
@@ -359,17 +370,47 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     ) {
       _gElement?.setAttribute(
         'transform',
-        `translate(${preset_tree_position.x}, ${preset_tree_position.y}) scale(${preset_tree_position.k})`
+        `translate(${preset_tree_position.x || 0}, ${preset_tree_position.y || 0}) scale(${
+          preset_tree_position.k || 1
+        })`
       );
+      _gCenterGroup?.setAttribute('transform', 'translate(0, 0))');
       setPositioningAndZoomLevel(preset_tree_position);
-    } else if (Object.keys(positioningAndZoomLevel).length !== 0) {
+
+      let svg = chart?.getChartState().svg!;
+      let zoomBehavior = chart?.getChartState().zoomBehavior!;
+      let _d = new d3.ZoomTransform(
+        preset_tree_position.k || 1,
+        preset_tree_position.x || 0,
+        preset_tree_position.y || 0
+      );
+      svg
+        .transition()
+        .duration(0)
+        .call(zoomBehavior.transform as any, _d);
+    } else if (
+      Object.keys(positioningAndZoomLevel).length > 0 &&
+      (positioningAndZoomLevel as any).x !== 0
+    ) {
+      console.log('hey', positioningAndZoomLevel);
       _gElement?.setAttribute(
         'transform',
-        `translate(${positioningAndZoomLevel.x}, ${positioningAndZoomLevel.y}) scale(${positioningAndZoomLevel.k})`
+        `translate(${(positioningAndZoomLevel as OrgChartTreePosition).x || 0}, ${
+          (positioningAndZoomLevel as OrgChartTreePosition).y || 0
+        }) scale(${(positioningAndZoomLevel as OrgChartTreePosition).k || 1})`
       );
-    } else {
-      return;
+      _gCenterGroup?.setAttribute('transform', 'translate(0, 0))');
     }
+  };
+
+  // Function to fit the chart to the screen
+  const fitToScreen = () => {
+    __chart
+      ?.onZoom(() => {
+        let _transform = __chart?.getChartState().lastTransform;
+        setPositioningAndZoomLevel({ x: _transform.x, y: _transform.y, k: _transform.k });
+      })
+      .fit();
   };
 
   return (
@@ -377,9 +418,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     <div className="w-100 h-100" id={PLUGIN_ID}>
       <button onClick={fitToScreen} ref={fitToScreenRef} style={{ display: 'none' }}>
         Fit to screen
-      </button>
-      <button onClick={downloadPdf} ref={downloadPdfRef} style={{ display: 'none' }}>
-        Download PDF
       </button>
       <div ref={d3Container} />
     </div>
