@@ -165,7 +165,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
     let initUpdated = initOrgChartSetting();
     newPresetsArray[_activePresetIdx].settings = Object.assign(_presetSettings, initUpdated);
     pluginDataStore.presets = newPresetsArray;
-    console.log(newPresetsArray, 'newPresetsArray');
+
     updatePresets(_activePresetIdx, newPresetsArray, pluginDataStore, _id);
     const _activeTableAndView: IActiveTableAndView = getActiveTableAndActiveView(
       newPresetsArray,
@@ -219,7 +219,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
       activePresetIdx = newPluginPresets.length - 1;
     }
     pluginDataStore.presets = newPluginPresets;
-    console.log(newPluginPresets, 'newPluginPresets');
+
     updatePresets(0, newPluginPresets, pluginDataStore, PresetHandleAction.delete);
     updateActiveData();
   };
