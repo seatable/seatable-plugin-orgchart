@@ -460,6 +460,13 @@ export const showFieldNames = (settings: PresetSettings) => {
   }
 };
 
+
+
+
+
+
+// CUSTOM FUNCTIONS
+
 export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
   let parentId: any;
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
@@ -593,4 +600,19 @@ export const formatOrgChartTreeData = (persistedData: any[], cardData: any[]) =>
   }) : cardData;
 
   return DATA;
+};
+
+export const formatOrgChartShownColumns = (pluginPresets:PresetsArray , appActiveState: AppActiveState, shownColumns: (TableColumn | undefined)[] | undefined) => {
+  let cols = pluginPresets[appActiveState.activePresetIdx].settings?.columns || [];
+  let extracols =
+    appActiveState.activeTable?.columns.filter(
+      (c) => !cols?.map((col) => col?.key).includes(c?.key)
+    ) || [];
+  let fields = [...cols, ...extracols] || appActiveState.activeTable?.columns;
+  let fieldsIDs = fields?.map((f) => f?.key);
+  let _shownColumns = fieldsIDs
+    ?.map((id) => shownColumns?.find((c) => c?.key === id))
+    .filter((c) => c !== undefined);
+
+  return _shownColumns;
 };

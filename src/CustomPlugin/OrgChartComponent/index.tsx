@@ -11,7 +11,7 @@ import { Table, TableView } from '../../utils/Interfaces/Table.interface';
 import ReactDOMServer from 'react-dom/server';
 import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
-import { arraysEqual, formatOrgChartTreeData } from '../../utils/utils';
+import { arraysEqual, formatOrgChartShownColumns, formatOrgChartTreeData } from '../../utils/utils';
 import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
@@ -40,18 +40,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   let chart: OrgChart<unknown> | null = null;
   // Get boolean value of show_field_names
   let showFieldNames = pluginPresets[appActiveState.activePresetIdx].settings?.show_field_names;
-  // Get the columns that are shown in the table
-  let colIDs = shownColumns?.map((s) => s?.key);
-  let cols = pluginPresets[appActiveState.activePresetIdx].settings?.columns || [];
-  let extracols =
-    appActiveState.activeTable?.columns.filter(
-      (c) => !cols?.map((col) => col?.key).includes(c?.key)
-    ) || [];
-  let fields = [...cols, ...extracols] || appActiveState.activeTable?.columns;
-  let fieldsIDs = fields?.map((f) => f?.key);
-  let _shownColumns = fieldsIDs
-    ?.map((id) => shownColumns?.find((c) => c?.key === id))
-    .filter((c) => c !== undefined);
+  // Get the columns that are shown in the table, update as settings updates.
+  let _shownColumns = formatOrgChartShownColumns(pluginPresets, appActiveState, shownColumns);
 
   // Function to get the formula rows of the table
   const getTableFormulaRows = (table: Table, view: TableView) => {
@@ -103,8 +93,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   // Get the collaborators
   const collaborators = window.app.state.collaborators;
 
-  // Function to add tree leaves to the active preset
-  const addTreeLeavesToPresets = (_id: string) => {
+  // Function to add tree data to the active preset
+  const addTreeDataToPresets = (_id: string) => {
     let newPluginPresets = deepCopy(pluginPresets);
     let oldPreset = pluginPresets.find((p) => p._id === _id)!;
     let _idx = pluginPresets.findIndex((p) => p._id === _id);
@@ -129,18 +119,25 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   useEffect(() => {
     // Save tree data and positioning to the active preset when the user changes the preset
     if (_presetChanged !== appActiveState.activePresetId) {
-      let _tree_data =
-        pluginPresets.find((p) => p._id === _presetChanged)?.settings?.tree_data || [];
+      let oldPreset = pluginPresets.find((p) => p._id === _presetChanged);
+      let _tree_data = oldPreset?.settings?.tree_data || [];
       let _tree_position =
         pluginPresets.find((p) => p._id === _presetChanged)?.settings?.tree_position || {};
 
+      // if preset is deleted or edited, do nothing
+      if (!oldPreset) {
+        return;
+      }
+
+      // if old data === new data and old positioning === new positioning, do nothing else add new data to the preset
       if (
         !arraysEqual(_tree_data, __data) ||
         !arraysEqual(positioningAndZoomLevel, _tree_position)
       ) {
-        addTreeLeavesToPresets(_presetChanged);
+        addTreeDataToPresets(_presetChanged);
       }
 
+      // update state accordingly
       setPresetChanged(appActiveState.activePresetId);
       setData([]);
       setPositioningAndZoomLevel({});
@@ -168,16 +165,16 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
       let _tree_data = pluginPresets[appActiveState.activePresetIdx]?.settings?.tree_data || [];
       // logic to render updated data
       let DATA = __data.length === 0 ? formatOrgChartTreeData(_tree_data, cardData) : __data;
+      // logic to see is the chart is completely collapsed
       let isCollapsed = DATA.every((d) => d._expanded === false);
 
+      // When base is changed, we update DATA
       if (
         __data.find((d) => !d.parentId)?.id !==
         formatOrgChartTreeData(_tree_data, cardData)?.find((d) => !d.parentId).id
       ) {
         DATA = formatOrgChartTreeData(_tree_data, cardData);
       }
-
-      console.log(formatOrgChartTreeData(_tree_data, cardData));
 
       chart
         .container(d3Container.current)
@@ -198,6 +195,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           let _transform = chart?.getChartState().lastTransform!;
           if (_transform.x === 0) return;
 
+          // update positioning and zoom level
           setPositioningAndZoomLevel({ x: _transform?.x, y: _transform?.y, k: _transform?.k });
         })
         .nodeContent((d: any, i: number, arr, state) => {
@@ -307,7 +305,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
           let isCollapsed = chartData.every((d: any) => d._expanded === false);
 
           if (!isCollapsed) {
-            chart?.duration(500);
+            chart?.duration(500); // set duration to 500ms if chart is not collapsed
           }
 
           // Update card height
@@ -328,16 +326,21 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
         chart?.collapseAll();
       }
 
+      // get position and zoom level from preset settings
+      // set position and zoom level accordingly
+      // only runs on component rerender
       _setPositioningAndZoomLevel(true);
     }
 
     return () => {
+      // clear chart on component unmount
       if (chart) {
         chart.clear();
       }
     };
   }, [cardData, d3Container.current, shownColumns, cardHeight]);
 
+  // update chart data and positioning when user leaves the page/refreshes/closes the tab
   useEffect(() => {
     let __tree_data = pluginPresets[appActiveState.activePresetIdx].settings?.tree_data || [];
     let __tree_position =
@@ -346,7 +349,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     const handleBeforeUnload = () => {
       if (arraysEqual(__data, __tree_data) && arraysEqual(__tree_position, positioningAndZoomLevel))
         return;
-      addTreeLeavesToPresets(appActiveState.activePresetId);
+      addTreeDataToPresets(appActiveState.activePresetId);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -363,6 +366,8 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
     let preset_tree_position: any =
       pluginPresets[appActiveState.activePresetIdx].settings?.tree_position || {};
 
+    // the if block: sets positioning on first component render, uses positioning from preset settings
+    // the else block: sets positioning on subsequent renders, uses positioning from state
     if (
       Object.keys(positioningAndZoomLevel).length === 0 &&
       Object.keys(preset_tree_position).length !== 0 &&
@@ -392,7 +397,6 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
       Object.keys(positioningAndZoomLevel).length > 0 &&
       (positioningAndZoomLevel as any).x !== 0
     ) {
-      console.log('hey', positioningAndZoomLevel);
       _gElement?.setAttribute(
         'transform',
         `translate(${(positioningAndZoomLevel as OrgChartTreePosition).x || 0}, ${

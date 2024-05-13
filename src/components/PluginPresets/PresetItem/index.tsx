@@ -40,7 +40,7 @@ const PresetItem: React.FC<IPresetItemProps> = ({
     } else if (window.innerWidth > 1200 && p?.name?.length > 25) {
       setPName(p?.name.slice(0, 25) + '...');
     } else {
-      setPName(p?.name || "");
+      setPName(p?.name || '');
     }
   };
 
