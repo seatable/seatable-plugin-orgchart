@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
 import styles from '../../styles/Modal.module.scss';
 import styles2 from '../../styles/Presets.module.scss';
 import { IHeaderProps } from '../../utils/Interfaces/Header.interface';
-import { PLUGIN_ID, PLUGIN_NAME } from '../../utils/constants';
+import { PLUGIN_NAME } from '../../utils/constants';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 
 const Header: React.FC<IHeaderProps> = (props) => {

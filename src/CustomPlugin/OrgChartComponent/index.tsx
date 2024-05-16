@@ -13,6 +13,7 @@ import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
 import { arraysEqual, formatOrgChartShownColumns, formatOrgChartTreeData } from '../../utils/utils';
 import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
+import placeholder from '../../assets/image/placeholder.png';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
@@ -28,7 +29,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const [cardHeight, setCardHeight] = useState<number>(0);
   // Set the initial data of the tree
   const [__data, setData] = useState<any[]>([]);
-  const [__chart, setChart] = useState<OrgChart<unknown> | null>(null);
+  const [__chart, setChart] = useState<OrgChart<unknown> | null>(null); // bug fix
   const [positioningAndZoomLevel, setPositioningAndZoomLevel] = useState<OrgChartTreePosition | {}>(
     {}
   );
@@ -203,10 +204,11 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             appActiveState.activeCoverImg &&
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
+          let noImg = !image && appActiveState.activeCoverImg;
 
           // fallback image
           if (!image && appActiveState.activeCoverImg) {
-            image = '/media/placeholder.png';
+            image = process.env.PUBLIC_URL + '/media/placeholder.png';
           }
 
           let titleCol = appActiveState.activeTable?.columns.find(
@@ -230,14 +232,23 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             ">
                 ${
                   image
-                    ? `<img class="card-img" src="${image}" style="width: 100%;
-                    height: 180px;
-                    object-fit: cover;
-                    position:relative;
-                    border-bottom: 1px solid #dedede;
-                    top: 0;
-                    left: 0;
-                    " />`
+                    ? ReactDOMServer.renderToString(
+                        <img
+                          className="card-img"
+                          src={
+                        image
+                      }
+                          style={{
+                            width: '100%',
+                            height: '180px',
+                            objectFit: 'cover',
+                            position: 'relative',
+                            borderBottom: '1px solid #dedede',
+                            top: 0,
+                            left: 0,
+                          }}
+                        />
+                      )
                     : ''
                 }
                 
@@ -315,6 +326,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             .reduce((a: any, b: any) => Math.max(a, b));
           setCardHeight(org_card_height);
 
+          // only runs once
           if (i === 0) {
             setData(chartData);
             setChart(chart); // update chart state so it wont be null

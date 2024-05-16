@@ -574,21 +574,6 @@ export const removeDeletedFields = (fields: TableColumn[], table: Table) => {
   return fields.filter((field: TableColumn) => table.columns.map((column) => column.key).includes(field.key));
 };
 
-export const getTreeLeaves = (nodes: any[]) => {
-  let leaves: any[] = [];
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = 0; j < nodes.length; j++) {
-      if (nodes[i].__data__.id === nodes[j].__data__.parent?.id) {
-        break;
-      }
-
-      if (j === nodes.length - 1) leaves.push(nodes[i]);
-    }
-  }
-
-  return leaves;
-};
-
 export const arraysEqual = (arr1: any, arr2: any) => {
   return JSON.stringify(arr1) === JSON.stringify(arr2);
 };
