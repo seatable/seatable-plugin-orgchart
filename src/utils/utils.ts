@@ -12,7 +12,6 @@ import {
 } from './Interfaces/Table.interface';
 import { DEFAULT_PLUGIN_DATA, PLUGIN_NAME, POSSIBLE, PresetHandleAction } from './constants';
 
-
 export const generatorBase64Code = (keyLength = 4) => {
   let key = '';
   for (let i = 0; i < keyLength; i++) {
@@ -41,6 +40,13 @@ export const generatorPresetId = (presets: Array<{ _id: string }>): string => {
   }
 
   return preset_id;
+};
+
+export const generateImageSrc = (imageName: string, server: string, pluginName: string, isDevelopment: boolean | undefined): string => {
+  if (isDevelopment || !server) {
+    return `./media/image/${imageName}`;
+  }
+  return `${server}/dtable-plugins/${pluginName}/?path=/media/image/${imageName}`;
 };
 
 export const getImageThumbnailUrl = (url: string, size?: number): string => {
@@ -489,7 +495,7 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
   return filterMultipleParentNodes(_rows);
 };
 
-// Function to filter out multiple parent nodes to one primary parent node 
+// Function to filter out multiple parent nodes to one primary parent node
 const filterMultipleParentNodes = (rows: TableRow[]) => {
   let parentNode;
   let parentNodes = rows.filter((row) => !row.parentId);

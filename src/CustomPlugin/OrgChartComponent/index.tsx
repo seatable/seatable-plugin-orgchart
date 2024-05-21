@@ -4,16 +4,15 @@ import * as d3 from 'd3';
 import { OrgChart } from 'd3-org-chart';
 import deepCopy from 'deep-copy';
 import { OrgChartComponentProps } from '../../utils/Interfaces/CustomPlugin';
-import { PLUGIN_ID } from '../../utils/constants';
+import { PLUGIN_ID, PLUGIN_INFO_NAME } from '../../utils/constants';
 import pluginContext from '../../plugin-context';
 import EditorFormatter from '../../components/Elements/formatter';
 import { Table, TableView } from '../../utils/Interfaces/Table.interface';
 import ReactDOMServer from 'react-dom/server';
 import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
-import { arraysEqual, formatOrgChartShownColumns, formatOrgChartTreeData } from '../../utils/utils';
+import { arraysEqual, formatOrgChartShownColumns, formatOrgChartTreeData, generateImageSrc } from '../../utils/utils';
 import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
-import placeholder from '../../assets/image/placeholder.png';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   pluginPresets,
@@ -37,6 +36,11 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
   const [_presetChanged, setPresetChanged] = useState<string>(appActiveState.activePresetId);
   // Set the ref for the d3 container
   const d3Container = useRef(null);
+
+  // Set placeholder image
+  const server = pluginContext.getSetting('server');
+  const placeholder = generateImageSrc('placeholder.png', server, PLUGIN_INFO_NAME, isDevelopment);
+
   // initialize the chart object
   let chart: OrgChart<unknown> | null = null;
   // Get boolean value of show_field_names
@@ -208,7 +212,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
           // fallback image
           if (!image && appActiveState.activeCoverImg) {
-            image = process.env.PUBLIC_URL + '/media/placeholder.png';
+            image = placeholder;
           }
 
           let titleCol = appActiveState.activeTable?.columns.find(
@@ -221,7 +225,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
               position: relative;
               background: #fff;
               margin: 0;
-              width:${d.width}px; 
+              width:${d.width}px;
               height:${d.height}px;
             ">
 
@@ -235,9 +239,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                     ? ReactDOMServer.renderToString(
                         <img
                           className="card-img"
-                          src={
-                        image
-                      }
+                          src={image}
                           style={{
                             width: '100%',
                             height: '180px',
@@ -251,7 +253,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                       )
                     : ''
                 }
-                
+
                 <!-- Card: Title -->
                 <div style="
                   padding: 15px;

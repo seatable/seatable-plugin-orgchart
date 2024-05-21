@@ -8,7 +8,9 @@ import { IActivePresetSettings } from '../Interfaces/PluginSettings.interface';
 // Constants
 const POSSIBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz0123456789';
 
-const PLUGIN_NAME = info.name
+const PLUGIN_INFO_NAME = info.name;
+
+const PLUGIN_NAME = PLUGIN_INFO_NAME
   .replace(/-([a-z])/g, (_, match) => ' ' + match.toUpperCase())
   .replace(/^./, (str) => str.toUpperCase())
   .replace('Plugin', '');
@@ -88,6 +90,7 @@ const DEFAULT_SELECTED_PRESET: IActivePresetSettings = {
 export {
   POSSIBLE,
   PLUGIN_NAME,
+  PLUGIN_INFO_NAME,
   PLUGIN_ID,
   TABLE_NAME,
   DEFAULT_PLUGIN_DATA,
