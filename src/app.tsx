@@ -28,7 +28,6 @@ import { PresetsArray } from './utils/Interfaces/PluginPresets/Presets.interface
 import { SelectOption } from './utils/Interfaces/PluginSettings.interface';
 // Import of CSS
 import styles from './styles/Modal.module.scss';
-import './assets/css/plugin-layout.css';
 import './styles/main.scss';
 // Import of Constants
 import {
@@ -307,7 +306,6 @@ const App: React.FC<IAppProps> = (props) => {
   };
 
   const toggleSettings = (e: any) => {
-    e.stopPropagation();
     if (isMobile() && isShowState.isShowPresets) {
       // Collapse presets if open
       togglePresets(e);
@@ -474,6 +472,7 @@ const App: React.FC<IAppProps> = (props) => {
         activePresetIdx={activePresetIdx}
         pluginDataStore={pluginDataStore}
         isShowPresets={isShowPresets}
+        isDevelopment={isDevelopment}
         onTogglePresets={togglePresets}
         onToggleSettings={toggleSettings}
         onSelectPreset={onSelectPreset}
@@ -493,6 +492,7 @@ const App: React.FC<IAppProps> = (props) => {
         />
         {/* main body  */}
         <div
+          id={PLUGIN_NAME}
           className="d-flex position-relative"
           style={{ height: '100%', width: '100%', backgroundColor: '#f5f5f5' }}>
           {/* content  */}
@@ -505,6 +505,7 @@ const App: React.FC<IAppProps> = (props) => {
               activeViewRows={activeViewRows}
               shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
               pluginDataStore={pluginDataStore}
+              isDevelopment={isDevelopment}
               updatePresets={updatePresets}
             />
 
