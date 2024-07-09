@@ -10,15 +10,14 @@ const POSSIBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz
 
 const PLUGIN_INFO_NAME = info.name;
 
-const PLUGIN_NAME = PLUGIN_INFO_NAME
-  .replace(/-([a-z])/g, (_, match) => ' ' + match.toUpperCase())
+const PLUGIN_NAME = PLUGIN_INFO_NAME.replace(/-([a-z])/g, (_, match) => ' ' + match.toUpperCase())
   .replace(/^./, (str) => str.toUpperCase())
   .replace('Plugin', '');
 const PLUGIN_ID = `${info.name}-component`;
 
 // Table and Preset Defaults
 const TABLE_NAME = 'table_name';
-const DEFAULT_PRESET_NAME = 'Default Preset';
+const DEFAULT_PRESET_NAME = 'Unnamed org chart';
 
 // Default Select Option
 const DEFAULT_SELECT_OPTION = {

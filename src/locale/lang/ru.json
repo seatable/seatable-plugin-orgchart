@@ -10,8 +10,8 @@
   "title": "Заголовок",
   "relationship": "Отношение",
   "cover_img": "Обложка",
-  "other_fields": "Other fields shown in Org chart",
-  "show_field_names": "Show field names",
-  "hide_all": "Hide all",
-  "show_all": "Show all"
+  "other_fields": "Другие поля, отображаемые в оргсхеме",
+  "show_field_names": "Показать названия полей",
+  "hide_all": "Скрыть все",
+  "show_all": "Показать все"
 }

@@ -2,7 +2,7 @@
   "settings_headline": "Settings",
   "table": "Table",
   "view": "View",
-  "preset_add": "Add org chart",
+  "preset_add": "Add new org chart",
   "preset_rename": "Rename",
   "preset_duplicate": "Duplicate",
   "preset_delete": "Delete",
@@ -10,7 +10,7 @@
   "title": "Title",
   "relationship": "Relationship",
   "cover_img": "Cover image",
-  "other_fields": "Other fields displayed in org chart",
+  "other_fields": "Other fields shown in org chart",
   "show_field_names": "Display field names",
   "hide_all": "Hide all",
   "show_all": "Show all"
