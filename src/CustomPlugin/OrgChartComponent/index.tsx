@@ -11,7 +11,12 @@ import { Table, TableView } from '../../utils/Interfaces/Table.interface';
 import ReactDOMServer from 'react-dom/server';
 import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
-import { arraysEqual, formatOrgChartShownColumns, formatOrgChartTreeData, generateImageSrc } from '../../utils/utils';
+import {
+  arraysEqual,
+  formatOrgChartShownColumns,
+  formatOrgChartTreeData,
+  generateImageSrc,
+} from '../../utils/utils';
 import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
@@ -208,6 +213,9 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
             appActiveState.activeCoverImg &&
             d.data[appActiveState.activeCoverImg.key] &&
             d.data[appActiveState.activeCoverImg.key][0];
+
+          // load smaller image
+          image = image ? `${image}?size=512` : image;
           let noImg = !image && appActiveState.activeCoverImg;
 
           // fallback image
@@ -243,7 +251,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
                           style={{
                             width: '100%',
                             height: '180px',
-                            objectFit: 'cover',
+                            objectFit: 'contain',
                             position: 'relative',
                             borderBottom: '1px solid #dedede',
                             top: 0,
