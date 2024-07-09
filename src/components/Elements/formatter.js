@@ -133,7 +133,7 @@ class EditorFormatter extends React.Component {
   renderColumnFormatter = (formatter) => {
     const { column } = this.props;
     const { name: columnName } = column;
-    
+
     return (
       <>
         <div className="orgchart-editor-title">
@@ -301,8 +301,10 @@ class EditorFormatter extends React.Component {
         }
       }
       case CellType.LAST_MODIFIER: {
+        let collaborator =
+          collaborators && collaborators.find((c) => c.email === row._last_modifier);
         if (!row._last_modifier || !collaborator) return this.renderEmptyFormatter();
-        if (isDataLoaded) {
+        else {
           let lastModifierFormatter = (
             <LastModifierFormatter collaborators={[collaborator]} value={row._last_modifier} />
           );
@@ -311,7 +313,7 @@ class EditorFormatter extends React.Component {
           }
           return lastModifierFormatter;
         }
-        return null;
+        //return null;
       }
       case CellType.FORMULA:
       case CellType.LINK_FORMULA: {
