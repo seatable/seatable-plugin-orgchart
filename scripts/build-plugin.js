@@ -17,6 +17,13 @@ const cssFilePath = getFullFileName(config.dir + 'css');
 zip.folder('plugin');
 zip.folder('plugin/media');
 
+// write assets/image
+const imagePath = path.join(paths.appBuild, '/media/image');
+const imageDir = fs.readdirSync(imagePath);
+imageDir.forEach((filePath) => {
+  zip.folder('plugin/media/image').file(filePath, fs.readFileSync(imagePath + '/' + filePath));
+});
+
 zip.file('plugin/main.js', getFileContent(jsFilePath));
 if (isDirExist(paths.appBuild + '/static/css') && cssFilePath) {
   zip.file('plugin/media/main.css', getFileContent(cssFilePath));

@@ -310,7 +310,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               </div>
 
               <div>
-                <p className="d-inline-block mb-2 mt-3">{intl.get('view').d(`${d.view}/`)}</p>
+                <p className="d-inline-block mb-2 mt-3">{intl.get('view').d(`${d.view}`)}</p>
                 {/* Toggle table view */}
                 <DtableSelect
                   value={viewSelectedOption}
@@ -328,7 +328,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
           <div className={styles.settings_dropdowns_noborder}>
             <div className="mt-3">
               <p className="d-inline-block mb-2">
-                {intl.get('relationship').d(`${d.relationship}/`)}
+                {intl.get('relationship').d(`${d.relationship}`)}
               </p>
               {/* Toggle relationship value */}
               <DtableSelect
@@ -338,7 +338,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               />
             </div>
             <div className="mt-3">
-              <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}/`)}</p>
+              <p className="d-inline-block mb-2">{intl.get('title').d(`${d.title}`)}</p>
               {/* Toggle title value */}
               <DtableSelect
                 value={titleSelectedOption}
@@ -347,7 +347,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               />
             </div>
             <div className="mt-3">
-              <p className="d-inline-block mb-2">{intl.get('cover_img').d(`${d.cover_img}/`)}</p>
+              <p className="d-inline-block mb-2">{intl.get('cover_img').d(`${d.cover_img}`)}</p>
               {/* Toggle title value */}
               <DtableSelect
                 value={coverImgSelectedOption}
@@ -356,7 +356,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               />
               <div className={`mt-5 ${styles.settings_fields}`}>
                 <div className="mb-2 d-flex align-items-center justify-content-between">
-                  <p>{intl.get('other_fields').d(`${d.other_fields}/`)}</p>
+                  <p>{intl.get('other_fields').d(`${d.other_fields}`)}</p>
                   <button
                     onClick={() =>
                       handleShownColumn(undefined, undefined, isAllShown ? 'hide' : 'show')
@@ -401,7 +401,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
               </div>
               <div className={`mt-5 ${styles.settings_fields}`}>
                 <div className="mb-2 d-flex align-items-center justify-content-between">
-                  <p>{intl.get('show_field_names').d(`${d.show_field_names}/`)}</p>
+                  <p>{intl.get('show_field_names').d(`${d.show_field_names}`)}</p>
                   <button
                     onClick={() =>
                       handleShownFieldNames(

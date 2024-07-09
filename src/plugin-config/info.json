@@ -1,6 +1,6 @@
 {
   "name": "plugin-org-chart",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "display_type": "overlay",
   "display_name": "Org chart",
   "description": "Visualize your organization's structure."

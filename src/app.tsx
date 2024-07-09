@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
+import deepCopy from 'deep-copy';
 // Import of Component
 import Header from './components/Header';
 import PluginSettings from './components/PluginSettings';
@@ -27,7 +28,6 @@ import { PresetsArray } from './utils/Interfaces/PluginPresets/Presets.interface
 import { SelectOption } from './utils/Interfaces/PluginSettings.interface';
 // Import of CSS
 import styles from './styles/Modal.module.scss';
-import './assets/css/plugin-layout.css';
 import './styles/main.scss';
 // Import of Constants
 import {
@@ -305,19 +305,19 @@ const App: React.FC<IAppProps> = (props) => {
     setAppActiveState(newPresetActiveState);
   };
 
-  const toggleSettings = () => {
+  const toggleSettings = (e: any) => {
     if (isMobile() && isShowState.isShowPresets) {
       // Collapse presets if open
-      togglePresets();
+      togglePresets(e);
     }
 
     setIsShowState((prevState) => ({ ...prevState, isShowSettings: !prevState.isShowSettings }));
   };
 
-  const togglePresets = () => {
+  const togglePresets = (e: any) => {
     if (isMobile() && isShowState.isShowSettings) {
       // Collapse settings if open
-      toggleSettings();
+      toggleSettings(e);
     }
 
     setIsShowState((prevState) => ({ ...prevState, isShowPresets: !prevState.isShowPresets }));
@@ -472,6 +472,7 @@ const App: React.FC<IAppProps> = (props) => {
         activePresetIdx={activePresetIdx}
         pluginDataStore={pluginDataStore}
         isShowPresets={isShowPresets}
+        isDevelopment={isDevelopment}
         onTogglePresets={togglePresets}
         onToggleSettings={toggleSettings}
         onSelectPreset={onSelectPreset}
@@ -491,6 +492,7 @@ const App: React.FC<IAppProps> = (props) => {
         />
         {/* main body  */}
         <div
+          id={PLUGIN_NAME}
           className="d-flex position-relative"
           style={{ height: '100%', width: '100%', backgroundColor: '#f5f5f5' }}>
           {/* content  */}
@@ -502,6 +504,9 @@ const App: React.FC<IAppProps> = (props) => {
               appActiveState={appActiveState}
               activeViewRows={activeViewRows}
               shownColumns={pluginPresets[activePresetIdx].settings?.shown_columns}
+              pluginDataStore={pluginDataStore}
+              isDevelopment={isDevelopment}
+              updatePresets={updatePresets}
             />
 
             <button className={styles.add_row} onClick={addRowItem}>

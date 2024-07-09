@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ICustomPluginProps } from '../utils/Interfaces/CustomPlugin';
 import '../styles/OrgChartCard.module.scss';
 import { parseRowsData } from '../utils/utils';
@@ -10,7 +10,10 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   appActiveState,
   shownColumns,
   downloadPdfRef,
+  pluginDataStore,
+  updatePresets,
   fitToScreenRef,
+  isDevelopment,
 }) => {
   const [cardData, setCardData] = useState<any[]>();
   let multiFields = appActiveState.activeTable?.columns.filter((c) => c.type === 'multiple-select');
@@ -19,13 +22,20 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
   );
 
   useEffect(() => {
-    let data = parseRowsData(
-      appActiveState.activeTable,
-      appActiveState.activeViewRows,
+    if (
+      appActiveState.activeTable &&
+      appActiveState.activeViewRows &&
       appActiveState.activeRelationship
-    );
-    setCardData(data);
-  }, [appActiveState]);
+    ) {
+      let data = parseRowsData(
+        appActiveState.activeTable,
+        appActiveState.activeViewRows,
+        appActiveState.activeRelationship
+      );
+
+      setCardData(data);
+    } 
+  }, [JSON.stringify(appActiveState)]);
 
   return (
     <OrgChartComponent
@@ -34,7 +44,10 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
       shownColumns={__shownColumns}
       appActiveState={appActiveState}
       downloadPdfRef={downloadPdfRef}
+      pluginDataStore={pluginDataStore}
+      updatePresets={updatePresets}
       fitToScreenRef={fitToScreenRef}
+      isDevelopment={isDevelopment}
     />
   );
 };

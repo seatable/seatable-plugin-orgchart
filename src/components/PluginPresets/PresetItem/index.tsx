@@ -13,7 +13,6 @@ import { KeyDownActions, PresetHandleAction } from '../../../utils/constants';
 import { IPresetItemProps } from '../../../utils/Interfaces/PluginPresets/Item.interface';
 // Styles
 import styles from '../../../styles/Modal.module.scss';
-import '../../../assets/css/plugin-layout.css';
 import intl from 'react-intl-universal';
 import { AVAILABLE_LOCALES, DEFAULT_LOCALE } from '../../../locale';
 const { [DEFAULT_LOCALE]: d } = AVAILABLE_LOCALES;
@@ -36,12 +35,12 @@ const PresetItem: React.FC<IPresetItemProps> = ({
   const [pName, setPName] = useState(p.name);
 
   const onWindowResize = () => {
-    if (window.innerWidth <= 1200 && p.name.length > 15) {
-      setPName(p.name.slice(0, 15) + '...');
-    } else if (window.innerWidth > 1200 && p.name.length > 25) {
-      setPName(p.name.slice(0, 25) + '...');
+    if (window.innerWidth <= 1200 && p?.name?.length > 15) {
+      setPName(p?.name.slice(0, 15) + '...');
+    } else if (window.innerWidth > 1200 && p?.name?.length > 25) {
+      setPName(p?.name.slice(0, 25) + '...');
     } else {
-      setPName(p.name);
+      setPName(p?.name || '');
     }
   };
 
@@ -59,7 +58,7 @@ const PresetItem: React.FC<IPresetItemProps> = ({
   });
 
   // toggle Preset dropdown(edit/delete)
-  const togglePresetDropdown = () => {
+  const togglePresetDropdown = (e: React.MouseEvent<HTMLElement>) => {
     setShowPresetDropdown((prev) => !prev);
   };
 
@@ -69,12 +68,12 @@ const PresetItem: React.FC<IPresetItemProps> = ({
     switch (action) {
       case PresetHandleAction.delete:
         deletePreset();
-        togglePresetDropdown();
+        togglePresetDropdown(e);
         break;
       case PresetHandleAction.rename:
         setIsEditing((prev) => !prev);
         togglePresetsUpdate(e, PresetHandleAction.edit);
-        togglePresetDropdown();
+        togglePresetDropdown(e);
         setShowPresetDropdown(false);
         break;
       case PresetHandleAction.duplicate:
@@ -87,7 +86,7 @@ const PresetItem: React.FC<IPresetItemProps> = ({
 
   const onClickPreset = (e: React.MouseEvent<HTMLElement>) => {
     if (e.detail === 2) {
-      onToggleSettings();
+      onToggleSettings(e);
     } else {
       onSelectPreset(p?._id);
     }
@@ -130,10 +129,9 @@ const PresetItem: React.FC<IPresetItemProps> = ({
             <span
               className={`dtable-font dtable-icon-set-up ${styles.modal_header_viewBtn_settings}`}
               onClick={onToggleSettings}></span>
-            <BsThreeDots
-              className={`ml-1 ${styles.modal_header_viewBtn_icons}`}
-              onClick={togglePresetDropdown}
-            />
+            <div onClick={togglePresetDropdown}>
+              <BsThreeDots className={`ml-1 ${styles.modal_header_viewBtn_icons}`} />
+            </div>
           </span>
         </div>
         {showPresetDropdown && (
