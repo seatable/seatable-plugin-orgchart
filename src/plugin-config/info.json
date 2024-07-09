@@ -1,7 +1,23 @@
 {
-  "name": "plugin-org-chart",
-  "version": "0.9.6",
+  "name": "org-chart",
+  "version": "1.0.0",
   "display_type": "overlay",
-  "display_name": "Org chart",
-  "description": "Visualize your organization's structure."
+  "display_name": {
+    "de": "Organigramm",
+    "en": "Org chart",
+    "fr": "Organigramme",
+    "es": "Organigrama",
+    "pt": "Organograma",
+    "ru": "Оргсхема",
+    "zh-cn": "组织结构图"
+  },
+  "description": {
+    "de": "Visualisieren Sie die Struktur Ihrer Organisation.",
+    "en": "Visualize your organization's structure.",
+    "fr": "Visualisez la structure de votre organisation.",
+    "es": "Visualice la estructura de su organización.",
+    "pt": "Visualize a estrutura da sua organização.",
+    "ru": "Визуализируйте структуру вашей организации.",
+    "zh-cn": "将组织结构可视化。"
+  }
 }
