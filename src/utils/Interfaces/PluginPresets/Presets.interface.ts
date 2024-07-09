@@ -1,7 +1,7 @@
 import { PLUGIN_NAME } from '../../constants';
 import { AppActiveState, IPluginDataStore } from '../App.interface';
 import { SelectOption } from '../PluginSettings.interface';
-import { TableArray } from '../Table.interface';
+import { TableArray, TableColumn } from '../Table.interface';
 
 export interface IPresetsProps {
   pluginPresets: PresetsArray;
@@ -15,9 +15,10 @@ export interface IPresetsProps {
   ) => void;
   pluginDataStore: IPluginDataStore;
   isShowPresets: boolean;
+  isDevelopment?: boolean;
   allTables: TableArray;
-  onTogglePresets: () => void;
-  onToggleSettings: () => void;
+  onTogglePresets: (e: any) => void;
+  onToggleSettings: (e: any) => void;
   updateActiveData: () => void;
 }
 
@@ -33,11 +34,25 @@ export interface IPresetInfo {
   settings?: PresetSettings;
 }
 
+export interface OrgChartTreePosition {
+  x: number;
+  y: number;
+  k: number
+}
+
 export interface PresetSettings {
   shown_image_name?: string | undefined;
   shown_title_name?: string | undefined;
   selectedTable?: SelectOption;
   selectedView?: SelectOption;
+  title?: TableColumn;
+  relationship?: TableColumn;
+  coverImg?: TableColumn;
+  shown_columns?: TableColumn[];
+  show_field_names?: boolean;
+  columns?: TableColumn[];
+  tree_data?: any[];
+  tree_position?: OrgChartTreePosition | {};
 }
 
 export type PresetsArray = IPresetInfo[];

@@ -2,9 +2,16 @@
   "settings_headline": "设置",
   "table": "子表",
   "view": "视图",
-  "preset_add": "添加预设",
+  "preset_add": "新增組織結構圖",
   "preset_rename": "重命名预置",
   "preset_duplicate": "复制预置",
   "preset_delete": "删除预设",
-  "preset_warn_exist": "请输入唯一的预设名称"
+  "preset_warn_exist": "请输入唯一的预设名称",
+  "title": "標題",
+  "relationship": "關係",
+  "cover_img": "封面圖片",
+  "other_fields": "组织结构图中显示的其他字段",
+  "show_field_names": "显示字段名称",
+  "hide_all": "显示全部",
+  "show_all": "隐藏全部"
 }

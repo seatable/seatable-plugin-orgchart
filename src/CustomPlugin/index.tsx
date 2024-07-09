@@ -1,80 +1,55 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useRef, useState } from 'react';
 import { ICustomPluginProps } from '../utils/Interfaces/CustomPlugin';
-import { IPresetInfo } from '../utils/Interfaces/PluginPresets/Presets.interface';
+import '../styles/OrgChartCard.module.scss';
+import { parseRowsData } from '../utils/utils';
+import OrgChartComponent from './OrgChartComponent';
 
 const CustomPlugin: React.FC<ICustomPluginProps> = ({
   pluginPresets,
   appActiveState,
-  activeViewRows,
-}) => (
-  <>
-    {pluginPresets.map((preset: IPresetInfo) => (
-      <div
-        key={preset._id}
-        style={{
-          border: '1px solid #ddd',
-          padding: '10px',
-          marginBottom: '10px',
-          borderRadius: '5px',
-          backgroundColor: '#fff',
-        }}>
-        <div style={{ fontWeight: 'bold' }}>{`Preset ID: ${preset._id}`}</div>
-        <div style={{ color: '#007bff' }}>{`Preset Name: ${preset.name}`}</div>
-        <div style={{ marginTop: '8px', fontWeight: 'bold' }}>Settings:</div>
-        <div style={{ marginLeft: '15px', color: '#28a745' }}>{`selectedTableId: ${
-          preset.settings?.selectedTable?.label ?? 'N/A'
-        }`}</div>
-        <div style={{ marginLeft: '15px', color: '#28a745' }}>{`selectedViewId: ${
-          preset.settings?.selectedView?.label ?? 'N/A'
-        }`}</div>
-      </div>
-    ))}
-    <div
-      style={{
-        border: '1px solid #ddd',
-        padding: '10px',
-        marginBottom: '10px',
-        borderRadius: '5px',
-        backgroundColor: '#fff',
-      }}>
-      <div
-        style={{
-          color: '#ff6666',
-        }}>{`Active Table: ${appActiveState.activeTableName}`}</div>
-      <div
-        style={{
-          color: '#ff6666',
-        }}>{`Active View: ${appActiveState?.activeTableView?.name}`}</div>
-    </div>
-    <div
-      style={{
-        border: '1px solid #ddd',
-        padding: '10px',
-        marginBottom: '10px',
-        borderRadius: '5px',
-        backgroundColor: '#fff',
-      }}>
-      <div style={{ marginTop: '8px', fontWeight: 'bold' }}>Rows of this selection:</div>
-      <div>
-        {activeViewRows?.map(
-          (row: {
-            [x: string]:
-              | boolean
-              | React.ReactChild
-              | React.ReactFragment
-              | React.ReactPortal
-              | null
-              | undefined;
-            _id: React.Key | null | undefined;
-          }) => (
-            <div key={row._id}>
-              <h6>{row['0000']}</h6>
-            </div>
-          )
-        )}
-      </div>
-    </div>
-  </>
-);
+  shownColumns,
+  downloadPdfRef,
+  pluginDataStore,
+  updatePresets,
+  fitToScreenRef,
+  isDevelopment,
+}) => {
+  const [cardData, setCardData] = useState<any[]>();
+  let multiFields = appActiveState.activeTable?.columns.filter((c) => c.type === 'multiple-select');
+  let __shownColumns = shownColumns?.map((s) =>
+    s?.type === 'multiple-select' ? multiFields?.find((_s) => s.key === _s.key) : s
+  );
+
+  useEffect(() => {
+    if (
+      appActiveState.activeTable &&
+      appActiveState.activeViewRows &&
+      appActiveState.activeRelationship
+    ) {
+      let data = parseRowsData(
+        appActiveState.activeTable,
+        appActiveState.activeViewRows,
+        appActiveState.activeRelationship
+      );
+
+      setCardData(data);
+    } 
+  }, [JSON.stringify(appActiveState)]);
+
+  return (
+    <OrgChartComponent
+      cardData={cardData}
+      pluginPresets={pluginPresets}
+      shownColumns={__shownColumns}
+      appActiveState={appActiveState}
+      downloadPdfRef={downloadPdfRef}
+      pluginDataStore={pluginDataStore}
+      updatePresets={updatePresets}
+      fitToScreenRef={fitToScreenRef}
+      isDevelopment={isDevelopment}
+    />
+  );
+};
 
 export default CustomPlugin;

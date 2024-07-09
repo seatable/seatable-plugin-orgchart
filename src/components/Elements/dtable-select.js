@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Select, { components } from 'react-select';
+import Select, { components, StylesConfig } from 'react-select';
 
 const MenuSelectStyle = {
   option: (provided, state) => {
@@ -106,6 +106,7 @@ class DtableSelect extends React.Component {
       noOptionsMessage,
       classNamePrefix,
     } = this.props;
+
     return (
       <Select
         value={value}

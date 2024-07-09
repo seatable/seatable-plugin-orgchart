@@ -2,9 +2,16 @@
   "settings_headline": "Configurações",
   "table": "Tabela",
   "view": "Vista",
-  "preset_add": "Adicionar predefinição",
+  "preset_add": "Adicionar organograma",
   "preset_rename": "Renomear",
   "preset_duplicate": "Duplicado",
   "preset_delete": "Excluir",
-  "preset_warn_exist": "Introduza um nome de predefinição único"
+  "preset_warn_exist": "Introduza um nome de predefinição único",
+  "title": "Título",
+  "relationship": "Relação",
+  "cover_img": "Imagem de capa",
+  "other_fields": "Otros campos del organigrama",
+  "show_field_names": "Mostrar nombres de campos",
+  "hide_all": "Ocultar todo",
+  "show_all": "Mostrar todo"
 }

@@ -1,3 +1,4 @@
+import { CellType } from 'dtable-utils';
 import pluginContext from '../plugin-context';
 import { AppActiveState, IPluginDataStore } from './Interfaces/App.interface';
 import { PresetSettings, PresetsArray } from './Interfaces/PluginPresets/Presets.interface';
@@ -5,6 +6,7 @@ import {
   IActiveTableAndView,
   Table,
   TableArray,
+  TableColumn,
   TableRow,
   TableView,
 } from './Interfaces/Table.interface';
@@ -38,6 +40,13 @@ export const generatorPresetId = (presets: Array<{ _id: string }>): string => {
   }
 
   return preset_id;
+};
+
+export const generateImageSrc = (imageName: string, server: string, pluginName: string, isDevelopment: boolean | undefined): string => {
+  if (isDevelopment || !server) {
+    return `./media/image/${imageName}`;
+  }
+  return `${server}/dtable-plugins/${pluginName}/?path=/media/image/${imageName}`;
 };
 
 export const getImageThumbnailUrl = (url: string, size?: number): string => {
@@ -121,6 +130,26 @@ export const isTableEditable = (
     return true;
   }
   return false;
+};
+
+export const getTitleColumns = (columns?: TableColumn[]) => {
+  const SHOW_TITLE_COLUMN_TYPE = [
+    CellType.TEXT,
+    CellType.SINGLE_SELECT,
+    CellType.MULTIPLE_SELECT,
+    CellType.NUMBER,
+    CellType.FORMULA,
+    CellType.DATE,
+    CellType.COLLABORATOR,
+    CellType.GEOLOCATION,
+    CellType.CTIME,
+    CellType.MTIME,
+    CellType.CREATOR,
+    CellType.LAST_MODIFIER,
+  ];
+  return (
+    columns?.filter((column) => SHOW_TITLE_COLUMN_TYPE.find((type) => type === column.type)) || []
+  );
 };
 
 export const canCreateRows = (
@@ -239,6 +268,9 @@ export const parsePluginDataToActiveState = (
   let tableView = table.views.find(
     (v) => v._id === pluginPresets[idx].settings?.selectedView?.value
   )!;
+  let title = pluginPresets[idx].settings?.title || getTitleColumns(table.columns)[0];
+  let relationship = pluginPresets[idx].settings?.relationship || getDefaultLinkColumn(table);
+  let coverImg = pluginPresets[idx].settings?.coverImg;
 
   // Create the appActiveState object with the extracted data
   const appActiveState = {
@@ -247,6 +279,9 @@ export const parsePluginDataToActiveState = (
     activeTable: table,
     activeTableName: tableName,
     activeTableView: tableView,
+    activeCardTitle: title,
+    activeRelationship: relationship,
+    activeCoverImg: coverImg,
   };
 
   // Return the active state object
@@ -281,6 +316,8 @@ export const getActiveStateSafeGuard = (
     activePresetId: (pluginPresets[0] && pluginPresets[0]._id) || '0000', // '0000' as Safe guard if there are no presets
     activePresetIdx: 0,
     activeViewRows: activeViewRows,
+    activeCardTitle: getTitleColumns(activeTableAndView.table.columns)[0],
+    activeRelationship: getDefaultLinkColumn(activeTableAndView?.table),
   };
 
   // Return the active state object considering presets or default values
@@ -348,6 +385,8 @@ export const createDefaultPluginDataStore = (
   const _presetSettings: PresetSettings = {
     selectedTable: { value: activeTable._id, label: activeTable.name },
     selectedView: { value: activeTable.views[0]._id, label: activeTable.views[0].name },
+    title: getTitleColumns(activeTable.columns)[0],
+    relationship: getDefaultLinkColumn(activeTable),
   };
 
   // Importing the default settings from the constants file and updating the presets array with the Default Settings
@@ -382,6 +421,9 @@ export const createDefaultPresetSettings = (allTables: TableArray) => {
     shown_title_name: 'Title',
     selectedTable: tableInfo,
     selectedView: viewInfo,
+    title: getTitleColumns(allTables[0].columns)[0],
+    relationship: getDefaultLinkColumn(allTables[0]),
+    show_field_names: true,
   };
 };
 
@@ -391,4 +433,177 @@ export const findPresetName = (presets: PresetsArray, presetId: string) => {
 
 export const isMobile = () => {
   return window.innerWidth <= 800;
+};
+
+export const getDefaultLinkColumn = (table: Table) => {
+  return table.columns.filter((c: TableColumn) => c.type === 'link')[0];
+};
+
+export const getImageColumns = (columns?: TableColumn[]) => {
+  return columns?.filter((c) => c.type === 'image') || [];
+};
+
+export const isAllColumnsShown = (shownColumns?: string[], columns?: TableColumn[]) => {
+  if (columns) {
+    for (let i = 0; i < columns.length; i++) {
+      if (!shownColumns?.includes(columns[i].key)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+};
+
+export const showFieldNames = (settings: PresetSettings) => {
+  if (
+    !Object.prototype.hasOwnProperty.call(settings, 'show_field_names') ||
+    settings.show_field_names
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+
+
+
+
+
+// CUSTOM FUNCTIONS
+
+export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
+  let parentId: any;
+  let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
+  let _rows = [];
+
+
+  if (Object.keys(linkedRows).length > 0) {
+    _rows = rows.map((r: any) => {
+      parentId = linkedRows[r._id][relationship?.key!][0];
+
+      return {
+        ...r,
+        id: r._id,
+        parentId,
+      };
+    })!;
+  }
+
+
+  return filterMultipleParentNodes(_rows);
+};
+
+// Function to filter out multiple parent nodes to one primary parent node
+const filterMultipleParentNodes = (rows: TableRow[]) => {
+  let parentNode;
+  let parentNodes = rows.filter((row) => !row.parentId);
+  let childNodes = rows.filter((row) => row.parentId);
+  let __rows = [...rows];
+
+
+  // if no parents and no child, return an empty array
+  if ((parentNodes.length === 0 && childNodes.length === 0)) {
+    return [];
+  }
+
+  // if no child, return one parent node
+  if (childNodes.length === 0) {
+    return [parentNodes[0]];
+  }
+
+  parentNodes = parentNodes.filter((parent) => childNodes.some((child) => child.parentId === parent.id));
+
+  // if no parent has children, remove all parent nodes, leaving only childNodes
+  if (parentNodes.length === 0) {
+    __rows = childNodes;
+  }
+
+  // assign rows to parentNodes if no parent nodes are found
+  if (parentNodes.length === 0 && childNodes.length === __rows.length) {
+    parentNodes = __rows;
+  }
+
+  parentNodes = parentNodes.map((parent) => { return ({ ...parent, children: getAllChildNodes(parent, childNodes) }); });
+
+  // get parent node with the most children
+  parentNode = parentNodes.sort((a, b) => (b.children as any[]).length - (a.children as any[]).length)[0];
+
+  // set childNodes to the children of parent node
+  childNodes = parentNode?.children as TableRow[];
+
+  // delete children property (not needed anymore)
+  if (parentNode) delete parentNode.children;
+
+  // create new array that includes one parentNode and all its children
+  const finalData = [{ ...parentNode, parentId: null }, ...childNodes];
+
+  return parentNode ? finalData : [];
+};
+
+/**  Function to get every single node in a parents subtree
+   Example
+        3
+       / \
+      4   6
+     / \
+    5   7
+If parent is 3, function will return [4, 6, 5, 7]
+If parent is 4, function will return [5, 7]
+**/
+const getAllChildNodes = (parentNode: TableRow, childNodes: any[]): any => {
+  const _children = childNodes.filter((child) => child.parentId === parentNode.id);
+
+  if (_children.length === 0) {
+    return _children;
+  } else {
+
+    return [..._children, ...[].concat(..._children.map((child) => {
+      return getAllChildNodes(child, childNodes);
+    }))];
+  };
+};
+
+export const checkIfLinkToDifferentTable = (link: TableColumn, table: Table) => {
+  const links = window.dtableSDK.getLinks();
+  const _link = links.find((l: any) => l._id === link.data.link_id);
+
+  if (_link?.table1_table2_map || (_link?.table1_table2_map && Object.keys(_link?.table1_table2_map).length > 0)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const removeDeletedFields = (fields: TableColumn[], table: Table) => {
+  return fields.filter((field: TableColumn) => table.columns.map((column) => column.key).includes(field.key));
+};
+
+export const arraysEqual = (arr1: any, arr2: any) => {
+  return JSON.stringify(arr1) === JSON.stringify(arr2);
+};
+
+export const formatOrgChartTreeData = (persistedData: any[], cardData: any[]) => {
+  let DATA = persistedData?.length === cardData?.length ? persistedData?.map((d) => {
+    let p_d = cardData?.find((p) => p.id === d.id);
+    return p_d ? { ...p_d, _expanded: d._expanded } : d;
+  }) : cardData;
+
+  return DATA;
+};
+
+export const formatOrgChartShownColumns = (pluginPresets:PresetsArray , appActiveState: AppActiveState, shownColumns: (TableColumn | undefined)[] | undefined) => {
+  let cols = pluginPresets[appActiveState.activePresetIdx].settings?.columns || [];
+  let extracols =
+    appActiveState.activeTable?.columns.filter(
+      (c) => !cols?.map((col) => col?.key).includes(c?.key)
+    ) || [];
+  let fields = [...cols, ...extracols] || appActiveState.activeTable?.columns;
+  let fieldsIDs = fields?.map((f) => f?.key);
+  let _shownColumns = fieldsIDs
+    ?.map((id) => shownColumns?.find((c) => c?.key === id))
+    .filter((c) => c !== undefined);
+
+  return _shownColumns;
 };

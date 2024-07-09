@@ -2,9 +2,16 @@
   "settings_headline": "Settings",
   "table": "Table",
   "view": "View",
-  "preset_add": "Add Preset",
+  "preset_add": "Add Org Chart",
   "preset_rename": "Rename",
   "preset_duplicate": "Duplicate",
   "preset_delete": "Delete",
-  "preset_warn_exist": "Please enter a unique preset name"
+  "preset_warn_exist": "Please enter a unique preset name",
+  "title": "Title",
+  "relationship": "Relationship",
+  "cover_img": "Cover Image",
+  "other_fields": "Other fields shown in Org chart",
+  "show_field_names": "Show field names",
+  "hide_all": "Hide all",
+  "show_all": "Show all"
 }

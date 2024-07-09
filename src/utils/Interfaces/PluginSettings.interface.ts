@@ -1,5 +1,5 @@
 import { SettingsOption } from '../types';
-import { AppActiveState } from './App.interface';
+import { AppActiveState, IPluginDataStore } from './App.interface';
 import { PresetSettings, PresetsArray } from './PluginPresets/Presets.interface';
 import { TableArray, TableViewArray } from './Table.interface';
 
@@ -9,8 +9,17 @@ interface IPluginSettingsProps {
   activeTableViews: TableViewArray;
   pluginPresets: PresetsArray;
   onTableOrViewChange: (type: SettingsOption, option: SelectOption) => void;
-  onToggleSettings: () => void;
+  onToggleSettings: (e: any) => void;
   isShowSettings: boolean;
+  activePresetIdx: number;
+  pluginDataStore: IPluginDataStore;
+  updatePresets: (
+    _activePresetIdx: number,
+    updatedPresets: PresetsArray,
+    pluginDataStore: IPluginDataStore,
+    activePresetId: string,
+    callBack?: any
+  ) => void;
 }
 
 interface SelectOption {

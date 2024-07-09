@@ -2,9 +2,16 @@
   "settings_headline": "Configuración",
   "table": "Tabla",
   "view": "Vista",
-  "preset_add": "Añadir preajuste",
+  "preset_add": "Agregar organigrama",
   "preset_rename": "Renombrar",
   "preset_duplicate": "Duplicado",
   "preset_delete": "Borrar",
-  "preset_warn_exist": "Introduzca un nombre único para la preajuste"
+  "preset_warn_exist": "Introduzca un nombre único para la preajuste",
+  "title": "Título",
+  "relationship": "relación",
+  "cover_img": "Imagen de portada",
+  "other_fields": "Otros campos del organigrama",
+  "show_field_names": "Mostrar nombres de campos",
+  "hide_all": "Ocultar todo",
+  "show_all": "Mostrar todo"
 }

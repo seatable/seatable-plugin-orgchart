@@ -3,7 +3,6 @@ import { getTableByName } from 'dtable-utils';
 import PresetItem from './PresetItem/index';
 import styles from '../../styles/Presets.module.scss';
 import deepCopy from 'deep-copy';
-import icon from '../../plugin-config/icon.png';
 import Preset from '../../model/preset';
 import {
   IPresetsProps,
@@ -13,12 +12,14 @@ import {
 import {
   appendPresetSuffix,
   createDefaultPresetSettings,
+  generateImageSrc,
   generatorPresetId,
   getActiveTableAndActiveView,
   isUniquePresetName,
 } from '../../utils/utils';
 import {
   DEFAULT_PLUGIN_DATA,
+  PLUGIN_INFO_NAME,
   PLUGIN_NAME,
   PresetHandleAction,
   TABLE_NAME,
@@ -34,6 +35,7 @@ import { AppActiveState } from '../../utils/Interfaces/App.interface';
 import { HiOutlineChevronDoubleLeft } from 'react-icons/hi2';
 import intl from 'react-intl-universal';
 import { AVAILABLE_LOCALES, DEFAULT_LOCALE } from '../../locale';
+import pluginContext from '../../plugin-context';
 const { [DEFAULT_LOCALE]: d } = AVAILABLE_LOCALES;
 
 const PluginPresets: React.FC<IPresetsProps> = ({
@@ -42,6 +44,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
   activePresetIdx,
   pluginDataStore,
   isShowPresets,
+  isDevelopment,
   onTogglePresets,
   onToggleSettings,
   onSelectPreset,
@@ -55,6 +58,10 @@ const PluginPresets: React.FC<IPresetsProps> = ({
   const [_pluginPresets, setPluginPresets] = useState<PresetsArray>([]);
   const [showNewPresetPopUp, setShowNewPresetPopUp] = useState<boolean>(false);
   const [showEditPresetPopUp, setShowEditPresetPopUp] = useState<boolean>(false);
+
+  // Set icon image
+  const server = pluginContext.getSetting('server');
+  const icon = generateImageSrc('icon.png', server, PLUGIN_INFO_NAME, isDevelopment);
 
   useEffect(() => {
     setPluginPresets(pluginPresets);
@@ -165,6 +172,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
     let initUpdated = initOrgChartSetting();
     newPresetsArray[_activePresetIdx].settings = Object.assign(_presetSettings, initUpdated);
     pluginDataStore.presets = newPresetsArray;
+
     updatePresets(_activePresetIdx, newPresetsArray, pluginDataStore, _id);
     const _activeTableAndView: IActiveTableAndView = getActiveTableAndActiveView(
       newPresetsArray,
@@ -180,6 +188,9 @@ const PluginPresets: React.FC<IPresetsProps> = ({
       activeTable: _activeTableAndView.table,
       activeTableName: newPresetsArray[_activePresetIdx]?.settings?.selectedTable?.label!,
       activeTableView: _activeTableAndView.view,
+      activeCardTitle: newPresetsArray[_activePresetIdx]?.settings?.title,
+      activeRelationship: newPresetsArray[_activePresetIdx]?.settings?.relationship,
+      activeCoverImg: newPresetsArray[_activePresetIdx]?.settings?.coverImg,
     };
 
     onSelectPreset(_id, newPresetActiveState);
@@ -215,6 +226,7 @@ const PluginPresets: React.FC<IPresetsProps> = ({
       activePresetIdx = newPluginPresets.length - 1;
     }
     pluginDataStore.presets = newPluginPresets;
+
     updatePresets(0, newPluginPresets, pluginDataStore, PresetHandleAction.delete);
     updateActiveData();
   };

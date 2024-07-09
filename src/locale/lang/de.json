@@ -2,9 +2,16 @@
   "settings_headline": "Einstellungen",
   "table": "Tabelle",
   "view": "Ansicht",
-  "preset_add": "Voreinstellung hinzufügen",
+  "preset_add": "Organigramm hinzufügen",
   "preset_rename": "Umbenennen",
   "preset_duplicate": "Duplizieren",
   "preset_delete": "Löschen",
-  "preset_warn_exist": "Bitte wählen Sie einen einzigartigen Namen"
+  "preset_warn_exist": "Bitte wählen Sie einen einzigartigen Namen",
+  "title": "Titel",
+  "relationship": "Beziehung",
+  "cover_img": "Titelbild",
+  "other_fields": "Andere Spalten im Organigramm anzeigen",
+  "show_field_names": "Spaltennamen anzeigen",
+  "hide_all": "Alle ausblenden",
+  "show_all": "Alle anzeigen"
 }

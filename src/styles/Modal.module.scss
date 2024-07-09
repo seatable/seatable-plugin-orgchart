@@ -193,6 +193,21 @@
 .main {
   padding-top: 50px;
   align-items: flex-start;
+
+  &_fit_to_screen {
+    all: unset;
+    cursor: pointer;
+    padding: 3px 10px;
+    color: $preset-text1;
+    background-color: $preset-bgColor;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    position: absolute;
+    z-index: 10;
+    top: 85%;
+    left: 30px;
+  };
 }
 
 .preset_dropdown {
@@ -270,6 +285,10 @@
   overflow: scroll;
   padding-bottom: 50px;
   background-color: $main-content-bgColor;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &::-webkit-scrollbar {
     display: none;

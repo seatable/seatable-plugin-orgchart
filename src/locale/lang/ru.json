@@ -2,9 +2,16 @@
   "settings_headline": "Настройки",
   "table": "Таблица",
   "view": "Вид",
-  "preset_add": "добавить предустановку",
+  "preset_add": "Добавить организационную структуру",
   "preset_rename": "переименовать",
   "preset_duplicate": "дубликат",
   "preset_delete": "удалить",
-  "preset_warn_exist": "Пожалуйста, введите уникальное имя предустановки"
+  "preset_warn_exist": "Пожалуйста, введите уникальное имя предустановки",
+  "title": "Заголовок",
+  "relationship": "Отношение",
+  "cover_img": "Обложка",
+  "other_fields": "Other fields shown in Org chart",
+  "show_field_names": "Show field names",
+  "hide_all": "Hide all",
+  "show_all": "Show all"
 }
