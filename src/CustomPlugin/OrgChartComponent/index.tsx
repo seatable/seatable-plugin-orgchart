@@ -11,7 +11,12 @@ import { Table, TableView } from '../../utils/Interfaces/Table.interface';
 import ReactDOMServer from 'react-dom/server';
 import { getTableById, getRowsByIds, getLinkCellValue } from 'dtable-utils';
 import '../../styles/FieldFormatter.scss';
-import { arraysEqual, formatOrgChartShownColumns, formatOrgChartTreeData, generateImageSrc } from '../../utils/utils';
+import {
+  arraysEqual,
+  formatOrgChartShownColumns,
+  formatOrgChartTreeData,
+  generateImageSrc,
+} from '../../utils/utils';
 import { OrgChartTreePosition } from '../../utils/Interfaces/PluginPresets/Presets.interface';
 
 const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
@@ -169,7 +174,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
       let _tree_data = pluginPresets[appActiveState.activePresetIdx]?.settings?.tree_data || [];
       // logic to render updated data
-      let DATA = __data.length === 0 ? formatOrgChartTreeData(_tree_data, cardData) : __data;
+      let DATA = __data.length === 0 ? formatOrgChartTreeData(_tree_data, cardData) : cardData;
       // logic to see is the chart is completely collapsed
       let isCollapsed = DATA.every((d) => d._expanded === false);
 
