@@ -34,7 +34,7 @@ const CustomPlugin: React.FC<ICustomPluginProps> = ({
       );
 
       setCardData(data);
-    } 
+    }
   }, [JSON.stringify(appActiveState)]);
 
   return (

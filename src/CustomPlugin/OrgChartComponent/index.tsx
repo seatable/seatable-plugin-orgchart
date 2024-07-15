@@ -174,7 +174,7 @@ const OrgChartComponent: React.FC<OrgChartComponentProps> = ({
 
       let _tree_data = pluginPresets[appActiveState.activePresetIdx]?.settings?.tree_data || [];
       // logic to render updated data
-      let DATA = __data.length === 0 ? formatOrgChartTreeData(_tree_data, cardData) : __data;
+      let DATA = __data.length === 0 ? formatOrgChartTreeData(_tree_data, cardData) : cardData;
       // logic to see is the chart is completely collapsed
       let isCollapsed = DATA.every((d) => d._expanded === false);
 
