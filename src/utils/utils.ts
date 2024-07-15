@@ -42,7 +42,12 @@ export const generatorPresetId = (presets: Array<{ _id: string }>): string => {
   return preset_id;
 };
 
-export const generateImageSrc = (imageName: string, server: string, pluginName: string, isDevelopment: boolean | undefined): string => {
+export const generateImageSrc = (
+  imageName: string,
+  server: string,
+  pluginName: string,
+  isDevelopment: boolean | undefined
+): string => {
   if (isDevelopment || !server) {
     return `./media/image/${imageName}`;
   }
@@ -466,18 +471,12 @@ export const showFieldNames = (settings: PresetSettings) => {
   }
 };
 
-
-
-
-
-
 // CUSTOM FUNCTIONS
 
 export const parseRowsData = (table: Table | null, rows: any, relationship?: TableColumn) => {
   let parentId: any;
   let linkedRows = window.dtableSDK.getTableLinkRows(rows, table);
   let _rows = [];
-
 
   if (Object.keys(linkedRows).length > 0) {
     _rows = rows.map((r: any) => {
@@ -491,7 +490,6 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
     })!;
   }
 
-
   return filterMultipleParentNodes(_rows);
 };
 
@@ -502,9 +500,8 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
   let childNodes = rows.filter((row) => row.parentId);
   let __rows = [...rows];
 
-
   // if no parents and no child, return an empty array
-  if ((parentNodes.length === 0 && childNodes.length === 0)) {
+  if (parentNodes.length === 0 && childNodes.length === 0) {
     return [];
   }
 
@@ -513,7 +510,9 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
     return [parentNodes[0]];
   }
 
-  parentNodes = parentNodes.filter((parent) => childNodes.some((child) => child.parentId === parent.id));
+  parentNodes = parentNodes.filter((parent) =>
+    childNodes.some((child) => child.parentId === parent.id)
+  );
 
   // if no parent has children, remove all parent nodes, leaving only childNodes
   if (parentNodes.length === 0) {
@@ -525,10 +524,14 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
     parentNodes = __rows;
   }
 
-  parentNodes = parentNodes.map((parent) => { return ({ ...parent, children: getAllChildNodes(parent, childNodes) }); });
+  parentNodes = parentNodes.map((parent) => {
+    return { ...parent, children: getAllChildNodes(parent, childNodes) };
+  });
 
   // get parent node with the most children
-  parentNode = parentNodes.sort((a, b) => (b.children as any[]).length - (a.children as any[]).length)[0];
+  parentNode = parentNodes.sort(
+    (a, b) => (b.children as any[]).length - (a.children as any[]).length
+  )[0];
 
   // set childNodes to the children of parent node
   childNodes = parentNode?.children as TableRow[];
@@ -552,24 +555,28 @@ const filterMultipleParentNodes = (rows: TableRow[]) => {
 If parent is 3, function will return [4, 6, 5, 7]
 If parent is 4, function will return [5, 7]
 **/
-const getAllChildNodes = (parentNode: TableRow, childNodes: any[]): any => {
-  const _children = childNodes.filter((child) => child.parentId === parentNode.id);
+const getAllChildNodes = (parentNode: TableRow, childNodes: TableRow[]): TableRow[] => {
+  const _children = childNodes.filter(
+    (child) => child.parentId === parentNode.id && child.id !== parentNode.id
+  );
 
   if (_children.length === 0) {
     return _children;
-  } else {
+  }
 
-    return [..._children, ...[].concat(..._children.map((child) => {
-      return getAllChildNodes(child, childNodes);
-    }))];
-  };
+  const descendants = _children.flatMap((child) => getAllChildNodes(child, childNodes));
+
+  return [..._children, ...descendants];
 };
 
 export const checkIfLinkToDifferentTable = (link: TableColumn, table: Table) => {
   const links = window.dtableSDK.getLinks();
   const _link = links.find((l: any) => l._id === link.data.link_id);
 
-  if (_link?.table1_table2_map || (_link?.table1_table2_map && Object.keys(_link?.table1_table2_map).length > 0)) {
+  if (
+    _link?.table1_table2_map ||
+    (_link?.table1_table2_map && Object.keys(_link?.table1_table2_map).length > 0)
+  ) {
     return true;
   } else {
     return false;
@@ -577,7 +584,9 @@ export const checkIfLinkToDifferentTable = (link: TableColumn, table: Table) => 
 };
 
 export const removeDeletedFields = (fields: TableColumn[], table: Table) => {
-  return fields.filter((field: TableColumn) => table.columns.map((column) => column.key).includes(field.key));
+  return fields.filter((field: TableColumn) =>
+    table.columns.map((column) => column.key).includes(field.key)
+  );
 };
 
 export const arraysEqual = (arr1: any, arr2: any) => {
@@ -585,15 +594,22 @@ export const arraysEqual = (arr1: any, arr2: any) => {
 };
 
 export const formatOrgChartTreeData = (persistedData: any[], cardData: any[]) => {
-  let DATA = persistedData?.length === cardData?.length ? persistedData?.map((d) => {
-    let p_d = cardData?.find((p) => p.id === d.id);
-    return p_d ? { ...p_d, _expanded: d._expanded } : d;
-  }) : cardData;
+  let DATA =
+    persistedData?.length === cardData?.length
+      ? persistedData?.map((d) => {
+          let p_d = cardData?.find((p) => p.id === d.id);
+          return p_d ? { ...p_d, _expanded: d._expanded } : d;
+        })
+      : cardData;
 
   return DATA;
 };
 
-export const formatOrgChartShownColumns = (pluginPresets:PresetsArray , appActiveState: AppActiveState, shownColumns: (TableColumn | undefined)[] | undefined) => {
+export const formatOrgChartShownColumns = (
+  pluginPresets: PresetsArray,
+  appActiveState: AppActiveState,
+  shownColumns: (TableColumn | undefined)[] | undefined
+) => {
   let cols = pluginPresets[appActiveState.activePresetIdx].settings?.columns || [];
   let extracols =
     appActiveState.activeTable?.columns.filter(
