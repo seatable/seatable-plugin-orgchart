@@ -20,6 +20,10 @@ Please refer to the [SeaTable Plugin Template](https://github.com/seatable/seata
 
 ## Changelog
 
+### Version 1.1.0
+
+- Support for link-column changes with SeaTable v5.2
+
 ### Version 1.0.0
 
 - Initial release with SeaTable v5.0.
