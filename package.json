@@ -1,6 +1,5 @@
 {
   "name": "seatable-plugin-org-chart",
-  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",

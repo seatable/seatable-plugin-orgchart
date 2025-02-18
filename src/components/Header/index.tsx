@@ -8,13 +8,7 @@ import { PLUGIN_NAME } from '../../utils/constants';
 import { HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 
 const Header: React.FC<IHeaderProps> = (props) => {
-  const {
-    presetName,
-    isShowPresets,
-    onTogglePresets,
-    togglePlugin,
-    fitToScreenRef,
-  } = props;
+  const { presetName, isShowPresets, onTogglePresets, togglePlugin, fitToScreenRef } = props;
 
   const downloadPdfDocument = () => {
     const input = document.getElementById(PLUGIN_NAME);
@@ -52,7 +46,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
       });
   };
 
-
   const fitToScreen = () => {
     if (fitToScreenRef.current) {
       fitToScreenRef.current.click();
@@ -75,9 +68,6 @@ const Header: React.FC<IHeaderProps> = (props) => {
         className={`d-flex align-items-center justify-content-end ${styles.modal_header_settings}`}>
         <span className={styles.modal_header_icon_btn} onClick={fitToScreen}>
           <span className="dtable-font dtable-icon-full-screen"></span>
-        </span>
-        <span className={styles.modal_header_icon_btn} onClick={downloadPdfDocument}>
-          <span className="dtable-font dtable-icon-download"></span>
         </span>
         <span className={styles.modal_header_icon_btn} onClick={togglePlugin}>
           <span className="dtable-font dtable-icon-x btn-close"></span>
