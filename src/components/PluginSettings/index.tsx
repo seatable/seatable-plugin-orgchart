@@ -108,7 +108,7 @@ const PluginSettings: React.FC<IPluginSettingsProps> = ({
     });
 
     // Create options for relationship dropdown
-    console.log(activeTable?.columns.filter((item) => item.type === 'link'));
+    //console.log(activeTable?.columns.filter((item) => item.type === 'link'));
     let relationshipOptions = activeTable?.columns
       .filter((item) => item.type === 'link')
       .filter((item) => !checkIfLinkToDifferentTable(item, appActiveState.activeTable!))

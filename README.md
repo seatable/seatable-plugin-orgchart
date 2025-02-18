@@ -23,6 +23,8 @@ Please refer to the [SeaTable Plugin Template](https://github.com/seatable/seata
 ### Version 1.1.0
 
 - Support for link-column changes with SeaTable v5.2
+- remove font-family css settings
+- fix error, after deleting a link-column
 
 ### Version 1.0.0
 

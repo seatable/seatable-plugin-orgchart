@@ -480,7 +480,7 @@ export const parseRowsData = (table: Table | null, rows: any, relationship?: Tab
 
   if (Object.keys(linkedRows).length > 0) {
     _rows = rows.map((r: any) => {
-      parentId = linkedRows[r._id][relationship?.key!][0];
+      parentId = linkedRows[r._id][relationship?.key!]?.[0];
 
       return {
         ...r,
@@ -573,6 +573,12 @@ export const checkIfLinkToDifferentTable = (link: TableColumn, table: Table) => 
   const links = window.dtableSDK.getLinks();
   const _link = links.find((l: any) => l._id === link.data.link_id);
 
+  // for seatable version 5.2 (with self-linkage column)
+  if (_link?.table1_id === _link?.table2_id) {
+    return false;
+  }
+
+  // for seatable version v5.1 or older
   if (
     _link?.table1_table2_map ||
     (_link?.table1_table2_map && Object.keys(_link?.table1_table2_map).length > 0)
