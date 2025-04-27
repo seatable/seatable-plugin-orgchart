@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 1.1.3
+
+- remove css class btn-close
+
+## Version 1.1.2
+
+- fix css style issues with bullets in base editor
+- fix css style issues with p.margin-bottom
+
 ## Version 1.1.1
 
 - Remove Download Option
