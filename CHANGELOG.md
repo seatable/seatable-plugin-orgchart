@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.1.4
+
+- update dtable-ui-component to 7.0.20
+- update React to 18.3.1
+- remove node-sass dependency (replaced by sass)
+
 ## Version 1.1.3
 
 - remove css class btn-close
